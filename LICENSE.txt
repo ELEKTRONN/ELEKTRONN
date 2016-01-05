@@ -1,0 +1,33 @@
+ELEKTRONN - Neural Network Toolkit
+
+This license affects the software package ELEKTRONN and all
+the herein distributed source / data files.
+
+Copyright (c) 2014 - now
+Max-Planck-Institute for Medical Research, Heidelberg, Germany
+Department: Biomedical Optics
+Max-Planck-Institute of Neuro Biology, Heidelberg, Germany
+Department: Electrons - Photons - Neurons
+
+Authors:
+Gregor Urban     2013 - 2014
+Marius Killinger 2014 - now
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+The complete license can be obtained from 
+http://www.gnu.org/licenses/gpl-3.0.html.
+
+The authors declare their intent that this software shall neither
+be used as part of military applications, nor be used to develop
+or facilitate the development of military applications.
+
+

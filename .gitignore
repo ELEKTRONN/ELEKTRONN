@@ -1,0 +1,10 @@
+*.pyc
+*.pkl
+*.param
+*.h5
+.idea
+*~
+.idea
+
+
+
