@@ -5,6 +5,8 @@ The package includes a sophisticated training pipeline designed for classificati
 File structure
 --------------
 
+::
+
     ELEKTRONN
     ├── doc                     # Documentation source files
     ├── elektronn               # The
