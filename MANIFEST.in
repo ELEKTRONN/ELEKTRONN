@@ -2,4 +2,4 @@ include LICENSE.txt
 include README.rst
 include requirements.txt
 include elektronn/training/warping.c
-
+global-include *.pyx
