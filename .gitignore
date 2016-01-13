@@ -3,8 +3,16 @@
 *.param
 *.h5
 .idea
+*.o
+*.so
 *~
 .idea
+*.so
+doc/_build
+build/
+elektronn/training/_warping.c
+
+
 
 
 
