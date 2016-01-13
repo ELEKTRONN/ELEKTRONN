@@ -6,8 +6,7 @@
 # Authors: Marius Killinger, Gregor Urban
 
 import os
-from elektronn.training.config import default_config,
-Config  # the global user-set config
+from elektronn.training.config import default_config, Config  # the global user-set config
 
 # prevent Qt-backend on remote machines early! (other modules may import mpl)
 #no_X = default_config.no_X
