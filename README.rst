@@ -9,7 +9,7 @@ File structure
 
     ELEKTRONN
     ├── doc                     # Documentation source files
-    ├── elektronn               # The
+    ├── elektronn
     │   ├── examples            # Example scripts and config files
     │   ├── net                 # Neural network library code
     │   ├── scripts             # Training script and profiling script

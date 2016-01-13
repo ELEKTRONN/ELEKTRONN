@@ -15,8 +15,8 @@
 import sys
 import os
 
-sys.path.append(os.path.expanduser('~/devel/ELEKTRONN/elektronn'))
-sys.path.append(os.path.expanduser('~/devel/ELEKTRONN'))
+sys.path.append(os.path.expanduser('~/devel/ELEKTRONN_github/elektronn'))
+sys.path.append(os.path.expanduser('~/devel/ELEKTRONN_github'))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
