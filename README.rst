@@ -2,8 +2,25 @@ ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general N
 
 The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally the toolkit offers training routines for tasks on non-image data.
 
+Install Instructions
+--------------------
+
+.. _Website: http://www.elektronn.org
+
+Documentation
+-------------
+
+.. _Doc: http://www.elektronn.org/documentation/
+
+Projekt Website
+---------------
+
+.. _Website: http://www.elektronn.org/getting-started/#Installation
+
 File structure
 --------------
+
+
 
 ::
 
