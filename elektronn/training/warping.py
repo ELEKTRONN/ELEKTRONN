@@ -342,8 +342,6 @@ def maketestimage(sh):
 
 
 if __name__ == "__main__":
-    from skimage import io
-
     #  test_img = io.imread('Lichtenstein.png')
     #  test_img = test_img.mean(axis=2)
     #  s1 = test_img.shape[0]
@@ -414,10 +412,10 @@ if __name__ == "__main__":
         img1, lab1 = warpAugment(img_s[None], lab, patch_size=patch_size)
 
         for i in xrange(n):
-            io.imsave('/tmp/%i-img.png' % i, img1[0, i, :, :] / 255)
+            plt.imsave('/tmp/%i-img.png' % i, img1[0, i, :, :] / 255)
 
         for i in xrange(lab1.shape[0]):
-            io.imsave('/tmp/%i-lab.png' % (i + off), lab1[i, :, :])
+            plt.imsave('/tmp/%i-lab.png' % (i + off), lab1[i, :, :])
 
     if False:  # visual 3d
         n = 40
@@ -428,13 +426,13 @@ if __name__ == "__main__":
         wow1 = warp3dFast(img_s[None], (s1, s2, n), 0, 0, (1, 1, 1),
                           (0.1, 0.1, 0.1, -0.1), 10)
         for i in xrange(n):
-            io.imsave('/tmp/%i-ref.png' % i, wow1[:, :, i] / 255)
+            plt.imsave('/tmp/%i-ref.png' % i, wow1[:, :, i] / 255)
 
         wow2 = _warp3dFastLab(img_s[20:-20, 20:-20], (s1 - 40, s2 - 40, n),
                               (s1, s2, n), 0, 0, (1, 1, 1),
                               (0.1, 0.1, 0.1, -0.1), 10)
         for i in xrange(wow2.shape[2]):
-            io.imsave('/tmp/%i.png' % i, wow2[:, :, i] / 255)
+            plt.imsave('/tmp/%i.png' % i, wow2[:, :, i] / 255)
 
     if False:  # 3d timing
         s = 400

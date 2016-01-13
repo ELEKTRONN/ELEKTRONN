@@ -13,7 +13,6 @@ import cPickle as pkl
 import gzip
 import h5py
 import getpass
-from skimage import io
 
 user_name = getpass.getuser()
 
@@ -447,8 +446,8 @@ def previewDiffPlot(names,
 
     def getDiff(p1, p2):
         plt.ion()
-        p1 = io.imread(p1).astype(np.float32) / 2**16
-        p2 = io.imread(p2).astype(np.float32) / 2**16
+        p1 = plt.imread(p1).astype(np.float32) / 2**16
+        p2 = plt.imread(p2).astype(np.float32) / 2**16
         out_sh = np.minimum(p1.shape, p2.shape)
 
         if np.any(p1.shape != out_sh):
@@ -488,7 +487,7 @@ def previewDiffPlot(names,
             plt.imshow(diff, interpolation='none')
             plt.title("%s (green) vs. %s (blue)" % (names[i], names[j]))
             if save:
-                io.imsave("%s_vs_%s_pred-%s-c%i-z%i-%ihrs.png" %
+                plt.imsave("%s_vs_%s_pred-%s-c%i-z%i-%ihrs.png" %
                           (names[i], names[j], block_name, c, z, number), diff)
 
     plt.show()

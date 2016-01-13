@@ -39,7 +39,6 @@ setup(
         'h5py',
         'theano',
         'cython',
-        'scikit-learn',
     ],
     dependency_links=['git+http://github.com/Theano/Theano.git#egg=Theano'],
     author="Marius Killinger, Gregor Urban",

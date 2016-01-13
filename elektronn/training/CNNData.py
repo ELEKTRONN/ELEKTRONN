@@ -995,7 +995,6 @@ if __name__ == "__main__":
 
     from elektronn.net import netutils
     from parallelisation import BackgroundProc
-    from skimage import io
 
     _data_path = os.path.expanduser('~/devel/data/BirdGT/'
                                     )  # (*) Path to data dir
