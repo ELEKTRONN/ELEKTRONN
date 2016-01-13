@@ -8,11 +8,10 @@
 *~
 .idea
 *.so
+.eggs/
+ELEKTRONN.egg-info/
+dist/
 doc/_build
 build/
 elektronn/training/_warping.c
-
-
-
-
 
