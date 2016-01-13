@@ -5,17 +5,17 @@ The package includes a sophisticated training pipeline designed for classificati
 Install Instructions
 --------------------
 
-.. _Website: http://www.elektronn.org
+	[Website:] (http://www.elektronn.org)
 
 Documentation
 -------------
 
-.. _Doc: http://www.elektronn.org/documentation/
+	[Doc:] (http://www.elektronn.org/documentation/)
 
 Projekt Website
 ---------------
 
-.. _Website: http://www.elektronn.org/getting-started/#Installation
+	[Website:] (http://www.elektronn.org/getting-started/#Installation)
 
 File structure
 --------------
