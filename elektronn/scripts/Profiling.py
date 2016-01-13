@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # ELEKTRONN - Neural Network Toolkit
 #
@@ -27,8 +27,7 @@ with open(
         print('X unavailable')
         matplotlib.use('AGG')
 
-from elektronn.training.config import default_config,
-Config  # the global user-set config
+from elektronn.training.config import default_config, Config  # the global user-set config
 from elektronn.training import trainutils  # contains import of mpl
 
 config_file = "./Profiling_conf.py"
