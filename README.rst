@@ -7,7 +7,7 @@ The package includes a sophisticated training pipeline designed for classificati
    :alt: Logo+Example
    :target: http://elektronn.org/
    
-   Membrane and mitochondria probability maps. Predicted with a CNN with recursive training. Data: zebra finch area X dataset by J.Kornfeld.
+Membrane and mitochondria probability maps. Predicted with a CNN with recursive training. Data: zebra finch area X dataset by J.Kornfeld.
 
 Install Instructions
 --------------------
