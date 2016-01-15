@@ -2,6 +2,14 @@ ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general N
 
 The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally the toolkit offers training routines for tasks on non-image data.
 
+.. image:: http://elektronn.org/downloads/combined_title.png
+   :width: 1000px
+   :alt: Logo+Example
+   :target: http://elektronn.org/
+   :align: center
+   
+   Membrane and mitochondria probability maps. Predicted with a CNN with recursive training. Data: zebra finch area X dataset by J.Kornfeld.
+
 Install Instructions
 --------------------
 
