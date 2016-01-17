@@ -291,7 +291,7 @@ LBFGS_params		$	dict			see file	see code and `here <http://docs.scipy.org/doc/sc
 
 
 Running elektronn-train
-================
+=======================
 
 Once the parameter file is set up, the training script can be started. Run the script ``elektronn-train`` from command line::
 
