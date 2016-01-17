@@ -505,8 +505,8 @@ or use a different boarder mode.")
         os.makedirs(self.save_path)
         os.mkdir(self.save_path + 'Backup/')
 
-        shutil.copy(trainer_file, self.save_path + "Backup/TrainCNN.py")
-        os.chmod(self.save_path + "Backup/TrainCNN.py", 0755)
+        shutil.copy(trainer_file, self.save_path + "Backup/elektronn-train")
+        os.chmod(self.save_path + "Backup/elektronn-train", 0755)
 
         #        import training
         #        trainer_dir = os.path.abspath(training.__file__)

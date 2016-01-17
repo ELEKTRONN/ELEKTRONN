@@ -11,7 +11,10 @@ if parse_version(setuptools.__version__) < parse_version('18.0'):
     raise ImportError(
         'Your installed Setuptools version is too old.\n'
         '  Please upgrade it to at least 18.0, e.g. by running\n'
-        '  "pip2 install --upgrade setuptools".')
+        '  "pip2 install --upgrade setuptools"\n'
+        '  or if that fails:\n'
+        '  "pip install --upgrade setuptools".\n'
+        '  If both of them fail, try additionally passing the "--user" switch to the install commands, or use Anaconda2.')
 
 
 def read(fname):
@@ -31,11 +34,11 @@ ext_modules = [
 ]
 
 setup(
-    name="ELEKTRONN",
-    version="0.1.0",
+    name='elektronn',
+    version='1.0.0',
     packages=find_packages(),
-    scripts=['elektronn/scripts/TrainCNN.py',
-             'elektronn/scripts/Profiling.py',
+    scripts=['elektronn/scripts/elektronn-train.py',
+             'elektronn/scripts/elektronn-profile.py',
     ],
     ext_modules=ext_modules,
     setup_requires=['cython'],
@@ -56,10 +59,14 @@ setup(
     keywords="cnn theano neural network machine learning classification",
     url="http://www.elektronn.org/",
     classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 2 :: Only',
         'Programming Language :: Python :: 2.7',
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering :: Artificial Intelligence",
-        "Topic :: Scientific/Engineering :: Information Analysis",
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Scientific/Engineering :: Information Analysis',
     ],
 )

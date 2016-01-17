@@ -32,9 +32,9 @@ def import_variable_from_file(file_path, class_name):
 
 def parseargs(args, config_file, gpu):
     """
-  Parses the commandline arguments if ``TrainCNN`` is called as:
+  Parses the commandline arguments if ``elektronn-train`` is called as:
 
-  "$ python TrainCNN.py [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
+  "$ python2 elektronn-train [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
   """
     for arg in args:
         if arg.startswith('gpu='):
@@ -732,7 +732,7 @@ if __name__ == "__main__":
     plotInfoFromFiles("/home/mfk/CNN_Training/MLP/MNIST_MLP_warp",
                       "MNIST_MLP_warp")
 #  print "Testing CNN-Training Configuration and Backup of Scripts"
-#  conf = ConfigObj("../Quick_config.py", 0, "../TrainCNN.py")
+#  conf = ConfigObj("../Quick_config.py", 0, "../elektronn-train")
 
 #  import scipy.ndimage as nd
 #  g = np.random.rand(200,200)
