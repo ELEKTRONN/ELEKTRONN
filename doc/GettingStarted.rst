@@ -6,10 +6,10 @@ Getting Started
 System Requirements & Installation
 ==================================
 
-* Python 2
+* Python 2.7
 * The whole toolkit was designed and tested on Linux systems (in particular Debian, Ubuntu, CentOS)
 * Theano creates CUDA binaries. Hence only Nvidia-GPUs will work (alternatively it can use the CPU, but this might be too slow for large nets and CNNs).
-* If you wish to use ELEKTRONN on Windows or with python 3 (or if you want to help making it portable) please contact us.
+* If you wish to use ELEKTRONN on Windows or with Python 3 (or if you want to help making it portable) please contact us.
 
 For installation instructions see :ref:`installation <installation>`.
 
@@ -45,9 +45,9 @@ Basic Recipe for CNN Training with Images
 
 * Edit ``config_template.py`` as a new file to specify your :ref:`training scenario <configuration>`.
 
-* Run the script ``TrainCNN.py`` from command line (or from an IDE like spyder)::
+* Run the script ``elektronn-train`` from command line (or from an IDE like spyder)::
 
-    TrainCNN.py [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
+    elektronn-train [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
 
 * Inspect the printed output and the plots to refine training settings or detect misconfigurations. Training Neural Networks is hard work and needs time. For a better understanding of how they should be trained refer to the sources in the next section.
 

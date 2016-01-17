@@ -6,7 +6,7 @@ General
 -------
 
 Many customisations can be achieved by sub-classing objects from the :py:mod:`training` package or adding new functions in the layers, e.g.:
-	- If you want to create another network architecture or use layer options which are not configurable through the config file (e.g. input noise or weight sharing between layers) you can still use the pipeline but make a sub-class of :py:class:`training.trainer.Trainer` in which the ``createNet`` method is overridden by your own code and everything else is inherited. Then you must only make sure that in the script ``TrainCNN.py`` your own Trainer class is used.
+	- If you want to create another network architecture or use layer options which are not configurable through the config file (e.g. input noise or weight sharing between layers) you can still use the pipeline but make a sub-class of :py:class:`training.trainer.Trainer` in which the ``createNet`` method is overridden by your own code and everything else is inherited. Then you must only make sure that in the script ``elektronn-train`` your own Trainer class is used.
 	- If you want another weight initialisation, you can override the ``randomizeWeights`` methods in the layer classes (e.g. there is already fragmentary code for creating Gabor filters for 2D conv layers)
 	- If you create your own data class (e.g. as a subclass of the MNIST pipeline of :py:mod:`training.traindata`) you can use it via the config option ``data_class_name``
 

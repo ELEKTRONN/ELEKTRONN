@@ -49,9 +49,9 @@ The architecture of the NN is determined by::
 
 This is 2D CNN with two conv layers (each has ``3 x 3`` 2D filter) and two fully connected layers each with 300 neurons. As MNIST has 10 classes, an output layer with 10 neurons is automatically added, and not specified here.
 
-To run the example, make a copy of the config file and adjust the paths. Then run the ``TrainCNN.py`` script, and pass the path of your config file::
+To run the example, make a copy of the config file and adjust the paths. Then run the ``elektronn-train`` script, and pass the path of your config file::
 
-  TrainCNN.py [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
+  elektronn-train [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
 
 The output should read like this::
 

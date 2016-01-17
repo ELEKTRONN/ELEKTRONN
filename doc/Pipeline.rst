@@ -13,7 +13,7 @@ This page gives further details about the steps described in :ref:`the basic rec
 How it works
 ============
 
-After you set up the configuration and run ``TrainCNN.py``:
+After you set up the configuration and run ``elektronn-train``:
 
 	- The configuration file is parsed and some consistency checks are made (but not every possible combination of anything...). From the architecture parameters a :py:func:`net.netutils.CNNCalculator` object is created (this checks the architecture and gives a list of valid input sizes, from which the closest is chosen automatically).
 	- A save directory is created, the ``cwd`` is set to this directory, the configuration file is copied to a ``Backup`` sub-directory in the save directory.
@@ -84,7 +84,7 @@ Configuration of Parameters
 There are three levels of parameter configuration, **higher levels override previous levels**:
   1. The master *default* values are hardcoded into python code in :py:class:`training.config.MasterConfig`.
   2. Users can set their own *default* values by editing the file ``examples/config_template.py`` (which is just a template and otherwise **ignored**). The user file must be put into the home directory as ``~/.elektronn.config``, from there is automatically read and overrides the master defaults. The *default* values found in the template are intended to provide guidance on some meta-parameters (e.g. learning rate, momentum) and to define certain behaviour of the pipeline (e.g. default save path, save intervals), see section :ref:`Pipeline Setup <setup>`.
-  3. *Specific* values for training a particular CNN/NN configuration should be set in a different file (again by editing ``config_template.py`` as new file). The path of this file is given as the ``config`` argument to the ``TrainCNN``-script. *Specific* values can override any default values and are mainly used to specify the CNN architecture and the training data options. Some values are mandatory to be provided specifically for each training (e.g. network architecture, data files, save name) - if such a value is not provided a warning is shown.
+  3. *Specific* values for training a particular CNN/NN configuration should be set in a different file (again by editing ``config_template.py`` as new file). The path of this file is given as the ``config`` argument to the ``elektronn-train``-script. *Specific* values can override any default values and are mainly used to specify the CNN architecture and the training data options. Some values are mandatory to be provided specifically for each training (e.g. network architecture, data files, save name) - if such a value is not provided a warning is shown.
 
 
 The configuration file is basically a python file that contains assignments of values to variables. You can use even use list comprehensions to create lists of file names, but then you must ``del`` the iteration variable (because this variable would also be read in, but it is not a valid config value) e.g::
@@ -290,12 +290,12 @@ LBFGS_params		$	dict			see file	see code and `here <http://docs.scipy.org/doc/sc
 ======================= =======	======================= =============== ===========
 
 
-Running TrainCNN
+Running elektronn-train
 ================
 
-Once the parameter file is set up, the training script can be started. Run the script ``TrainCNN.py`` from command line::
+Once the parameter file is set up, the training script can be started. Run the script ``elektronn-train`` from command line::
 
-	TrainCNN.py [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
+	elektronn-train [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
 
 or from an existing python interpreter (e.g. within spyder).
 
