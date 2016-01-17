@@ -8,7 +8,7 @@ from elektronn.training.traindata import MNISTData
 from elektronn.net.convnet import MixedConvNN
 
 # Load Data #
-data = MNISTData(path='/docs/devel/ELEKTRONN/elektronn/examples/mnist.pkl.gz',
+data = MNISTData(path=None,
                  convert2image=True,
                  shift_augment=False)
 

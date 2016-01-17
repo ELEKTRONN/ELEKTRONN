@@ -19,6 +19,13 @@ The design goals of ELEKTRONN are twofold:
 
 .. TODO put some nice pictures etc. here
 
+.. image:: http://elektronn.org/downloads/combined_title.png
+   :width: 1000px
+   :alt: Logo+Example
+   :target: http://elektronn.org/
+
+Membrane and mitochondria probability maps. Predicted with a CNN with recursive training. Data: zebra finch area X dataset j0126 by Jörgen Kornfeld. (*Click on the image to get to our main site*)
+
 Main Features
 =============
 

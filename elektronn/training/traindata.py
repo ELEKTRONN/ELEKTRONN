@@ -354,10 +354,12 @@ class MNISTData(Data):
                  shift_augment=True,
                  center=True):
         if path is None:
-            raise ValueError("Path to MNIST data file must be given")
-        path = os.path.expanduser(path)
-        (self.train_d, self.train_l), (self.valid_d, self.valid_l), (
-            self.test_d, self.test_l) = ut.pickleLoad(path)
+            (self.train_d, self.train_l), (self.valid_d, self.valid_l), (
+            self.test_d, self.test_l) = self.download()
+        else:
+            path = os.path.expanduser(path)
+            (self.train_d, self.train_l), (self.valid_d, self.valid_l), (
+                self.test_d, self.test_l) = ut.pickleLoad(path)
 
         self.warp_on = warp_on
         self.shif_augment = shift_augment
@@ -384,6 +386,34 @@ class MNISTData(Data):
             self.example_shape = self.train_d[0].size
 
         print "MNIST data is converted/augmented to shape", self.example_shape
+
+
+    def download(self):
+        if os.name == 'nt':
+            dest = os.path.join(os.environ['APPDATA'], 'ELEKTRONN')
+        else:
+            dest = os.path.join(os.path.expanduser('~'), '.ELEKTRONN')
+
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+
+        dest = os.path.join(dest, 'mnist.pkl.gz')
+
+        if os.path.exists(dest):
+            print "Found existing mnist data"
+            return ut.pickleLoad(dest)
+        else:
+            print "Downloading mnist data from"
+            print "http://www.elektronn.org/downloads/mnist.pkl.gz"
+            f = urllib2.urlopen("http://www.elektronn.org/downloads/mnist.pkl.gz")
+            data = f.read()
+            print "Saving data to %s" %(dest,)
+            with open(dest, "wb") as code:
+                code.write(data)
+
+            return ut.pickleLoad(dest)
+
+
 
     def convert_to_image(self):
         """For MNIST / flattened 2d, single-layer, square images"""
@@ -554,7 +584,7 @@ if __name__ == "__main__":
     #  d, l = data.getbatch(200, 'train')
     #  m = embedMatricesInGray(d[:,0])
     #  plt.imshow(m, interpolation='none', cmap='gray')
-    data = MNISTData(path='~/devel/data/mnist.pkl',
+    data = MNISTData(path=None,
                      convert2image=False,
                      shift_augment=False)
 

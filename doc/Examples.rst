@@ -15,7 +15,7 @@ This page gives examples other than using the "big" :ref:`data pipeline <pipelin
 MNIST Example
 =============
 
-MNIST is a benchmark data set for digit recognition/classification. The data can be downloaded from `MNIST <http://www.elektronn.org/downloads/mnist.pkl.gz>`_ and state of the art benchmarks for comparison can be found `here <http://yann.lecun.com/exdb/mnist/>`_.
+MNIST is a benchmark data set for digit recognition/classification. State of the art benchmarks for comparison can be found `here <http://yann.lecun.com/exdb/mnist/>`_. The data will be automatically downloaded but can also be downloaded from `here <http://www.elektronn.org/downloads/mnist.pkl.gz>`_.
 
 .. note::
   For all examples you must download and unpack the MNIST files. Additionally you must update the path to the MNIST file in the example scripts / configs.
@@ -26,13 +26,13 @@ CNN with built-in Pipeline
 In ELEKTRONN's ``examples`` folder is a file ``MNIST_CNN_warp_config.py``. This is a configuration for *img-scalar* training and it uses a different data class than the "big" pipeline for neuro data. In case the of an alternative data pipeline the options for data loading and batch creation are given given by keyword argument dictionaries in the ``Data Alternative`` section of the config::
 
 	data_class_name      = 'MNISTData'
-	data_load_kwargs     = dict(path='~/devel/ELEKTRONN/Examples/mnist.pkl', convert2image=True, warp_on=True, shift_augment=True)
+	data_load_kwargs     = dict(path=None, convert2image=True, warp_on=True, shift_augment=True)
 	data_batch_kwargs    = dict()
 
 This configuration results in:
 
   * Initialising a data class adapted for MNIST from :py:mod:`training.traindata`
-  * Loading the MNIST data from the specified path
+  * Downloading the MNIST data automatically if path is ``None`` or loading from the specified path
   * Reshaping the "flat" training examples (they are stored as vectors of length 784) to ``28 x 28`` matrices i.e. images
   * Data augmentation through warping (see :ref:`warping`): for each batch in a training iteration random deformation parameters are sampled and the corresponding transformations are applied to the images in a background process.
   * Data augmentation through translation: ``shift_augment`` crops the ``28 x 28`` images  to ``26 x 26`` (you may notice this in the printed output). The cropping allows to choose from which origin to crop from (like applying small translations), in this example the data set size is inflated by factor ``4``.

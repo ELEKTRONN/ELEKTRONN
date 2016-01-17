@@ -50,7 +50,7 @@ background_processes = 3  # <Bool>/<Int>: whether to "pre-fetch" batches in sepa
 ### Data Alternative / vect-scalar ### (this may replace the above CNN block) ### -------------------------------------------------------
 data_class_name = 'MNISTData'  # Name of Data Class in traindata module
 data_load_kwargs = dict(
-    path='/docs/devel/ELEKTRONN/elektronn/examples/mnist.pkl.gz',
+    path=None,
     convert2image=True,
     warp_on=True,
     shift_augment=True)

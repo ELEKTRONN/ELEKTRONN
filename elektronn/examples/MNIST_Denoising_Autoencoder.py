@@ -14,7 +14,7 @@ from elektronn.net.convnet import MixedConvNN
 from elektronn.net.introspection import embedMatricesInGray
 
 # Load Data #
-data = MNISTData(path='/docs/devel/ELEKTRONN/elektronn/examples/mnist.pkl.gz',
+data = MNISTData(path=None,
                  convert2image=False,
                  shift_augment=False)
 
