@@ -8,7 +8,6 @@ Installation
 Installation
 ============
 
-* Install below dependencies in advance (theano optional)
 * Install ELEKTRONN from the repo using python ``pip`` (options can specify target locations, editable installs etc., see ``man pip``)::
 
     pip install [options] elektronn
