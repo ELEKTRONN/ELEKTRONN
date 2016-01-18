@@ -8,41 +8,48 @@ Installation
 Setup
 =====
 
-* Install ELEKTRONN from the repo using python ``pip`` (options can specify target locations, editable installs etc., see ``man pip``)::
+Anaconda
+########
+
+A comfortable way to setup a python environment with common scientific python packages is the `Anaconda distribution by Continuum <https://store.continuum.io/cshop/anaconda/>`_ (make sure to use the Python 2.7 version). If you don't want to install the whole Anaconda distribution you can use Miniconda instead.
+
+* Install ELEKTRONN using  ``conda``::
+
+    conda config --add channels elektronn
+    conda install elektronn
+
+  .. Note::
+    This resolves all dependencies, but you still need to *configure* theano (which will be installed as a dependency) as described :ref:`below <theano>`
+
+* After installation you can optionally create a user configuration file by editing the file ``examples/config_template.py`` and putting it into your home as ``elektronn.config`` (see :ref:`configuration`)
+* Try out one of the :ref:`examples <examples>` to confirm everything works
+
+pip
+###
+
+If you don't want to use Anaconda you can use ``pip`` instead, but then you must take care of the dependices yourself to some degree:
+
+*  Install ELEKTRONN using python ``pip`` (options can specify target locations, editable installs etc., see ``man pip``)::
 
     pip install [options] elektronn
 
-.. Note::
-  If ``pip install <package>`` fails due to a permission error, try ``pip install --user <package>``.
+   In the likely case that this gives you errors (amongst other reasons because pip does not install system-level dependencies), you must install the dependencies with your system package manager e.g::
 
-.. Note::
-  In some Distributions (e.g. Arch Linux), you need to use ``pip2`` instead of ``pip`` to install Python 2 packages like ELEKTRONN.
+    apt-get install python-numpy python-scipy python-matplotlib python-h5py
 
-  This will install ELEKTRONN as a python package. Alternatively you can download the files, add the folder to ``PYTHONPATH`` and directly use the code.
+  The dependencies are listed in the file ``requirements.txt``
 
-* Configure theano as explained below
-* You can optionally create a user configuration file by editing the file ``examples/config_template.py`` and putting it into your home as ``elektronn.config`` (see :ref:`configuration`)
+  .. Note::
+    If ``pip install <package>`` fails due to a permission error, try ``pip install --user <package>``.
+
+  .. Note::
+    In some Distributions (e.g. Arch Linux), you need to use ``pip2`` instead of ``pip`` to install Python 2 packages like ELEKTRONN.
+
+* Configure theano as explained :ref:`below <theano>`
+* After installation you can optionally create a user configuration file by editing the file ``examples/config_template.py`` and putting it into your home as ``elektronn.config`` (see :ref:`configuration`)
 * Try out one of the :ref:`examples <examples>` to confirm everything works
 
-
-Dependencies
-============
-
-ELEKTRONN has dependencies which are sometimes difficult to install using ``pip`` (e.g. because ``pip`` does not install system-level dependencies). You can try::
-
-  pip install -r requirements.txt
-
-or::
-
-  pip install elektronn
-
-But that will most likely fail for some packages. Instead we recommend that you install those with your system package manager e.g.::
-
-  apt-get install python-numpy python-scipy python-matplotlib python-h5py
-
-The dependencies are listed in the file ``requirements.txt``
-
-A comfortable way to setup a python environment with common scientific python packages is e.g. the `Anaconda distribution by Continuum <https://store.continuum.io/cshop/anaconda/>`_. If you use Anaconda the only additional required package is ``h5py``.
+.. _theano:
 
 Theano
 ======
@@ -68,8 +75,8 @@ If you let our setup install theano, you nonetheless have to do the configuratio
 		[cuda]
 		root = /usr/local/cuda-7.5/
 
-  .. Note::
-    If you want to use the command line option of ``elektronn-train`` to select a GPU device you can leave out setting a device value here
+    .. Note::
+      If you want to use the command line option of ``elektronn-train`` to select a GPU device you can leave out setting a device value here
 
   * You might be interested in using cuDNN which is an optimised CUDA library for CNNs (`theano's instructions <http://www.deeplearning.net/software/theano/library/sandbox/cuda/dnn.html?highlight=cudnn>`_).
 
