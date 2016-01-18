@@ -53,7 +53,7 @@ setup(
     extras_require={'cross-validation': ['scikit-learn']},
     author="Marius Killinger, Gregor Urban",
     author_email="Marius.Killinger@mailbox.org",
-    description=("ELEKTRONN a is highly configurable toolkit for training 3d/2d CNNs and general Neural Networks"),
+    description=("ELEKTRONN is a highly configurable toolkit for training 3d/2d CNNs and general Neural Networks"),
     long_description=read('README.rst'),
     license="GPL",
     keywords="cnn theano convolutional neural network machine learning classification",
