@@ -52,7 +52,7 @@ def parseargs_dev(args, config_file, gpu):
     """
   Parses the commandline arguments if ``elektronn-train`` is called as:
 
-  "$ python2 elektronn-train [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
+  "elektronn-train [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
   """
     for arg in args:
         if arg.startswith('gpu='):

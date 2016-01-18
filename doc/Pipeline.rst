@@ -295,7 +295,7 @@ Running elektronn-train
 
 Once the parameter file is set up, the training script can be started. Run the script ``elektronn-train`` from command line::
 
-	elektronn-train [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
+	elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
 
 or from an existing python interpreter (e.g. within spyder).
 

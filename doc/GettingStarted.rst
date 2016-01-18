@@ -47,7 +47,7 @@ Basic Recipe for CNN Training with Images
 
 * Run the script ``elektronn-train`` from command line (or from an IDE like spyder)::
 
-    elektronn-train [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
+    elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
 
 * Inspect the printed output and the plots to refine training settings or detect misconfigurations. Training Neural Networks is hard work and needs time. For a better understanding of how they should be trained refer to the sources in the next section.
 

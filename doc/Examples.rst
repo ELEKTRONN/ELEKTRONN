@@ -51,7 +51,7 @@ This is 2D CNN with two conv layers (each has ``3 x 3`` 2D filter) and two fully
 
 To run the example, make a copy of the config file and adjust the paths. Then run the ``elektronn-train`` script, and pass the path of your config file::
 
-  elektronn-train [config=</path/to_config_file>] [ gpu={Auto|False|<int>}]
+  elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
 
 The output should read like this::
 
