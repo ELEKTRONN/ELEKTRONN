@@ -9,7 +9,7 @@
 .idea
 *.so
 .eggs/
-ELEKTRONN.egg-info/
+elektronn.egg-info/
 dist/
 doc/_build
 build/

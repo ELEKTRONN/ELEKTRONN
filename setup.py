@@ -35,13 +35,13 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.0',
+    version='1.0.1',
     packages=find_packages(),
-    scripts=['elektronn/scripts/elektronn-train.py',
-             'elektronn/scripts/elektronn-profile.py',
+    scripts=['elektronn/scripts/elektronn-train',
+             'elektronn/scripts/elektronn-profile',
     ],
     ext_modules=ext_modules,
-    setup_requires=['cython'],
+    setup_requires=['cython>=0.23'],
     install_requires=[
         'numpy>=1.8',
         'scipy>=0.14',
