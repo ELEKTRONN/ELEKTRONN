@@ -13,6 +13,7 @@ import cPickle as pkl
 import gzip
 import h5py
 import getpass
+import argparse
 
 user_name = getpass.getuser()
 
@@ -30,7 +31,24 @@ def import_variable_from_file(file_path, class_name):
     return cls
 
 
-def parseargs(args, config_file, gpu):
+def parseargs(gpu):
+    def convert(s):
+        if s in ['auto', False, None]:
+            return s
+        else:
+            return int(s)
+    
+    parser = argparse.ArgumentParser(
+    usage="elektronn-train </path/to_config_file> [--gpu={Auto|False|<int>}]")
+    
+    parser.add_argument("--gpu", default=gpu, type=convert, choices=['auto',False,None]+range(0,100))
+    parser.add_argument("config", type=str)
+    parsed = parser.parse_args()
+    return parsed.config, parsed.gpu
+
+    
+
+def parseargs_dev(args, config_file, gpu):
     """
   Parses the commandline arguments if ``elektronn-train`` is called as:
 
