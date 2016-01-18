@@ -18,6 +18,15 @@ Learn More:
 | `here <http://www.elektronn.org/getting-started/#Installation>`_ | `here <http://www.elektronn.org/documentation/>`_   | `here <http://www.elektronn.org>`_  |
 +------------------------------------------------------------------+-----------------------------------------------------+-------------------------------------+
 
+Toy Example
+-----------
+
+::
+
+  elektronn-train </installpath>/elektronn/examples/MNIST_CNN_warp_config.py
+  
+This will download the MNIST data set and run a training defined in an example config file. The plots are saved to ``~/CNN_Training/2D/MNIST_example_warp``.
+
 File structure
 --------------
 
