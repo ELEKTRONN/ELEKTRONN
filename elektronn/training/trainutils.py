@@ -33,15 +33,20 @@ def import_variable_from_file(file_path, class_name):
 
 def parseargs(gpu):
     def convert(s):
-        if s in ['auto', False, None]:
+        if s=='auto':
             return s
+        elif s.lower()=='false':
+            return False
+        elif s.lower()==None:
+            return None
         else:
             return int(s)
     
     parser = argparse.ArgumentParser(
     usage="elektronn-train </path/to_config_file> [--gpu={Auto|False|<int>}]")
     
-    parser.add_argument("--gpu", default=gpu, type=convert, choices=['auto',False,None]+range(0,100))
+    parser.add_argument("--gpu", default=gpu, type=convert,
+                        choices=['auto',False,None]+range(0,100))
     parser.add_argument("config", type=str)
     parsed = parser.parse_args()
     return parsed.config, parsed.gpu
