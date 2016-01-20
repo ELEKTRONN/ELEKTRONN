@@ -43,8 +43,7 @@ for i in range(10000):
     if i % 100 == 0:
         r = cnn.getDropoutRates()
         cnn.setDropoutRates([0.0, ] * len(r))
-        valid_loss, valid_error, valid_predictions = cnn.get_error(
-            data.valid_d, data.valid_l)
+        valid_loss, valid_error, valid_predictions = cnn.get_error(data.valid_d, data.valid_l)
         print "update:", i, "; Validation loss:", valid_loss, "Validation error:", valid_error * 100., "%"
         cnn.setDropoutRates(r)
 

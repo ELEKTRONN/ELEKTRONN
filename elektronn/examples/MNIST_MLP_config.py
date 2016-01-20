@@ -42,8 +42,7 @@ data_load_kwargs = dict(
     convert2image=False,
     warp_on=True,
     shift_augment=True)
-data_batch_kwargs = dict(
-)  # <Dict>: Arguments for getbach method of Data Class (for training set only!)
+data_batch_kwargs = dict()  # <Dict>: Arguments for getbach method of Data Class (for training set only!)
 # The batch_size argument is added internally and needn't be specified here
 
 ### Optimisation Options ### ------------------------------------------------------------------------------------------------------------

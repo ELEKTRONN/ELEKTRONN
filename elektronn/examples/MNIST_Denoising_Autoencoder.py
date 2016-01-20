@@ -27,8 +27,7 @@ cnn.addPerceptronLayer(n_outputs=50, activation_func="tanh")
 cnn.addTiedAutoencoderChain(n_layers=None,
                             activation_func="tanh",
                             input_noise=0.3)
-cnn.compileOutputFunctions(target="regression"
-                           )  #compiles the cnn.get_error function as well
+cnn.compileOutputFunctions(target="regression")  #compiles the cnn.get_error function as well
 cnn.setOptimizerParams(SGD={'LR': 5e-1, 'momentum': 0.9}, weight_decay=0)
 
 print "training..."
@@ -40,8 +39,7 @@ for i in range(40000):
         print "update:", i, "; Training error:", loss
 
 cnn.layers[3].input_noise.set_value(0.0)
-loss, _, test_predictions = cnn.get_error(
-    data.valid_d.reshape((10000, 784)), data.valid_d.reshape((10000, 784)))
+loss, _, test_predictions = cnn.get_error(data.valid_d.reshape((10000, 784)), data.valid_d.reshape((10000, 784)))
 print "Final error:", loss
 print "Done."
 
@@ -62,9 +60,7 @@ recon = embedMatricesInGray(pred[:200].reshape((200, 28, 28)), 1)
 plt.imshow(recon, interpolation='none', cmap='gray')
 
 # Use pre-trained weights from AE to train a classifier
-cnn.saveParameters('AE-pretraining.param',
-                   layers=cnn.layers[0:3]
-                   )  # only save the weights from the compression
+cnn.saveParameters('AE-pretraining.param', layers=cnn.layers[0:3])  # only save the weights from the compression
 
 cnn2 = MixedConvNN((28**2), input_depth=None)
 cnn2.addPerceptronLayer(n_outputs=300, activation_func="tanh")

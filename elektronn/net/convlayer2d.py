@@ -18,9 +18,9 @@ from gaborfilters import makeGaborFilters, blob
 
 def getOutputShape(insh, fsh, pool, mfp, r=1):
     """
-  Returns shape of convolution result from (bs, ch, x, y) * (nof, ch, xf, yf)
-  """
-    #insh = (1 if input_shape[0]==None else input_shape[0],)+input_shape[1:]
+    Returns shape of convolution result from (bs, ch, x, y) * (nof, ch, xf, yf)
+    """
+    # insh = (1 if input_shape[0]==None else input_shape[0],)+input_shape[1:]
 
     if insh[0] is None:
         bs = None
@@ -34,71 +34,70 @@ def getOutputShape(insh, fsh, pool, mfp, r=1):
 
 def getProbShape(output_shape, mfp_strides):
     """
-  Given outputshape (bs, ch, x, y) and mfp_stride (sx, sy) returns shape of Class Prob output
-  """
+    Given outputshape (bs, ch, x, y) and mfp_stride (sx, sy) returns shape of Class Prob output
+    """
     if mfp_strides is None:
         return output_shape
     else:
-        return (1, output_shape[1], output_shape[2] * mfp_strides[1],
-                output_shape[3] * mfp_strides[1])
+        return (1, output_shape[1], output_shape[2] * mfp_strides[1], output_shape[3] * mfp_strides[1])
 
 
 class ConvLayer2d(object):
     """
-  Conv-Pool Layer of a CNN
+    Conv-Pool Layer of a CNN
 
-  :type input: theano.tensor.dtensor4 ('batch', 'channel', x, y)
-  :param input: symbolic image tensor, of shape input_shape
+    :type input: theano.tensor.dtensor4 ('batch', 'channel', x, y)
+    :param input: symbolic image tensor, of shape input_shape
 
-  :type input_shape: tuple or list of length 4
-  :param input_shape: (batch size, num input feature maps, image height, image width)
+    :type input_shape: tuple or list of length 4
+    :param input_shape: (batch size, num input feature maps, image height, image width)
 
-  :type filter_shape: tuple or list of length 4
-  :param filter_shape: (number of filters, input_channels, filter height,filter width)
+    :type filter_shape: tuple or list of length 4
+    :param filter_shape: (number of filters, input_channels, filter height,filter width)
 
 
-  :type pool: int 2-tuple
-  :param pool: the down-sampling (max-pooling) factor
+    :type pool: int 2-tuple
+    :param pool: the down-sampling (max-pooling) factor
 
-  :type activation_func: string
-  :param activation_func: Options: tanh, relu, sig, abs, linear, maxout <i>
+    :type activation_func: string
+    :param activation_func: Options: tanh, relu, sig, abs, linear, maxout <i>
 
-  :type enable_dropout: Bool
-  :param enable_dropout: whether to enable dropout in this layer. The default rate is 0.5 but it can be changed with
+    :type enable_dropout: Bool
+    :param enable_dropout: whether to enable dropout in this layer. The default rate is 0.5 but it can be changed with
                self.activation_noise.set_value(set_value(np.float32(p)) or using cnn.setDropoutRates
 
-  :type use_fragment_pooling: Bool
-  :param use_fragment_pooling: whether to use max fragment pooling in this layer (MFP)
+    :type use_fragment_pooling: Bool
+    :param use_fragment_pooling: whether to use max fragment pooling in this layer (MFP)
 
-  :type reshape_output: Bool
-  :param reshape_output: whether to reshape class_probabilities to (bs, cls, x, y) and re-assemble fragments
+    :type reshape_output: Bool
+    :param reshape_output: whether to reshape class_probabilities to (bs, cls, x, y) and re-assemble fragments
                          to dense images if MFP was enabled. Use this in for the last layer.
 
-  :type mfp_offsets: list of list of ints
-  :param mfp_offsets: this lists specifies the offsets that the MFP-fragments have w.r.t to the original patch.
+    :type mfp_offsets: list of list of ints
+    :param mfp_offsets: this lists specifies the offsets that the MFP-fragments have w.r.t to the original patch.
                       Only needed if MFP is enabled.
 
-  :type mfp_strides: list of int
-  :param mfp_strides: the strides of the output in each dimension
+    :type mfp_strides: list of int
+    :param mfp_strides: the strides of the output in each dimension
 
-  :type input_layer: layer object
-  :param input_layer: just for keeping track of un-usual input layers
+    :type input_layer: layer object
+    :param input_layer: just for keeping track of un-usual input layers
 
-  :type W: np.ndarray or T.TensorVariable
-  :param W: weight matrix. If array, the values are used to initialise a shared variable for this layer.
+    :type W: np.ndarray or T.TensorVariable
+    :param W: weight matrix. If array, the values are used to initialise a shared variable for this layer.
                            If TensorVariable, than this variable is directly used (weight sharing with the
                            layer from which this variable comes from)
 
-  :type b: np.ndarray or T.TensorVariable
-  :param b: bias vector. If array, the values are used to initialise a shared variable for this layer.
+    :type b: np.ndarray or T.TensorVariable
+    :param b: bias vector. If array, the values are used to initialise a shared variable for this layer.
                            If TensorVariable, than this variable is directly used (weight sharing with the
                            layer from which this variable comes from)
 
-  :type pooling_mode: str
-  :param pooling_mode: 'max' or 'maxabs' where the first is normal maxpooling and the second also retains
+    :type pooling_mode: str
+    :param pooling_mode: 'max' or 'maxabs' where the first is normal maxpooling and the second also retains
                        sign of large negative values
 
-  """
+    """
 
     def __init__(self,
                  input,
@@ -144,9 +143,7 @@ class ConvLayer2d(object):
                     name='W_conv',
                     borrow=True)
             else:
-                assert isinstance(
-                    W,
-                    T.TensorVariable), "W must be either np.ndarray or theano var"
+                assert isinstance(W, T.TensorVariable), "W must be either np.ndarray or theano var"
                 self.W = W
 
         if b is None:
@@ -181,9 +178,7 @@ class ConvLayer2d(object):
                     name='b_conv',
                     borrow=True)
             else:
-                assert isinstance(
-                    b,
-                    T.TensorVariable), "b must be either np.ndarray or theano var"
+                assert isinstance(b, T.TensorVariable), "b must be either np.ndarray or theano var"
                 self.b = b
 
         # store parameters of this layer
@@ -191,11 +186,12 @@ class ConvLayer2d(object):
 
         # convolve input feature maps with filters
         # shape of pooled_out , e.g.: (1,2,27,27) for 2 class-output
-        self.conv_out = conv.conv2d(input=input,
-                                    filters=self.W,
-                                    border_mode='valid',
-                                    filter_shape=filter_shape)
-        # image_shape = input_shape if input_shape[0] is not None else None)
+        self.conv_out = conv.conv2d(
+                input=input,
+                filters=self.W,
+                border_mode='valid',
+                filter_shape=filter_shape
+        )  # image_shape = input_shape if input_shape[0] is not None else None)
 
         # down-sample each feature map individually, using maxpooling
         if np.any(pool != 1):
@@ -211,9 +207,7 @@ class ConvLayer2d(object):
 
         if enable_dropout:
             #print "Dropout: ACTIVE"
-            self.activation_noise = theano.shared(
-                np.float32(0.5),
-                name='Dropout Rate')
+            self.activation_noise = theano.shared(np.float32(0.5), name='Dropout Rate')
             rng = T.shared_randomstreams.RandomStreams(int(time.time()))
             p = 1 - self.activation_noise
             self.dropout_gate = 1.0 / p * rng.binomial(
@@ -221,8 +215,7 @@ class ConvLayer2d(object):
                 1,
                 p,
                 dtype=theano.config.floatX)
-            pooled_out = pooled_out * self.dropout_gate.dimshuffle(('x', 'x',
-                                                                    0, 1))
+            pooled_out = pooled_out * self.dropout_gate.dimshuffle(('x', 'x', 0, 1))
 
         # add the bias term. Since the bias is a vector (1D array), we first
         # reshape it to a tensor of shape (1,n_filters,1,1). Each bias will
@@ -231,11 +224,9 @@ class ConvLayer2d(object):
         r = 1  # maxout factor
         lin_output = pooled_out + self.b.dimshuffle('x', 0, 'x', 'x')
         if activation_func == 'tanh':
-            self.output = T.tanh(lin_output
-                                 )  # shape: (batch_size, num_outputs)
+            self.output = T.tanh(lin_output)  # shape: (batch_size, num_outputs)
         elif activation_func in ['ReLU', 'relu']:  #rectified linear unit
-            self.output = lin_output * (lin_output > 0
-                                        )  # shape: (batch_size, num_outputs)
+            self.output = lin_output * (lin_output > 0)  # shape: (batch_size, num_outputs)
         elif activation_func in ['sigmoid']:
             self.output = T.nnet.sigmoid(lin_output)
         elif activation_func in ['abs']:
@@ -249,19 +240,16 @@ class ConvLayer2d(object):
         else:
             raise NotImplementedError()
 
-        output_shape = getOutputShape(input_shape, filter_shape, pool,
-                                      use_fragment_pooling, r)
+        output_shape = getOutputShape(input_shape, filter_shape, pool, use_fragment_pooling, r)
 
-        print "Output =", output_shape, "Dropout", (
-            "ON," if enable_dropout else
-            "OFF,"), "Act:", activation_func, "pool:", pooling_mode
+        print "Output =", output_shape, "Dropout", ("ON," if enable_dropout else "OFF,"), "Act:",\
+            activation_func, "pool:", pooling_mode
         self.output_shape = output_shape  # e.g. (None, 16, 100, 100)
 
         sh = lin_output.shape  # (bs,ch,x,y) # use this shape to reshape the output to image-shape after softmax
         sh = (sh[1], sh[2], sh[3], sh[0])  #(ch, x, y, bs)
         # put batchsize, at back --> (ch,x,y,bs), flatten this --> (ch, x*y*bs), swap labels --> (x*y*bs, ch)
-        self.class_probabilities = T.nnet.softmax(lin_output.dimshuffle((
-            1, 2, 3, 0)).flatten(2).dimshuffle((1, 0)))
+        self.class_probabilities = T.nnet.softmax(lin_output.dimshuffle((1, 2, 3, 0)).flatten(2).dimshuffle((1, 0)))
         if reshape_output:
             self.reshapeoutput(sh)
             if use_fragment_pooling:
@@ -286,8 +274,7 @@ class ConvLayer2d(object):
 
         for px in xrange(pool[0]):
             for py in xrange(pool[1]):
-                pxy = pool_func(conv_out[:, :, px:sh[2] - pool[0] + px + 1, py:
-                                         sh[3] - pool[1] + py + 1])
+                pxy = pool_func(conv_out[:, :, px:sh[2] - pool[0] + px + 1, py:sh[3] - pool[1] + py + 1])
                 result.append(pxy)
                 for p in offsets:
                     new = p.copy()
@@ -303,22 +290,17 @@ class ConvLayer2d(object):
 
     def reshapeoutput(self, sh):
         # same shape as result, no significant time cost
-        self.class_probabilities = self.class_probabilities.dimshuffle((
-            1, 0)).reshape(sh).dimshuffle((3, 0, 1, 2))
+        self.class_probabilities = self.class_probabilities.dimshuffle((1, 0)).reshape(sh).dimshuffle((3, 0, 1, 2))
 
     def fragmentstodense(self, sh):
         mfp_strides = self.mfp_strides
-        example_stride = np.prod(
-            mfp_strides
-        )  # This stride is conceptually unneeded but theano-grad fails otherwise
+        example_stride = np.prod(mfp_strides)  # This stride is conceptually unneeded but theano-grad fails otherwise
         zero = np.array((0), dtype=theano.config.floatX)
-        embedding = T.alloc(zero, 1, sh[0], sh[1] * mfp_strides[0], sh[2] *
-                            mfp_strides[1])
+        embedding = T.alloc(zero, 1, sh[0], sh[1] * mfp_strides[0], sh[2] * mfp_strides[1])
         ix = self.mfp_offsets
         for i, (n, m) in enumerate(ix):
             embedding = T.set_subtensor(
-                embedding[:, :, n::mfp_strides[0], m::mfp_strides[1]],
-                self.class_probabilities[i::example_stride])
+                embedding[:, :, n::mfp_strides[0], m::mfp_strides[1]], self.class_probabilities[i::example_stride])
 
         self.class_probabilities = embedding
 
@@ -482,63 +464,64 @@ class ConvLayer2d(object):
             mask_class_not_present=None,
             label_prop_thresh=None):
         """
-    Returns the symbolic mean and instance-wise negative log-likelihood of the prediction
-    of this model under a given target distribution.
+        Returns the symbolic mean and instance-wise negative log-likelihood of the prediction
+        of this model under a given target distribution.
 
-    y: theano.tensor.TensorType
-      corresponds to a vector that gives for each example the correct label. Labels < 0 are ignored (e.g. can
-      be used for label propagation)
-              
-    class_weights: theano.tensor.TensorType
-      weight vector of float32 of length  ``n_lab``. Values: ``1.0`` (default), ``w < 1.0`` (less important),
-      ``w > 1.0`` (more important class)
-    
-    The following refers to lazy labels, the masks are always on a per patch basis, depending on the
-    origin cube of the patch. The masks are properties of the individual image cubes and must be loaded
-    into CNNData.
-    
-    mask_class_labeled: theano.tensor.TensorType
-      shape = (batchsize, num_classes).
-      Binary masks indicating whether a class is properly labeled in ``y``. If a class ``k``
-      is (in general) present in the image patches **and** ``mask_class_labeled[k]==1``, then
-      the labels  **must** obey ``y==k`` for all pixels where the class is present.
-      If a class ``k`` is present in the image, but was not labeled (-> cheaper labels), set
-      ``mask_class_labeled[k]=0``. Then all pixels for which the ``y==k`` will be ignored.
-      Alternative: set ``y=-1`` to ignore those pixels.
-      Limit case: ``mask_class_labeled[:]==1`` will result in the ordinary NLL.
-      
-    mask_class_not_present: theano.tensor.TensorType
-      shape = (batchsize, num_classes).
-      Binary mask indicating whether a class is present in the image patches.
-      ``mask_class_not_present[k]==1`` means that the image does **not** contain examples of class ``k``.
-      Then for all pixels in the patch, class ``k`` predictive probabilities are trained towards ``0``.
-      Limit case: ``mask_class_not_present[:]==0`` will result in the ordinary NLL.
-      
-    label_prop_thresh: float (0.5,1)
-      This threshold allows unsupervised label propagation (only for examples with negative/ignore labels).
-      If the predictive probability of the most likely class exceeds the threshold, this class is assumed to
-      be the correct label and the training is pushed in this direction.
-      Should only be used with pre-trained networks, and values <= 0.5 are disabled.
-    
-    Examples:
-    
-    - A cube contains no class ``k``. Instead of labelling the remaining classes they can be
-      marked as unlabelled by the first mask (``mask_class_labeled[:]==0``, whether ``mask_class_labeled[k]``
-      is ``0`` or ``1`` is actually indifferent because the labels should not be ``y==k`` anyway in this case).
-      Additionally ``mask_class_not_present[k]==1`` (otherwise ``0``) to suppress predictions of ``k`` in
-      in this patch. The actual value of the labels is indifferent, it can either be ``-1`` or it could be the
-      background class, if the background is marked as unlabelled (i.e. then those labels are ignored).
-    
-    - Only part of the cube is densely labelled. Set ``mask_class_labeled[:]=1`` for all classes, but set the
-      label values in the un-labelled part to ``-1`` to ignore this part.
-    
-    - Only a particular class ``k`` is labelled in the cube. Either set all other label pixels to ``-1`` or the
-      corresponding flags in ``mask_class_labeled`` for the unlabelled classes.
-    
-   ..  Note::
-      Using ``-1`` labels or telling that a class is not labelled, is somewhat redundant and just
-      supported for convenience.
-    """
+        y: theano.tensor.TensorType
+          corresponds to a vector that gives for each example the correct label. Labels < 0 are ignored (e.g. can
+          be used for label propagation)
+
+        class_weights: theano.tensor.TensorType
+          weight vector of float32 of length  ``n_lab``. Values: ``1.0`` (default), ``w < 1.0`` (less important),
+          ``w > 1.0`` (more important class)
+
+        The following refers to lazy labels, the masks are always on a per patch basis, depending on the
+        origin cube of the patch. The masks are properties of the individual image cubes and must be loaded
+        into CNNData.
+
+        mask_class_labeled: theano.tensor.TensorType
+          shape = (batchsize, num_classes).
+          Binary masks indicating whether a class is properly labeled in ``y``. If a class ``k``
+          is (in general) present in the image patches **and** ``mask_class_labeled[k]==1``, then
+          the labels  **must** obey ``y==k`` for all pixels where the class is present.
+          If a class ``k`` is present in the image, but was not labeled (-> cheaper labels), set
+          ``mask_class_labeled[k]=0``. Then all pixels for which the ``y==k`` will be ignored.
+          Alternative: set ``y=-1`` to ignore those pixels.
+          Limit case: ``mask_class_labeled[:]==1`` will result in the ordinary NLL.
+
+        mask_class_not_present: theano.tensor.TensorType
+          shape = (batchsize, num_classes).
+          Binary mask indicating whether a class is present in the image patches.
+          ``mask_class_not_present[k]==1`` means that the image does **not** contain examples of class ``k``.
+          Then for all pixels in the patch, class ``k`` predictive probabilities are trained towards ``0``.
+          Limit case: ``mask_class_not_present[:]==0`` will result in the ordinary NLL.
+
+        label_prop_thresh: float (0.5,1)
+          This threshold allows unsupervised label propagation (only for examples with negative/ignore labels).
+          If the predictive probability of the most likely class exceeds the threshold, this class is assumed to
+          be the correct label and the training is pushed in this direction.
+          Should only be used with pre-trained networks, and values <= 0.5 are disabled.
+
+        Examples:
+
+        - A cube contains no class ``k``. Instead of labelling the remaining classes they can be
+          marked as unlabelled by the first mask (``mask_class_labeled[:]==0``, whether ``mask_class_labeled[k]``
+          is ``0`` or ``1`` is actually indifferent because the labels should not be ``y==k`` anyway in this case).
+          Additionally ``mask_class_not_present[k]==1`` (otherwise ``0``) to suppress predictions of ``k`` in
+          in this patch. The actual value of the labels is indifferent, it can either be ``-1`` or it could be the
+          background class, if the background is marked as unlabelled (i.e. then those labels are ignored).
+
+        - Only part of the cube is densely labelled. Set ``mask_class_labeled[:]=1`` for all classes, but set the
+          label values in the un-labelled part to ``-1`` to ignore this part.
+
+        - Only a particular class ``k`` is labelled in the cube. Either set all other label pixels to ``-1`` or the
+          corresponding flags in ``mask_class_labeled`` for the unlabelled classes.
+
+        ..  Note::
+          Using ``-1`` labels or telling that a class is not labelled, is somewhat redundant and just
+          supported for convenience.
+        """
+
         # NOTE: This whole function has a ugly problem with NaN. They arise for pred values close to 0 or 1
         # (i.e. for NNs that make very confident and usually also correct predictions) because initially the log of
         # all the whole pred tensor is taken. Later we want to use only some indices of the tensor (mask) but
@@ -549,12 +532,12 @@ class ConvLayer2d(object):
         # fails because the replaced value is disconnected from the parameters and gives NaN (mathematically
         # the gradient should correctly be 0 then; there is a Theano ticket open to request a fix).
         # So finally the best practice is to add a stabilisation to the log: T.log(pred) --> T.log(pred+eps)
-        # This looks ugly, but does the task and the introduced error is completely negligible
+        # This looks ugly, but does the task and the introduced error is completely negligible.
+
         eps = 1e-6
         pred = self.class_probabilities  # predictive (bs, cl, x, y)
         y = y.dimshuffle(0, 'x', 1, 2)  # the labels (bs, 1,  x, y)
-        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle(
-            'x', 0, 'x', 'x')  # available classes
+        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle('x', 0, 'x', 'x')  # available classes
         label_selection = T.eq(cls, y)  # selects correct labels
 
         if class_weights is None:
@@ -572,9 +555,7 @@ class ConvLayer2d(object):
 
         if label_prop_thresh is not None:  # Label propagation block
             above_thresh = pred > label_prop_thresh  # this is one for the class with highes prob
-            prop_mask = above_thresh * (
-                1 - mask_class_labeled
-            )  # don't do where training labels are available
+            prop_mask = above_thresh * (1 - mask_class_labeled)  # don't do where training labels are available
             nll_inst_up_prop = -T.log(pred + eps) * prop_mask * class_weights
             N_up_prop = prop_mask.sum()
 
@@ -582,21 +563,17 @@ class ConvLayer2d(object):
             N_up += N_up_prop
 
         if mask_class_not_present is not None:  # Down vote block
-            mask_class_not_present = mask_class_not_present.dimshuffle(
-                0, 1, 'x', 'x')
-            nll_inst_dn = -T.log(1.0 - (pred * mask_class_not_present *
-                                        class_weights) + eps)
-            N_dn = mask_class_not_present.sum(
-            )  # number of not present classes examples
+            mask_class_not_present = mask_class_not_present.dimshuffle(0, 1, 'x', 'x')
+            nll_inst_dn = -T.log(1.0 - (pred * mask_class_not_present * class_weights) + eps)
+            N_dn = mask_class_not_present.sum()  # number of not present classes examples
         else:
             nll_inst_dn = 0.0
             N_dn = 0.0
 
         nll_inst = (nll_inst_up + nll_inst_dn).sum(axis=1)
         N_total = (N_up + N_dn)
-        N_total = T.switch(
-            T.eq(N_total, 0), 1, N_total
-        )  # patch N_total to be not 0, when this is the case the sum is 0 anyway!
+        # patch N_total to be not 0, when this is the case the sum is 0 anyway:
+        N_total = T.switch(T.eq(N_total, 0), 1, N_total)
         nll = (nll_inst_up + nll_inst_dn).sum() / N_total
 
         return nll, nll_inst
@@ -608,13 +585,12 @@ class ConvLayer2d(object):
                  mask_class_not_present=None,
                  label_prop_thresh=None):
         """
-    NLL that mixes the current cnn output and the hard labels as target
-    """
+        NLL that mixes the current cnn output and the hard labels as target
+        """
         eps = 1e-6
         pred = self.class_probabilities  # predictive (bs, cl, x, y)
         y = y.dimshuffle(0, 'x', 1, 2)  # the labels (bs, 1,  x, y)
-        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle(
-            'x', 0, 'x', 'x')  # available classes
+        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle('x', 0, 'x', 'x')  # available classes
         hard_labels = T.eq(cls, y)  # selects correct labels
 
         soft_labels = 0.5 * hard_labels + 0.5 * pred
@@ -633,40 +609,37 @@ class ConvLayer2d(object):
         N_dn = 0.0
 
         N_total = (N_up + N_dn)
-        N_total = T.switch(
-            T.eq(N_total, 0), 1, N_total
-        )  # patch N_total to be not 0, when this is the case the sum is 0 anyway!
+        # patch N_total to be not 0, when this is the case the sum is 0 anyway:
+        N_total = T.switch(T.eq(N_total, 0), 1, N_total)
         nll = (nll_inst_up + nll_inst_dn).sum() / N_total
 
         return nll, nll
 
     def squared_distance(self, y):
         """
-    Returns squared distance between prediction and ``y``
+        Returns squared distance between prediction and ``y``
 
-    :type y: theano.tensor.TensorType
-    :param y: corresponds to a vector that gives for each example the
-                  correct label
-    """
+        :type y: theano.tensor.TensorType
+        :param y: corresponds to a vector that gives for each example the
+                      correct label
+        """
         return T.mean((self.output - y)**2)
 
     def errors(self, y):
         """
-    Returns classification accuracy
+        Returns classification accuracy
 
-    :type y: theano.tensor.TensorType
-    :param y: corresponds to a vector that gives for each example the
-              correct label
-    """
+        :type y: theano.tensor.TensorType
+        :param y: corresponds to a vector that gives for each example the
+                  correct label
+        """
         # check if y has same dimension of y_pred
         if y.ndim != self.class_prediction.ndim:
-            raise TypeError(
-                'y should have the same shape as self.class_prediction',
-                ('y', y.type, 'class_prediction', self.class_prediction.type))
+            raise TypeError('y should have the same shape as self.class_prediction',
+                            ('y', y.type, 'class_prediction', self.class_prediction.type))
         # check if y is of the correct datatype
         if y.dtype.startswith('int'):
-            return T.mean(T.neq(self.class_prediction, y)[T.ge(y, 0).nonzero(
-            )])
+            return T.mean(T.neq(self.class_prediction, y)[T.ge(y, 0).nonzero()])
         else:
             print "something went wrong"
             raise NotImplementedError()

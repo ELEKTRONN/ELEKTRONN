@@ -35,8 +35,7 @@ for i in range(5000):
     loss, loss_instance, time_per_step = cnn.trainingStep(d, l, mode="SGD")
 
     if i % 100 == 0:
-        valid_loss, valid_error, valid_predictions = cnn.get_error(
-            data.valid_d, data.valid_l)
+        valid_loss, valid_error, valid_predictions = cnn.get_error(data.valid_d, data.valid_l)
         print "update:", i, "; Validation loss:", valid_loss, "Validation error:", valid_error * 100., "%"
 
 loss, error, test_predictions = cnn.get_error(data.test_d, data.test_l)

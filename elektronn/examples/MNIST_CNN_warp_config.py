@@ -32,8 +32,7 @@ filters = [
 pool = [
     2, 2
 ]  # (*) <List> of <Int> or <List> of <2/3-tuples> or []: pool shapes in (x,y)/(x,y,z)-order
-nof_filters = [16, 32
-               ]  # (*) <List> of <Int> / []: number of feature maps per layer
+nof_filters = [16, 32]  # (*) <List> of <Int> / []: number of feature maps per layer
 
 # Other
 MLP_layers = [
