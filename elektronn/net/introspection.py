@@ -12,11 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plotFilters(cnn,
-                layer=0,
-                channel=None,
-                normalize=False,
-                savename='filters_layer0.png'):
+def plotFilters(cnn, layer=0, channel=None, normalize=False, savename='filters_layer0.png'):
     W = cnn.layers[layer].W.get_value()
 
     if W.shape[1] == 3:  # RGB
@@ -39,10 +35,7 @@ def plotFilters(cnn,
         mat = embedMatricesInGray(W, normalize=normalize)
 
     plt.figure()
-    plt.imshow(mat,
-               interpolation='None',
-               cmap='gray'
-               )  # Note that cmap is ignored by matplotlib for RGB-img
+    plt.imshow(mat, interpolation='None', cmap='gray')  # Note that cmap is ignored by matplotlib for RGB-img
     plt.show()
     print "Saving filter image as as %s" % (savename)
     plt.savefig(savename, bbox_inches='tight')
@@ -81,22 +74,16 @@ def showActivations(cnn, data, show_first_class_prob=False, no_show=False):
 
         if len(sp) != 3:
             if len(sp) == 4:
-                activity = activity.reshape(
-                    sp[0] * sp[1], sp[2], sp[3]
-                )  #np.swapaxes(np.swapaxes(activity,2,0),2,4)
+                activity = activity.reshape(sp[0] * sp[1], sp[2], sp[3])  #np.swapaxes(np.swapaxes(activity,2,0),2,4)
             else:
                 continue
         if len(sp) == 3:
             image = embedMatricesInGray(activity, 1, True)
         elif len(sp) == 5:
-            image = embedMatricesInGray(activity,
-                                        1,
-                                        True,
-                                        fixed_n_horizontal=sp[1])
+            image = embedMatricesInGray(activity, 1, True, fixed_n_horizontal=sp[1])
 
         all_act.append(image)
-        showMultipleFiguresAdd(myfig, n, i, image,
-                               "Layer-" + str(i) + " Activity")
+        showMultipleFiguresAdd(myfig, n, i, image, "Layer-" + str(i) + " Activity")
 
     plt.tight_layout()
 
@@ -105,9 +92,7 @@ def showActivations(cnn, data, show_first_class_prob=False, no_show=False):
         plt.figure()
         plt.gray()
         plt.title('prediction map of first class')
-        plt.imshow(prob_pred[:, 0].reshape(
-            np.sqrt(np.shape(prob_pred)[0]), -1),
-                   interpolation='nearest')
+        plt.imshow(prob_pred[:, 0].reshape(np.sqrt(np.shape(prob_pred)[0]), -1), interpolation='nearest')
 
     if not no_show:
         plt.show()
@@ -117,27 +102,26 @@ def showActivations(cnn, data, show_first_class_prob=False, no_show=False):
 
 def showParamHistogram(cnn, no_show=False, onlyW=True):
     """
-  Plots histograms of parameter/weight values.
+    Plots histograms of parameter/weight values.
 
-  Parameters
-  ----------
-  
-  :type no_show: object
-  cnn:
-    instance of MixedConvNN
-  onlyW:
-    True/False whether to ignore the biases b
-  no_show:
-    True/False whether to pop up plots or silently return a list of image arrays
-  
-  """
+    Parameters
+    ----------
+
+    :type no_show: object
+    cnn:
+      instance of MixedConvNN
+    onlyW:
+      True/False whether to ignore the biases b
+    no_show:
+      True/False whether to pop up plots or silently return a list of image arrays
+
+    """
     n = len(cnn.layers)
     for layer, i in zip(cnn.layers, range(n)):
         for par in layer.params if onlyW == False else [layer.W]:
             pa = par.get_value()
             print 'Layer {0:2d}: mean={1:3.6e}, median={2:3.6e}, mean(abs)={3:2.6e}, median(abs)={4:2.6e}'.format(
-                1 + i, np.mean(pa), np.median(pa), np.mean(abs(pa)),
-                np.median(abs(pa)))
+                1 + i, np.mean(pa), np.median(pa), np.mean(abs(pa)), np.median(abs(pa)))
             print 'Layer  ' + str(i + 1) + ': filter_shape =', np.shape(pa)
 
             hist, bins = np.histogram(pa.flatten(), bins=100)
@@ -154,20 +138,20 @@ def showParamHistogram(cnn, no_show=False, onlyW=True):
 
 def showActivityHistogram(cnn, data, no_show=False):
     """
-  Plots histograms of activation maps given data. It requires that cnn.debug_functions contains a list
-  of functions that return the activations (i.e. cnn.compileDebugFunctions must have been called
+    Plots histograms of activation maps given data. It requires that cnn.debug_functions contains a list
+    of functions that return the activations (i.e. cnn.compileDebugFunctions must have been called
 
-  Parameters
-  ----------
-  
-  cnn:
-    instance of MixedConvNN
-  data:
-    input to cnn for which activations should be shown
-  no_show:
-    True/False whether to pop up plots or silently return a list of image arrays
-  
-  """
+    Parameters
+    ----------
+
+    cnn:
+      instance of MixedConvNN
+    data:
+      input to cnn for which activations should be shown
+    no_show:
+      True/False whether to pop up plots or silently return a list of image arrays
+
+    """
     n = len(cnn.layers)
     for layer, dbgf, i in zip(cnn.layers, cnn.debug_functions, range(n)):
         activity = dbgf(data).flatten()
@@ -183,14 +167,11 @@ def showActivityHistogram(cnn, data, no_show=False):
         plt.show()
 
 
-def embedMatricesInGray(mat,
-                        border_width=1,
-                        normalize=False,
-                        output_ratio=1.7,
-                        fixed_n_horizontal=0):
+def embedMatricesInGray(mat, border_width=1, normalize=False, output_ratio=1.7, fixed_n_horizontal=0):
     """
     Creates a big matrix out of smaller ones (mat) assumed format of mat:(index, ch, i_vert,i_horiz)
     """
+
     #    sh = np.shape(mat)
     #    if sh[1]==3: # interpret 3 channels as rgb
     #      mat = np.swapaxes(mat, 1, 3) # swap RGB channels at back
@@ -211,9 +192,7 @@ def embedMatricesInGray(mat,
         nhor = int(np.sqrt(n * output_ratio))  # aim: ratio 16:9
     nvert = int(n * 1.0 / nhor + 1)  #warning: too big: nvert*nhor >= n
 
-    ret = np.zeros(
-        (nvert * (border_width + sh[1]), nhor * (border_width + sh[2])),
-        dtype=np.float32)
+    ret = np.zeros((nvert * (border_width + sh[1]), nhor * (border_width + sh[2])), dtype=np.float32)
 
     if normalize:
         maxs = [np.max(mat[i, :, :]) + 1e-8 for i in range(n)]
@@ -229,9 +208,8 @@ def embedMatricesInGray(mat,
             #print (j*(border_width+sh[1]),j*(border_width+sh[1])+sh[1], i*(border_width+sh[2]),i*(border_width+sh[2])+sh[2])
             #print shape(mat[i+j*nhor,:,:])
             ret[j * (border_width + sh[1]):j * (border_width + sh[1]) + sh[1],
-                i * (border_width + sh[2]):i * (border_width + sh[2]) + sh[
-                    2]] = (mat[i + j * nhor, :, :] - mins[i + j * nhor]) / (
-                        maxs[i + j * nhor] - mins[i + j * nhor])
+                i * (border_width + sh[2]):i * (border_width + sh[2]) + sh[2]
+               ] = (mat[i + j * nhor, :, :] - mins[i + j * nhor]) / (maxs[i + j * nhor] - mins[i + j * nhor])
     return ret
 
 

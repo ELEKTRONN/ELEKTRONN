@@ -59,12 +59,10 @@ def makeGabor(filter_angle, n_modes, size, offset):
     m_offset = float(offset) / 180.0 * np.pi
     Max = (size - 1) / 2 if size % 2 == 1 else size / 2
 
-    X, Y = np.meshgrid(
-        np.linspace(-Max, Max, size), np.linspace(-Max, Max, size))
+    X, Y = np.meshgrid(np.linspace(-Max, Max, size), np.linspace(-Max, Max, size))
     X_ = X / (Max + 1) * np.cos(theta) + Y / (Max + 1) * np.sin(theta)
     Y_ = -X / (Max + 1) * np.sin(theta) + Y / (Max + 1) * np.cos(theta)
-    gabor = np.exp(-0.5 * ((X_**2) + (Y_**2)) /
-                   (sigma**2)) * np.cos(2.0 * np.pi * (freq * Y_ + m_offset))
+    gabor = np.exp(-0.5 * ((X_**2) + (Y_**2)) / (sigma**2)) * np.cos(2.0 * np.pi * (freq * Y_ + m_offset))
     gabor = gabor - gabor.mean()
     gabor = gabor / np.square(gabor).sum()
     return gabor.astype(np.float32)

@@ -13,23 +13,23 @@ from netutils import CNNCalculator
 ### CNN Creation #############################################################################################
 def createNet(config, input_size, n_ch, n_lab, dimension_calc):
     """
-  Creates CNN according to config
+    Creates CNN according to config
 
-  Parameters
-  ----------
+    Parameters
+    ----------
 
-  n_ch: int
-    Number of input channels in data
-  n_lab: int
-    Number of labels/classes/output_neurons
-  param_file: string/path
-    Optional file to initialise parameters of CNN from
+    n_ch: int
+      Number of input channels in data
+    n_lab: int
+      Number of labels/classes/output_neurons
+    param_file: string/path
+      Optional file to initialise parameters of CNN from
 
-  Returns
-  -------
+    Returns
+    -------
 
-  CNN-Object
-  """
+    CNN-Object
+    """
     enable_dropout = False
     if len(config.dropout_rates) > 0 and (config.dropout_rates[0] is not None):
         enable_dropout = True
@@ -43,15 +43,9 @@ def createNet(config, input_size, n_ch, n_lab, dimension_calc):
                               dimension_calc=dimension_calc)
 
     # Conv layers
-    conv = zip(config.nof_filters, config.filters, config.pool,
-               config.activation_func, config.MFP, config.pooling_mode)
+    conv = zip(config.nof_filters, config.filters, config.pool, config.activation_func, config.MFP, config.pooling_mode)
     for i, (n, f, p, act, mfp, p_m) in enumerate(conv):
-        cnn.addConvLayer(n,
-                         f,
-                         p,
-                         act,
-                         use_fragment_pooling=mfp,
-                         pooling_mode=p_m)
+        cnn.addConvLayer(n, f, p, act, use_fragment_pooling=mfp, pooling_mode=p_m)
 
     # RNN Layers
     if config.rnn_layer_kwargs is not None:
@@ -59,8 +53,7 @@ def createNet(config, input_size, n_ch, n_lab, dimension_calc):
 
     # MLP layers
     c = len(config.filters)
-    for i, (n, act) in enumerate(zip(config.MLP_layers, config.activation_func[
-            c:])):
+    for i, (n, act) in enumerate(zip(config.MLP_layers, config.activation_func[c:])):
         cnn.addPerceptronLayer(n, act)
 
         # Auto adding of last layer
@@ -69,35 +62,19 @@ def createNet(config, input_size, n_ch, n_lab, dimension_calc):
     else:
         if config.target in ['affinity', 'malis']:
             if config.target == 'malis':
-                cnn.addConvLayer(n_lab,
-                                 1,
-                                 1,
-                                 'linear',
-                                 is_last_layer=True,
-                                 affinity='malis')  # reshape=True
+                cnn.addConvLayer(n_lab, 1, 1, 'linear', is_last_layer=True, affinity='malis')  # reshape=True
             else:
-                cnn.addConvLayer(n_lab,
-                                 1,
-                                 1,
-                                 'linear',
-                                 is_last_layer=True,
-                                 affinity=True)  # reshape=True
+                cnn.addConvLayer(n_lab, 1, 1, 'linear', is_last_layer=True, affinity=True)  # reshape=True
         else:
-            cnn.addConvLayer(n_lab,
-                             1,
-                             1,
-                             'linear',
-                             is_last_layer=True)  # reshape=True
+            cnn.addConvLayer(n_lab, 1, 1, 'linear', is_last_layer=True)  # reshape=True
 
     use_class_weights = True if config.class_weights is not None else False
     use_label_prop = True if config.label_prop_thresh is not None else False
     cnn.compileOutputFunctions(config.target, use_class_weights,
-                               config.use_example_weights, config.lazy_labels,
-                               use_label_prop)
+                               config.use_example_weights, config.lazy_labels, use_label_prop)
 
-    cnn.setOptimizerParams(config.SGD_params, config.CG_params,
-                           config.RPROP_params, config.LBFGS_params,
-                           config.Adam_params, config.weight_decay)
+    cnn.setOptimizerParams(config.SGD_params, config.CG_params, config.RPROP_params,
+                           config.LBFGS_params, config.Adam_params, config.weight_decay)
 
     if enable_dropout:
         cnn.setDropoutRates(config.dropout_rates)
@@ -114,34 +91,34 @@ def createNetfromParams(param_file,
                         MFP=None,
                         only_prediction=False):
     """
-  Convenience function to create CNN without ``config`` directly from a saved parameter file.
-  Therefore this function only allows restricted configuration and does not initialise the training optimisers.
+    Convenience function to create CNN without ``config`` directly from a saved parameter file.
+    Therefore this function only allows restricted configuration and does not initialise the training optimisers.
 
-  Parameters
-  ----------
+    Parameters
+    ----------
 
-  param_file: string/path
-    File to initialise parameters of CNN from. The file must contain a list of shapes of the W-parameters as
-    first entry and should ideally contain a list of pooling factors as last entry, alternatively the can be
-    given as optional argument
-  patch_size: tuple of int
-    Patch size for input data
-  batch_size: int
-    Number of input patches
-  activation_func: string
-    Activation function to use for all layers
-  poolings: list of int
-    Pooling factors per layer (if not included in the parameter file)
-  MFP: list of bool/{0,1}
-    Whether to use MFP in the respective layers
-  only_prediction: Bool
-    This excludes the building of the gradient (faster)
+    param_file: string/path
+      File to initialise parameters of CNN from. The file must contain a list of shapes of the W-parameters as
+      first entry and should ideally contain a list of pooling factors as last entry, alternatively the can be
+      given as optional argument
+    patch_size: tuple of int
+      Patch size for input data
+    batch_size: int
+      Number of input patches
+    activation_func: string
+      Activation function to use for all layers
+    poolings: list of int
+      Pooling factors per layer (if not included in the parameter file)
+    MFP: list of bool/{0,1}
+      Whether to use MFP in the respective layers
+    only_prediction: Bool
+      This excludes the building of the gradient (faster)
 
-  Returns
-  -------
+    Returns
+    -------
 
-  CNN-Object
-  """
+    CNN-Object
+    """
     f = open(param_file, 'r')
     shapes = cPickle.load(f)
     n_lay = len(shapes)
@@ -181,18 +158,11 @@ def createNetfromParams(param_file,
                          n_dim=len(shapes[0]) - 2, )
     patch_size = dims.input
 
-    cnn = convnet.MixedConvNN(patch_size,
-                              input_depth=n_ch,
-                              batch_size=batch_size)
+    cnn = convnet.MixedConvNN(patch_size, input_depth=n_ch, batch_size=batch_size)
 
-    for i, (n, f, p,
-            mfp) in enumerate(zip(nof_filters, filters, poolings, MFP)):
+    for i, (n, f, p, mfp) in enumerate(zip(nof_filters, filters, poolings, MFP)):
         if i < n_lay - 1:
-            cnn.addConvLayer(n,
-                             f,
-                             p,
-                             activation_func,
-                             use_fragment_pooling=mfp)
+            cnn.addConvLayer(n, f, p, activation_func, use_fragment_pooling=mfp)
         else:
             cnn.addConvLayer(n, 1, p, activation_func, is_last_layer=True)
 
