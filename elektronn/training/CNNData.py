@@ -32,20 +32,20 @@ except:
 
 def plotTrainingTarget(img, lab, stride=1):
     """
-  Plots raw image vs label to check if valid batches are produced.
-  Raw data is also shown overlaid with labels
+    Plots raw image vs label to check if valid batches are produced.
+    Raw data is also shown overlaid with labels
 
-  Parameters
-  ----------
+    Parameters
+    ----------
 
-  img: 2d array
-    raw image from batch
-  lab: 2d array
-    labels
-  stride: int
-    stride of labels
+    img: 2d array
+      raw image from batch
+    lab: 2d array
+      labels
+    stride: int
+      stride of labels
 
-  """
+    """
 
     if len(lab) * stride != len(img):
         off = (len(img) - stride * len(lab)) // 2 // stride
@@ -82,8 +82,7 @@ def _getValid3dTranspose(arr, ps):
     possible_T = []
     for T in all_T:
         sh = np.transpose(arr, T).shape
-        if reduce(lambda x, y: (y[0] <= y[1]) and x, zip(ps, sh[:2]),
-                  True):  # check if first 2 dims are large enough
+        if reduce(lambda x, y: (y[0] <= y[1]) and x, zip(ps, sh[:2]), True):  # check if first 2 dims are large enough
             possible_T.append(T)
 
     return possible_T
@@ -97,9 +96,7 @@ def _randomFlip(d, l, rng, aniso=True, upright_x=False):
             if 0.5 < rng.rand():
                 d = np.swapaxes(d, 1, 2)
                 l = np.swapaxes(l, 0, 1)
-            flip = rng.binomial(
-                1, 0.5,
-                2) * 2 - 1  # gives strides of -1 and 1 for all spatial axis
+            flip = rng.binomial(1, 0.5, 2) * 2 - 1  # gives strides of -1 and 1 for all spatial axis
             d = d[:, ::flip[0], ::flip[1]]  # this flips axis directions
             l = l[::flip[0], ::flip[1]]
         else:  # only flip the y-axis for upright images
@@ -126,27 +123,21 @@ def _randomFlip(d, l, rng, aniso=True, upright_x=False):
 
 def _greyAugment(d, channels, rng):
     """
-  Performs grey value (historgram) augmentations on ``d``. This is only applied to ``channels``
-  (list of channels indices), ``rng`` is a random number generator
-  """
+    Performs grey value (historgram) augmentations on ``d``. This is only applied to ``channels``
+    (list of channels indices), ``rng`` is a random number generator
+    """
     if channels == []:
         return d
     else:
         n_dim = len(d.shape) - 1
         k = len(channels)
-        d = d.copy(
-        )  # d is still just a view, we don't want to change the original data so copy it
+        d = d.copy()  # d is still just a view, we don't want to change the original data so copy it
         alpha = 1 + (rng.rand(k) - 0.5) * 0.3  # ~ contrast
-        c = (
-            rng.rand(k) - 0.5
-        ) * 0.3  # mediates whether values are clipped for shadows or lights
+        c = (rng.rand(k) - 0.5) * 0.3  # mediates whether values are clipped for shadows or lights
         gamma = 2.0**(rng.rand(k) * 2 - 1)  # sample from [0.5,2] with mean 0
         if n_dim == 3:
-            d[:, channels] = d[:, channels] * alpha[None, :, None, None] + c[
-                None, :, None, None]
-            d[:, channels] = np.clip(
-                d[:, channels], 0, 1
-            )  # clip to valid range (otherwise the above has little effect)
+            d[:, channels] = d[:, channels] * alpha[None, :, None, None] + c[None, :, None, None]
+            d[:, channels] = np.clip(d[:, channels], 0, 1)  # clip to valid range (otherwise the above has little effect)
             d[:, channels] = d[:, channels]**gamma[None, :, None, None]
         elif n_dim == 2:
             d[channels] = d[channels] * alpha[:, None, None] + c[:, None, None]
@@ -157,10 +148,10 @@ def _greyAugment(d, channels, rng):
 
 def _stripCubes(d, l, off, ldtype):
     """
-  Determine minimal trainable image data size (depending on the size of labels and CNN offset).
-  It is assumed that labels lie in the center of the corresponding raw image cube.
-  Finally d and l have same shapes in x,y,z, where l is zero-padded or d is cut.
-  """
+    Determine minimal trainable image data size (depending on the size of labels and CNN offset).
+    It is assumed that labels lie in the center of the corresponding raw image cube.
+    Finally d and l have same shapes in x,y,z, where l is zero-padded or d is cut.
+    """
     if len(off) == 2:
         off = np.concatenate(([0, ], off))
 
@@ -169,8 +160,7 @@ def _stripCubes(d, l, off, ldtype):
     for i, (d_sh, l_sh) in enumerate(zip(
             np.array(d.shape)[[0, 2, 3]], l.shape)):
         assert ((d_sh - l_sh) - 2 * off[i]) % 2 == 0
-        x = ((d_sh - l_sh) - 2 *
-             off[i]) / 2  #  This the offset with which data needs to be cut
+        x = ((d_sh - l_sh) - 2 * off[i]) / 2  #  This the offset with which data needs to be cut
         # The missing length of the labels, but data must still be 2*off[i] larger, by two (one cut from each side)
         if x < 0:  # More labels than data
             l_cut.append(-x)  # These are the superfluous label stripes
@@ -180,22 +170,16 @@ def _stripCubes(d, l, off, ldtype):
         d_off.append(x)  # These are the superfluous data stripes
 
     # cut minimal trainable data
-    d = d[d_off[0]:d.shape[0] - d_off[0], :, d_off[1]:d.shape[2] - d_off[1],
-          d_off[2]:d.shape[3] - d_off[2]]
+    d = d[d_off[0]:d.shape[0] - d_off[0], :, d_off[1]:d.shape[2] - d_off[1], d_off[2]:d.shape[3] - d_off[2]]
 
     # cut minimal trainable labels
     if np.any(l_cut):
-        print "Warning: the CNN offset is so large that labels are cut off!\nOn each side of the cube %s" % (
-            l_cut)
-    new_l_sh = np.array(d.shape)[
-        [0, 2, 3]
-    ]  #map(lambda x: x[0] - 2*x[1] , zip(np.array(d.shape)[[0,2,3]], off))
+        print "Warning: the CNN offset is so large that labels are cut off!\nOn each side of the cube %s" % (l_cut)
+    new_l_sh = np.array(d.shape)[[0, 2, 3]]  #map(lambda x: x[0] - 2*x[1] , zip(np.array(d.shape)[[0,2,3]], off))
     new_l = np.zeros(new_l_sh, dtype=ldtype)
-    l = l[l_cut[0]:l.shape[0] - l_cut[0], l_cut[1]:l.shape[1] - l_cut[1],
-          l_cut[2]:l.shape[2] - l_cut[2]]
+    l = l[l_cut[0]:l.shape[0] - l_cut[0], l_cut[1]:l.shape[1] - l_cut[1], l_cut[2]:l.shape[2] - l_cut[2]]
 
-    new_l[off[0]:new_l.shape[0] - off[0], off[1]:new_l.shape[1] - off[1], off[
-        2]:new_l.shape[2] - off[2]] = l
+    new_l[off[0]:new_l.shape[0] - off[0], off[1]:new_l.shape[1] - off[1], off[2]:new_l.shape[2] - off[2]] = l
 
     assert d.shape[2:] == new_l.shape[1:]
     assert d.shape[0] == new_l.shape[0]
@@ -215,33 +199,23 @@ def _borderTreatment(data_list, ps, border_mode, n_dim):
         if border_mode == 'crop':
             excess = map(lambda x: int((x[0] - x[1]) // 2), zip(sh, ps))
             if n_dim == 3:
-                data = data[excess[0]:excess[0] + ps[0], :, excess[1]:excess[1]
-                            + ps[1], excess[2]:excess[2] + ps[2]]
+                data = data[excess[0]:excess[0] + ps[0], :, excess[1]:excess[1] + ps[1], excess[2]:excess[2] + ps[2]]
             elif n_dim == 2:
-                data = data[:, :, excess[0]:excess[0] + ps[0], excess[1]:
-                            excess[1] + ps[1]]
+                data = data[:, :, excess[0]:excess[0] + ps[0], excess[1]: excess[1] + ps[1]]
 
         else:
-            excess_l = map(lambda x: int(np.ceil(float(x[0] - x[1]) / 2)), zip(
-                ps, sh))
-            excess_r = map(lambda x: int(np.floor(float(x[0] - x[1]) / 2)),
-                           zip(ps, sh))
+            excess_l = map(lambda x: int(np.ceil(float(x[0] - x[1]) / 2)), zip(ps, sh))
+            excess_r = map(lambda x: int(np.floor(float(x[0] - x[1]) / 2)), zip(ps, sh))
             if n_dim == 3:
-                pad_with = [(excess_l[0], excess_r[0]), (0, 0),
-                            (excess_l[1], excess_r[1]),
-                            (excess_l[2], excess_r[2])]
+                pad_with = [(excess_l[0], excess_r[0]), (0, 0), (excess_l[1], excess_r[1]), (excess_l[2], excess_r[2])]
             else:
-                pad_with = [(0, 0), (0, 0), (excess_l[0], excess_r[0]),
-                            (excess_l[1], excess_r[1])]
+                pad_with = [(0, 0), (0, 0), (excess_l[0], excess_r[0]), (excess_l[1], excess_r[1])]
 
             if border_mode == 'mirror':
                 data = np.pad(data, pad_with, mode='symmetric')
 
             if border_mode == '0-pad':
-                data = np.pad(data,
-                              pad_with,
-                              mode='constant',
-                              constant_values=0)
+                data = np.pad(data, pad_with, mode='constant', constant_values=0)
 
         return data
 
@@ -303,41 +277,41 @@ def _make_affinities(labels, nhood=None, size_thresh=1):
 
 class CNNData(object):
     """
-  Patch creation and data handling interface for image like training data
+    Patch creation and data handling interface for image like training data
 
-  Parameters
-  ----------
+    Parameters
+    ----------
 
-  patch_size: 2/3-tuple
-    Specifying CNN input shape of a single example, **without** channels: (x,y)/(z,x,y)
-  stride: 2/3-tuple
-    Specifying CNN output stride. May be ``None`` for scalar labels
-  offset: 2/3-tuple
-    Specifying overall CNN convolution border. May be ``None`` for scalar labels
-  n_dim: int
-    2 or 3, CNN dimension
-  n_lab: int
-    Number of distinct classes/labels, if not provided (->None) this is automatically inferred (slow!)
-  anistropic_data: Bool
-    If True 2d slices are only cut and rotated along z-axis, otherwise all 3 alignments are used
-  mode: str
-    Mode that describes the kind of data and labels: img-img or img-scalar. If the labels are
-    scalar but the data is a stack (along z-axis) of many examples, the many scalar labels should be
-    stacked to a vector. For vect-scalar training use the ``TrainData``-class instead.
-  zchxy_order: Bool
-    If the data files are already in memory layout (z,ch,x,y)/(z,x,y), this option must be set to True,
-    which makes data loading faster.
-  border_mode: string
-    For img-scalar training: specifies how to treat images that don't match a valid CNN input size
-  upright_x: Bool
-    If ``True``, image augmentation leaves the upright position of natural images intact, e.g. they are
-    only mirrored horizontally, not vertically. Note: the horizontal direction corresponds to 'y' (because the
-    'x' comes before 'y' and the vertical comes before horizontal in numpy)!
-  float_label: Bool
-     Whether to return labels as float32 (for regression) or int16 (for classification)
-  affinity: str/False
-     False/'affinity'/'malis': malis returs additionally the segmentation IDs
-  """
+    patch_size: 2/3-tuple
+      Specifying CNN input shape of a single example, **without** channels: (x,y)/(z,x,y)
+    stride: 2/3-tuple
+      Specifying CNN output stride. May be ``None`` for scalar labels
+    offset: 2/3-tuple
+      Specifying overall CNN convolution border. May be ``None`` for scalar labels
+    n_dim: int
+      2 or 3, CNN dimension
+    n_lab: int
+      Number of distinct classes/labels, if not provided (->None) this is automatically inferred (slow!)
+    anistropic_data: Bool
+      If True 2d slices are only cut and rotated along z-axis, otherwise all 3 alignments are used
+    mode: str
+      Mode that describes the kind of data and labels: img-img or img-scalar. If the labels are
+      scalar but the data is a stack (along z-axis) of many examples, the many scalar labels should be
+      stacked to a vector. For vect-scalar training use the ``TrainData``-class instead.
+    zchxy_order: Bool
+      If the data files are already in memory layout (z,ch,x,y)/(z,x,y), this option must be set to True,
+      which makes data loading faster.
+    border_mode: string
+      For img-scalar training: specifies how to treat images that don't match a valid CNN input size
+    upright_x: Bool
+      If ``True``, image augmentation leaves the upright position of natural images intact, e.g. they are
+      only mirrored horizontally, not vertically. Note: the horizontal direction corresponds to 'y' (because the
+      'x' comes before 'y' and the vertical comes before horizontal in numpy)!
+    float_label: Bool
+       Whether to return labels as float32 (for regression) or int16 (for classification)
+    affinity: str/False
+       False/'affinity'/'malis': malis returs additionally the segmentation IDs
+    """
 
     def __init__(self,
                  patch_size=None,
@@ -381,8 +355,7 @@ class CNNData(object):
         if n_dim == 3 and upright_x:
             print "Warning: the data is 3-dimensional and the 'upright_x'-flag is active, but it works only for 2d!"
 
-        self.rng = np.random.RandomState(np.uint32((time.time() * 0.0001 - int(
-            time.time() * 0.0001)) * 4294967295))
+        self.rng = np.random.RandomState(np.uint32((time.time() * 0.0001 - int(time.time() * 0.0001)) * 4294967295))
         self.pid = os.getpid()
         self.gc_count = 1
 
@@ -417,48 +390,42 @@ class CNNData(object):
                         valid_cubes=[],
                         downsample_xy=False):
         """
-    Parameters
-    ----------
+        Parameters
+        ----------
 
-    d_path/l_path: string
-      Directories to load data from
-    d_files/l_files: list
-      List of data/label files in <path> directory (must be in the same order!). Each list
-    element is a tuple in the form **(<Name of h5-file>, <Key of h5-dataset>)**
-    cube_prios: list
-      (not normalised) list of sampling weights to draw examples from the respective cubes.
-      If None the cube sizes are taken as priorities.
-    valid_cubes: list
-      List of indices for cubes (from the file-lists) to use as validation data and exclude from training,
-      may be empty list to skip performance estimation on validation data.
-    """
+        d_path/l_path: string
+          Directories to load data from
+        d_files/l_files: list
+          List of data/label files in <path> directory (must be in the same order!). Each list
+        element is a tuple in the form **(<Name of h5-file>, <Key of h5-dataset>)**
+        cube_prios: list
+          (not normalised) list of sampling weights to draw examples from the respective cubes.
+          If None the cube sizes are taken as priorities.
+        valid_cubes: list
+          List of indices for cubes (from the file-lists) to use as validation data and exclude from training,
+          may be empty list to skip performance estimation on validation data.
+        """
         self.names += d_files
         if fadvise_avail:
-            names = reduce(
-                lambda x, y: x + [d_path + y[0][0], l_path + y[1][0]],
-                zip(d_files, l_files), [])
+            names = reduce(lambda x, y: x + [d_path + y[0][0], l_path + y[1][0]], zip(d_files, l_files), [])
             fadvise.willneed(names)
         # returns lists of cubes, info is a tuple per cube
-        data, label, info = self._read_images(d_path, l_path, d_files, l_files,
-                                              downsample_xy)
+        data, label, info = self._read_images(d_path, l_path, d_files, l_files, downsample_xy)
 
         if self.mode == 'img-scalar':
-            data = _borderTreatment(data, self.patch_size, self.border_mode,
-                                    self.n_dim)
+            data = _borderTreatment(data, self.patch_size, self.border_mode, self.n_dim)
 
         if self.pre_process:
             if self.pre_process == 'standardise':
                 M = np.mean(map(np.mean, data))
                 S = np.mean(map(np.std, data))
                 data = map(lambda x: (x - M) / S, data)
-                print "Data is standardised. Original mean: %.g, original std %.g" % (
-                    M, S)
+                print "Data is standardised. Original mean: %.g, original std %.g" % (M, S)
                 self.data_mean = M
                 self.data_std = S
 
             else:
-                raise NotImplementedError(
-                    "Pre-processing %s is not implemented" % self.pre_process)
+                raise NotImplementedError("Pre-processing %s is not implemented" % self.pre_process)
 
         if self.n_lab is None:
             unique = [np.unique(l) for l in label]
@@ -502,25 +469,24 @@ class CNNData(object):
                            l_valid=[],
                            cube_prios=None):
         """
-    Parameters
-    ----------
+        Parameters
+        ----------
 
-    d_train: list of numpy arrays
-      the input data for Training
-    l_train: list of numpy arrays
-      the labels     for Training
-    d_valid: list of numpy arrays
-      the input data for validation [OPTIONAL]
-    l_valid: list of numpy arrays
-      the labels     for validation [OPTIONAL]
-    cube_prios: list of floats
-      Default: None --> probability of sampling Training data from a cube is proportional to its size
-    """
+        d_train: list of numpy arrays
+          the input data for Training
+        l_train: list of numpy arrays
+          the labels     for Training
+        d_valid: list of numpy arrays
+          the input data for validation [OPTIONAL]
+        l_valid: list of numpy arrays
+          the labels     for validation [OPTIONAL]
+        cube_prios: list of floats
+          Default: None --> probability of sampling Training data from a cube is proportional to its size
+        """
         if type(d_train) is not type([]):
             d_train = [d_train]
             l_train = [l_train]
-        self.names = ["directly_added_data_" + str(i)
-                      for i in range(len(d_train))]
+        self.names = ["directly_added_data_" + str(i) for i in range(len(d_train))]
         if self.n_lab is None:
             unique = [np.unique(l) for l in l_train]
             self.n_lab = np.unique(np.hstack(unique)).size
@@ -528,18 +494,14 @@ class CNNData(object):
         info = map(lambda x: default_info if x is None else x, default_info)
         self.info = info
 
-        if len(d_train) and d_train[0].n_dim == 3 or len(d_valid) and d_valid[
-                0].n_dim == 3:
+        if len(d_train) and d_train[0].n_dim == 3 or len(d_valid) and d_valid[0].n_dim == 3:
             self.n_ch = 1
         else:
-            self.n_ch = d_train[0].shape[0] if len(d_train) else d_valid[
-                0].shape[0]
+            self.n_ch = d_train[0].shape[0] if len(d_train) else d_valid[0].shape[0]
 
         if self.mode == 'img-scalar':
-            self.valid_d += _borderTreatment(d_valid, self.patch_size,
-                                             self.border_mode, self.n_dim)
-            self.train_d += _borderTreatment(d_train, self.patch_size,
-                                             self.border_mode, self.n_dim)
+            self.valid_d += _borderTreatment(d_valid, self.patch_size, self.border_mode, self.n_dim)
+            self.train_d += _borderTreatment(d_train, self.patch_size, self.border_mode, self.n_dim)
         else:
             self.valid_d += d_valid
             self.train_d += d_train
@@ -567,29 +529,24 @@ class CNNData(object):
         patch_size = self.patch_size
         if self.n_dim == 2:
 
-            images = np.zeros(
-                (batch_size, self.n_ch, patch_size[0], patch_size[1]),
-                dtype='float32')
+            images = np.zeros((batch_size, self.n_ch, patch_size[0], patch_size[1]), dtype='float32')
             if self.mode == 'img-img':
                 off = self.offset
-                label = np.zeros(
-                    (batch_size, patch_size[0] - 2 * off[0],
-                     patch_size[1] - 2 * off[1]),
-                    dtype=self.ldtype)
+                label = np.zeros((batch_size, patch_size[0] - 2 * off[0],
+                                 patch_size[1] - 2 * off[1]),
+                                 dtype=self.ldtype)
             else:
                 label = np.zeros((batch_size, ), dtype=self.ldtype)
 
         elif self.n_dim == 3:
-            images = np.zeros(
-                (batch_size, patch_size[0], self.n_ch, patch_size[1],
-                 patch_size[2]),
-                dtype='float32')
+            images = np.zeros((batch_size, patch_size[0], self.n_ch, patch_size[1],
+                              patch_size[2]),
+                              dtype='float32')
             if self.mode == 'img-img':
                 off = self.offset
-                label = np.zeros(
-                    (batch_size, patch_size[0] - 2 * off[0],
-                     patch_size[1] - 2 * off[1], patch_size[2] - 2 * off[2]),
-                    dtype=self.ldtype)
+                label = np.zeros((batch_size, patch_size[0] - 2 * off[0],
+                                  patch_size[1] - 2 * off[1], patch_size[2] - 2 * off[2]),
+                                  dtype=self.ldtype)
             else:
                 label = np.zeros((batch_size, ), dtype=self.ldtype)
 
@@ -606,44 +563,44 @@ class CNNData(object):
                  ignore_thresh=0.0,
                  ret_example_weights=False):
         """
-    Prepares a batch by randomly sampling, shifting and augmenting patches from the data
+        Prepares a batch by randomly sampling, shifting and augmenting patches from the data
 
-    Parameters
-    ----------
-    batch_size: int
-      Number of examples in batch (for CNNs often just 1)
-    source: string
-      Data set to draw data from: 'train'/'valid'
-    strided: Bool
-      If True the labels are sub-sampled according to the CNN output stride.
-      Non-strided labels requires MFP in the CNN!
-    flip: Bool
-      If True examples are mirrored and rotated by 90 deg randomly
-    grey_augment_channels: list
-      List of channel indices to apply grey-value augmentation to
-    ret_info: Bool
-      If True additional information for reach batch example is returned. Currently implemented are two info
-      arrays to indicate the labelling mode. The first dimension of those arrays is the batch_size!
-    warp_on: Bool/Float(0,1)
-      Whether warping/distortion augmentations are applied to examples (slow --> use multiprocessing)
-      If this is a float number, warping is applied to this fraction of examples e.g. 0.5 --> every other example
-    ignore_thresh: float
-      If the fraction of negative labels in an example patch exceeds this threshold, this example is discarded
-      (Negative labels are ignored for training [but could be used for unsupervised label propagation]).
+        Parameters
+        ----------
+        batch_size: int
+          Number of examples in batch (for CNNs often just 1)
+        source: string
+          Data set to draw data from: 'train'/'valid'
+        strided: Bool
+          If True the labels are sub-sampled according to the CNN output stride.
+          Non-strided labels requires MFP in the CNN!
+        flip: Bool
+          If True examples are mirrored and rotated by 90 deg randomly
+        grey_augment_channels: list
+          List of channel indices to apply grey-value augmentation to
+        ret_info: Bool
+          If True additional information for reach batch example is returned. Currently implemented are two info
+          arrays to indicate the labelling mode. The first dimension of those arrays is the batch_size!
+        warp_on: Bool/Float(0,1)
+          Whether warping/distortion augmentations are applied to examples (slow --> use multiprocessing)
+          If this is a float number, warping is applied to this fraction of examples e.g. 0.5 --> every other example
+        ignore_thresh: float
+          If the fraction of negative labels in an example patch exceeds this threshold, this example is discarded
+          (Negative labels are ignored for training [but could be used for unsupervised label propagation]).
 
-    Returns
-    -------
+        Returns
+        -------
 
-    data:
-      [bs, ch, x, y] or [bs, z, ch, x, y] for 2d and 3d CNNS
+        data:
+          [bs, ch, x, y] or [bs, z, ch, x, y] for 2d and 3d CNNS
 
-    label:
-      [bs, x, y] or [bs, z, x, y]
-    info1:
-      (optional) [bs, n_lab]
-    info2:
-      (optional) [bs, n_lab]
-    """
+        label:
+          [bs, x, y] or [bs, z, x, y]
+        info1:
+          (optional) [bs, n_lab]
+        info2:
+          (optional) [bs, n_lab]
+        """
         # This is especially required for multiprocessing
         self._reseed()
         images, label = self._allocBatch(batch_size)
@@ -651,26 +608,19 @@ class CNNData(object):
         patch_count = 0
         while patch_count < batch_size:  # Loop to fill up batch with examples
             d, l, info = self._getcube(source)  # get cube randomly
-            d, l = self._warpAugment(d, l, warp_on, ignore_thresh,
-                                     self.upright_x
-                                     )  # does not change l if l is non-image
+            d, l = self._warpAugment(d, l, warp_on, ignore_thresh, self.upright_x)  # doesn't change l if l is non-image
 
-            if (ignore_thresh != 0.0) and (not np.any(info[1])) and (
-                    float(np.count_nonzero([l < 0])) / l.size) > ignore_thresh:
+            if (ignore_thresh != 0.0) and (not np.any(info[1])) and (float(np.count_nonzero([l < 0])) / l.size) > ignore_thresh:
                 continue  # do not use cubes which have no information
 
             if flip:
                 if self.patch_size[-1] != self.patch_size[-2]:
-                    raise RuntimeError(
-                        "Cannot apply 'flip' to image if x and y have different sizes")
+                    raise RuntimeError("Cannot apply 'flip' to image if x and y have different sizes")
 
                 if self.mode == 'img-img':
-                    d, l = _randomFlip(d, l, self.rng, self.aniso,
-                                       self.upright_x)
+                    d, l = _randomFlip(d, l, self.rng, self.aniso, self.upright_x)
                 else:
-                    d, _ = _randomFlip(
-                        d, d, self.rng, self.aniso, self.upright_x
-                    )  # lazy hack to exclude labels from transform
+                    d, _ = _randomFlip(d, d, self.rng, self.aniso, self.upright_x)  # lazy hack to exclude labels from transform
 
             if source == "train":  # no grey augmentation for testing
                 d = _greyAugment(d, grey_augment_channels, self.rng)
@@ -697,8 +647,7 @@ class CNNData(object):
             ret = [images, aff]
 
         if ret_info:  # info is now a list(bs) of tuples(2)
-            infos = np.atleast_3d(np.array(infos,
-                                           dtype=np.int16))  # (bs, 2, 5)
+            infos = np.atleast_3d(np.array(infos, dtype=np.int16))  # (bs, 2, 5)
             info1 = infos[:, 0]
             info2 = infos[:, 1]
             ret += [info1, info2]
@@ -724,37 +673,27 @@ class CNNData(object):
             assert self.n_dim == 2, "upright_x only works for 2d"
             raise NotImplementedError()
         elif do_warp:
-            ext_size, rot, shear, scale, stretch, twist = getWarpParams(
-                self.patch_size)
+            ext_size, rot, shear, scale, stretch, twist = getWarpParams(self.patch_size)
             try:
                 d, l = self._cutPatch(d, l, ps=ext_size, thresh=ignore_thresh)
                 if self.n_dim == 2:
-                    d, l = warp2dJoint(d, l, self.patch_size, rot, shear,
-                                       scale, stretch
-                                       )  # ignores label if non-image
+                    d, l = warp2dJoint(d, l, self.patch_size, rot, shear, scale, stretch)  # ignores label if non-image
                 else:
-                    d, l = warp3dJoint(d, l, self.patch_size, rot, shear,
-                                       scale, stretch, twist
-                                       )  # ignores label if non-image
+                    d, l = warp3dJoint(d, l, self.patch_size, rot, shear, scale, stretch, twist)  # ignores label if non-image
                 self.n_successful_warp += 1
 
             except ValueError:  # the ext_size is to big for this data cube
                 self.n_failed_warp += 1
-                d, l = self._cutPatch(d,
-                                      l,
-                                      thresh=ignore_thresh)  # Don't do warping
+                d, l = self._cutPatch(d, l, thresh=ignore_thresh)  # Don't do warping
         else:  # do not warp
-            d, l = self._cutPatch(d,
-                                  l,
-                                  thresh=ignore_thresh)  # Don't do warping
+            d, l = self._cutPatch(d, l, thresh=ignore_thresh)  # Don't do warping
 
         return d, l
 
     def getExampleWeights(self, raw_rec, lab, gain=2.0, blurr=False):
         off = self.offset
         previous_pred = raw_rec[:, :, -1]  # the last channel is the prediction
-        previous_pred = previous_pred[:, off[0]:-off[0], off[1]:-off[1], off[
-            2]:-off[2]]
+        previous_pred = previous_pred[:, off[0]:-off[0], off[1]:-off[1], off[2]:-off[2]]
         if blurr:
             lab = lab
             raise NotImplementedError()
@@ -791,32 +730,29 @@ class CNNData(object):
 
     def _cutPatch(self, img, lab, ps=None, thresh=0, it=0):
         """
-    Cut a patch from a cube of data and label
-    To enable deformations the patch must be cut with ``ps`` shape. ``thresh`` specifies threshold on negative
-    (i.e. ignore) labels, then another iteration ``it`` is started (but maximal 10)
-    """
+        Cut a patch from a cube of data and label
+        To enable deformations the patch must be cut with ``ps`` shape. ``thresh`` specifies threshold on negative
+        (i.e. ignore) labels, then another iteration ``it`` is started (but maximal 10)
+        """
         if ps is None:
             ps = self.patch_size
 
         if self.n_dim == 3:
             try:
-                shift = [int(self.rng.randint(0, s - p, 1))
-                         for p, s in zip(ps, np.array(img.shape)[[0, 2, 3]])]
+                shift = [int(self.rng.randint(0, s - p, 1)) for p, s in zip(ps, np.array(img.shape)[[0, 2, 3]])]
             except ValueError:
                 if np.all(np.equal(ps, np.array(img.shape)[[0, 2, 3]])):
                     shift = [0, 0, 0]
                 else:
-                    raise ValueError(
-                        "Image smaller than patch size: Image shape=%s, patch size=%s"
-                        % (img.shape[1:], ps))
+                    raise ValueError("Image smaller than patch size: Image shape=%s, patch size=%s"
+                                     % (img.shape[1:], ps))
 
-            cut_img = img[shift[0]:shift[0] + ps[0], :, shift[1]:shift[1] + ps[
-                1], shift[2]:shift[2] + ps[2]]
+            cut_img = img[shift[0]:shift[0] + ps[0], :, shift[1]:shift[1] + ps[1], shift[2]:shift[2] + ps[2]]
             if self.mode == 'img-img':
                 off = self.offset
-                cut_lab = lab[off[0] + shift[0]:shift[0] + ps[0] - off[0], off[
-                    1] + shift[1]:shift[1] + ps[1] - off[1], off[2] + shift[2]:
-                              shift[2] + ps[2] - off[2]]
+                cut_lab = lab[off[0] + shift[0]:shift[0] + ps[0] - off[0],
+                              off[1] + shift[1]:shift[1] + ps[1] - off[1],
+                              off[2] + shift[2]: shift[2] + ps[2] - off[2]]
             else:
                 cut_lab = lab
 
@@ -828,36 +764,31 @@ class CNNData(object):
                 # cut also perpendicular to x or y axis, this is not flipping (see separate function _flip)!
                 possible_T = _getValid3dTranspose(lab, ps)
                 i = self.rng.randint(0, len(possible_T))
-                imgT = _transposeIgnoreCh(img, possible_T[i]
-                                          )  # img has one dim more
+                imgT = _transposeIgnoreCh(img, possible_T[i])  # img has one dim more
                 labT = np.transpose(lab, possible_T[i])
 
             z_pos = self.rng.randint(0, imgT.shape[0])
             try:
-                shift = [int(self.rng.randint(0, s - p, 1))
-                         for p, s in zip(ps, imgT.shape[-2:])]
+                shift = [int(self.rng.randint(0, s - p, 1)) for p, s in zip(ps, imgT.shape[-2:])]
             except ValueError:
                 if np.all(np.equal(ps, imgT.shape[-2:])):
                     shift = [0, 0]
                 else:
-                    raise ValueError(
-                        "Image smaller than patch size: Image shape=%s, patch size=%s"
-                        % (imgT.shape[1:], ps))
+                    raise ValueError("Image smaller than patch size: Image shape=%s, patch size=%s"
+                                     % (imgT.shape[1:], ps))
 
-            cut_img = imgT[z_pos, :, shift[0]:shift[0] + ps[0], shift[1]:shift[
-                1] + ps[1]]
+            cut_img = imgT[z_pos, :, shift[0]:shift[0] + ps[0], shift[1]:shift[1] + ps[1]]
 
             if self.mode == 'img-img':
                 off = self.offset
-                cut_lab = labT[z_pos, off[0] + shift[0]:shift[0] + ps[0] - off[
-                    0], off[1] + shift[1]:shift[1] + ps[1] - off[1]]
+                cut_lab = labT[z_pos, off[0] + shift[0]:shift[0] + ps[0] - off[0],
+                               off[1] + shift[1]:shift[1] + ps[1] - off[1]]
             else:
                 cut_lab = labT[z_pos]
 
                 # check if there are enough non-ignore (i.e. positive) labels , but MAX 10 time, then use current result
         if (it < 10) and (
-                thresh != 0.0) and (float(np.count_nonzero([cut_lab < 0])) /
-                                    cut_lab.size) > thresh:
+                thresh != 0.0) and (float(np.count_nonzero([cut_lab < 0])) / cut_lab.size) > thresh:
             return self._cutPatch(img, lab, ps, thresh, it + 1)
 
         else:
@@ -868,8 +799,7 @@ class CNNData(object):
         current_pid = os.getpid()
         if current_pid != self.pid:
             self.pid = current_pid
-            self.rng.seed(np.uint32((time.time() * 0.0001 - int(time.time(
-            ) * 0.0001)) * 4294967295 + self.pid))
+            self.rng.seed(np.uint32((time.time() * 0.0001 - int(time.time() * 0.0001)) * 4294967295 + self.pid))
             print "Reseeding RNG in Process with PID:", self.pid
 
     def _stridedLabels(self, lab):
@@ -880,14 +810,13 @@ class CNNData(object):
 
     def _read_images(self, d_path, l_path, d_files, l_files, downsample_xy):
         """
-    Image files on disk are expected to be in order (ch,x,y,z) or (x,y,z)
-    But image stacks are returned as (z,ch,x,y) and label as (z,x,y,) irrespective of the order in the file.
-    If the image files have no channel this dimension is extended to a singleton dimension.
-    """
+        Image files on disk are expected to be in order (ch,x,y,z) or (x,y,z)
+        But image stacks are returned as (z,ch,x,y) and label as (z,x,y,) irrespective of the order in the file.
+        If the image files have no channel this dimension is extended to a singleton dimension.
+        """
         data, label, info = [], [], []
         if len(d_files) != len(l_files):
-            raise ValueError(
-                "d_files and l_files must be lists of same length!")
+            raise ValueError("d_files and l_files must be lists of same length!")
         for (d_f, d_key), (l_f, l_key) in zip(d_files, l_files):
             print 'Loading %s' % d_f,
             d = ut.h5Load(d_path + d_f, d_key)
@@ -947,10 +876,8 @@ class CNNData(object):
                 m = l.max()
                 M = np.iinfo(self.ldtype).max
                 if m > M:
-                    raise ValueError(
-                        "Loading of data: labels must be cast to %s, but %s cannot store \
-            value %g, maximum allowed value: %g. You may try to renumber \
-            labels." % (self.ldtype, self.ldtype, m, M))
+                    raise ValueError("Loading of data: labels must be cast to %s, but %s cannot store value %g, maximum allowed value: %g. You may try to renumber labels."
+                                     % (self.ldtype, self.ldtype, m, M))
 
             l = np.ascontiguousarray(l, dtype=self.ldtype)
 
@@ -990,14 +917,12 @@ class CNNData(object):
 if __name__ == "__main__":
     print "Testing CNNData"
     if __package__ is None:
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(
-            __file__))))
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     from elektronn.net import netutils
     from parallelisation import BackgroundProc
 
-    _data_path = os.path.expanduser('~/devel/data/BirdGT/'
-                                    )  # (*) Path to data dir
+    _data_path = os.path.expanduser('~/devel/data/BirdGT/')  # (*) Path to data dir
     # _data_path        = os.path.expanduser('~/mnt_ssh/home/mkilling/devel/data/BirdGT/') # (*) Path to data dir
     _label_path = _data_path
     _d_files = [('raw_cube0-crop.h5', 'raw')]
