@@ -9,7 +9,8 @@
 elektronn-train </path/to_config_file> [--gpu={Auto|False|<int>}]
 """
 
-import os, inspect
+import os
+import inspect
 import matplotlib
 
 # prevent setting of mpl qt-backend
@@ -22,8 +23,7 @@ from elektronn.training import trainutils  # contains import of mpl
 
 config_file, gpu = trainutils.parseargs(default_config.device)
 # copies config, inits gpu (theano import)
-this_file = os.path.abspath(inspect.getframeinfo(inspect.currentframe(
-)).filename)
+this_file = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
 config = Config(config_file, gpu, this_file)
 
 from elektronn.training import trainer  # contains import of theano

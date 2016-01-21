@@ -17,44 +17,44 @@ from netutils import initWeights
 
 class PerceptronLayer(object):
     """
-  Typical hidden layer of a MLP: units are fully-connected.
-  Weight matrix W is of shape (n_in,n_out), the bias vector b is of shape (n_out,).
+    Typical hidden layer of a MLP: units are fully-connected.
+    Weight matrix W is of shape (n_in,n_out), the bias vector b is of shape (n_out,).
 
-  :type input: theano.tensor.dmatrix
-  :param input: a symbolic tensor of shape (n_examples, n_in)
+    :type input: theano.tensor.dmatrix
+    :param input: a symbolic tensor of shape (n_examples, n_in)
 
-  :type n_in: int
-  :param n_in: dimensionality of input
+    :type n_in: int
+    :param n_in: dimensionality of input
 
-  :type n_out: int
-  :param n_out: number of hidden units
+    :type n_out: int
+    :param n_out: number of hidden units
 
-  :type batch_size: int
-  :param batch_size: batch_size
+    :type batch_size: int
+    :param batch_size: batch_size
 
-  :type enable_dropout: Bool
-  :param pool: whether to enable dropout in this layer. The default rate is 0.5 but it can be changed with
+    :type enable_dropout: Bool
+    :param pool: whether to enable dropout in this layer. The default rate is 0.5 but it can be changed with
                self.activation_noise.set_value(set_value(np.float32(p)) or using cnn.setDropoutRates
 
-  :type activation_func: string
-  :param activation_func: {'relu','sigmoid','tanh','abs', 'maxout <i>'}
-  
-  :type input_noise: theano.shared float32
-  :param input_noise: std of gaussian (centered) input noise. 0 or None --> no noise
+    :type activation_func: string
+    :param activation_func: {'relu','sigmoid','tanh','abs', 'maxout <i>'}
 
-  :type input_layer: layer object
-  :param input_layer: just for keeping track of un-usual input layers
+    :type input_noise: theano.shared float32
+    :param input_noise: std of gaussian (centered) input noise. 0 or None --> no noise
 
-  :type W: np.ndarray or T.TensorVariable
-  :param W: weight matrix. If array, the values are used to initialise a shared variable for this layer.
+    :type input_layer: layer object
+    :param input_layer: just for keeping track of un-usual input layers
+
+    :type W: np.ndarray or T.TensorVariable
+    :param W: weight matrix. If array, the values are used to initialise a shared variable for this layer.
                            If TensorVariable, than this variable is directly used (weight sharing with the
                            layer from which this variable comes from)
 
-  :type b: np.ndarray or T.TensorVariable
-  :param b: bias vector. If array, the values are used to initialise a shared variable for this layer.
+    :type b: np.ndarray or T.TensorVariable
+    :param b: bias vector. If array, the values are used to initialise a shared variable for this layer.
                            If TensorVariable, than this variable is directly used (weight sharing with the
                            layer from which this variable comes from)
-  """
+    """
 
     def __init__(self,
                  input,
@@ -77,9 +77,7 @@ class PerceptronLayer(object):
 
         print "PerceptronLayer( #Inputs =", n_in, "#Outputs =", n_out, ")"
         if input_noise is not None:
-            self.input_noise = theano.shared(
-                np.float32(input_noise),
-                name='Input Noise')
+            self.input_noise = theano.shared(np.float32(input_noise), name='Input Noise')
             print "Input_noise active, p=" + str(self.input_noise.get_value())
             rng = np.random.RandomState(int(time.time()))
             theano_rng = RandomStreams(rng.randint(2**30))
@@ -95,105 +93,63 @@ class PerceptronLayer(object):
             self.input = input
 
         if W is None:
-            W_values = np.asarray(
-                initWeights(
-                    (n_in, n_out),
-                    scale='glorot',
-                    mode='uni'),
-                dtype=theano.config.floatX)
-            self.W = theano.shared(
-                value=W_values,
-                name='W_perceptron' + str(n_in) + '.' + str(n_out),
-                borrow=True)
+            W_values = np.asarray(initWeights((n_in, n_out), scale='glorot', mode='uni'), dtype=theano.config.floatX)
+            self.W = theano.shared(value=W_values, name='W_perceptron' + str(n_in) + '.' + str(n_out), borrow=True)
         else:
             print "Directly using fixed/shared W (", W, "), no Training on it in this layer!"
             if isinstance(W, np.ndarray):
-                self.W = theano.shared(
-                    value=W.astype(np.float32),
-                    name='W_perceptron' + str(n_in) + '.' + str(n_out),
-                    borrow=True)
+                self.W = theano.shared(value=W.astype(np.float32),
+                                       name='W_perceptron' + str(n_in) + '.' + str(n_out),
+                                       borrow=True)
             else:
-                assert isinstance(
-                    W,
-                    T.TensorVariable), "W must be either np.ndarray or theano var"
+                assert isinstance(W, T.TensorVariable), "W must be either np.ndarray or theano var"
                 self.W = W
 
         if b is None:
             #b_values = np.asarray(np.random.uniform(-1e-8,1e-8,(n_out,)), dtype=theano.config.floatX)
             if activation_func == 'relu' or activation_func == 'ReLU':
-                b_values = np.asarray(
-                    initWeights(
-                        (n_out, ),
-                        scale=1.0,
-                        mode='const'),
-                    dtype=theano.config.floatX)
+                b_values = np.asarray(initWeights((n_out, ), scale=1.0, mode='const'), dtype=theano.config.floatX)
             elif activation_func == 'sigmoid':
-                b_values = np.asarray(
-                    initWeights(
-                        (n_out, ),
-                        scale=0.5,
-                        mode='const'),
-                    dtype=theano.config.floatX)
+                b_values = np.asarray(initWeights((n_out, ), scale=0.5, mode='const'), dtype=theano.config.floatX)
             else:  # activation_func=='tanh':
-                b_values = np.asarray(
-                    initWeights(
-                        (n_out, ),
-                        scale=1e-6,
-                        mode='fix-uni'),
-                    dtype=theano.config.floatX)
+                b_values = np.asarray(initWeights((n_out, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
 
-            self.b = theano.shared(
-                value=b_values,
-                name='b_perceptron' + str(n_in) + '.' + str(n_out),
-                borrow=True)
+            self.b = theano.shared(value=b_values, name='b_perceptron' + str(n_in) + '.' + str(n_out), borrow=True)
 
         else:
             print "Directly using fixed given b (", b, "), no Training on it in this layer!"
             if isinstance(b, np.ndarray):
-                self.b = theano.shared(
-                    value=b.astype(np.float32),
-                    name='b_perceptron' + str(n_in) + '.' + str(n_out),
-                    borrow=True)
+                self.b = theano.shared(value=b.astype(np.float32),
+                                       name='b_perceptron' + str(n_in) + '.' + str(n_out),
+                                       borrow=True)
             else:
-                assert isinstance(
-                    b,
-                    T.TensorVariable), "b must be either np.ndarray or theano var"
+                assert isinstance(b, T.TensorVariable), "b must be either np.ndarray or theano var"
                 self.b = b
 
         lin_output = T.dot(self.input, self.W)
 
         if enable_dropout:
             print "Dropout ON"
-            self.activation_noise = theano.shared(
-                np.float32(0.5),
-                name='Dropout Rate')
+            self.activation_noise = theano.shared(np.float32(0.5), name='Dropout Rate')
             rng = T.shared_randomstreams.RandomStreams(int(time.time()))
             p = 1 - self.activation_noise
-            self.dropout_gate = 1.0 / p * rng.binomial(
-                (n_out, ),
-                1,
-                p,
-                dtype=theano.config.floatX)
+            self.dropout_gate = 1.0 / p * rng.binomial((n_out, ), 1, p, dtype=theano.config.floatX)
             lin_output = lin_output * self.dropout_gate.dimshuffle(('x', 0))
 
         lin_output = lin_output + self.b
 
         # Apply non-linearities and ggf. change bias-initialisations
         if activation_func == 'tanh':  # range = [-1,1]
-            self.output = T.tanh(lin_output
-                                 )  # shape: (batch_size, num_outputs)
+            self.output = T.tanh(lin_output)  # shape: (batch_size, num_outputs)
         elif activation_func == 'relu' or activation_func == 'ReLU':  # rectified linear unit ,range = [0,inf]
             self.activation_func = 'relu'
-            self.output = lin_output * (
-                lin_output > 0
-            )  #T.maximum(lin_output,T.zeros_like(lin_output))
+            self.output = lin_output * (lin_output > 0)  #T.maximum(lin_output,T.zeros_like(lin_output))
         elif activation_func == 'abs':  # abs unit ,range = [0,inf]
             self.output = T.abs_(lin_output)
         elif activation_func == 'sigmoid':  # range = [0,1]
             #print "WARNING: consider using tanh(.) or relu(.) instead! Sigmoid is BAD! (relu > tanh >> sigmoid)"
             lin_output = T.dot(self.input, self.W) + self.b
-            self.output = T.nnet.sigmoid(lin_output
-                                         )  #1/(1 + T.exp(-lin_output))
+            self.output = T.nnet.sigmoid(lin_output)  #1/(1 + T.exp(-lin_output))
         elif activation_func == 'linear':
             self.output = (lin_output)
         elif activation_func.startswith("maxout"):
@@ -202,17 +158,14 @@ class PerceptronLayer(object):
             n_out = n_out / r
             self.output = pooling.maxout(lin_output, factor=r)
         else:
-            raise NotImplementedError(
-                "Options are: activation_func=('relu'|'sigmoid'|'tanh'|'abs')")
+            raise NotImplementedError("Options are: activation_func=('relu'|'sigmoid'|'tanh'|'abs')")
 
         self.lin_output = lin_output
         self.params = [self.b if b is None else []] + ([self.W]
                                                        if W is None else [])
-        self.class_probabilities = T.nnet.softmax(
-            lin_output)  # shape: (batch_size, num_outputs)
+        self.class_probabilities = T.nnet.softmax(lin_output)  # shape: (batch_size, num_outputs)
         #self.class_probabilities = T.exp(lin_output) / T.sum(T.exp(lin_output), axis=1, keepdims=True) # For Hessian
-        self.class_prediction = T.argmax(self.class_probabilities,
-                                         axis=1)  # shape: (batch_size,)
+        self.class_prediction = T.argmax(self.class_probabilities, axis=1)  # shape: (batch_size,)
 
     #############################################################################################
 
@@ -220,58 +173,37 @@ class PerceptronLayer(object):
         n_in = self.n_in
         n_out = self.output_shape[1]
         if self.activation_func == 'relu':
-            b_values = np.asarray(
-                initWeights(
-                    (n_out, ),
-                    scale=1.0,
-                    mode='const'),
-                dtype=theano.config.floatX)
+            b_values = np.asarray(initWeights((n_out, ), scale=1.0, mode='const'), dtype=theano.config.floatX)
         elif self.activation_func == 'sigmoid':
-            b_values = np.asarray(
-                initWeights(
-                    (n_out, ),
-                    scale=0.5,
-                    mode='const'),
-                dtype=theano.config.floatX)
+            b_values = np.asarray(initWeights((n_out, ), scale=0.5, mode='const'), dtype=theano.config.floatX)
         else:  #self.activation_func=='tanh':
-            b_values = np.asarray(
-                initWeights(
-                    (n_out, ),
-                    scale=1e-6,
-                    mode='fix-uni'),
-                dtype=theano.config.floatX)
+            b_values = np.asarray(initWeights((n_out, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
 
-        W_values = np.asarray(
-            initWeights(
-                (n_in, n_out), scale, mode),
-            dtype=theano.config.floatX)
+        W_values = np.asarray(initWeights((n_in, n_out), scale, mode), dtype=theano.config.floatX)
 
         self.W.set_value(W_values)
         self.b.set_value(b_values)
 
-    def NLL(self,
-            y,
-            class_weights=None,
-            example_weights=None,
-            label_prop_thresh=None):
+    def NLL(self, y, class_weights=None, example_weights=None, label_prop_thresh=None):
         """
-    Returns the symbolic mean and instance-wise negative log-likelihood of the prediction
-    of this model under a given target distribution.
+        Returns the symbolic mean and instance-wise negative log-likelihood of the prediction
+        of this model under a given target distribution.
 
-    y: theano.tensor.TensorType
-      corresponds to a vector that gives for each example the correct label. Labels < 0 are ignored (e.g. can
-      be used for label propagation)
-              
-    class_weights: theano.tensor.TensorType
-      weight vector of float32 of length  ``n_lab``. Values: ``1.0`` (default), ``w < 1.0`` (less important),
-      ``w > 1.0`` (more important class) 
-      
-    label_prop_thresh: float (0.5,1)
-      This threshold allows unsupervised label propagation (only for examples with negative/ignore labels).
-      If the predictive probability of the most likely class exceeds the threshold, this class is assumed to
-      be the correct label and the training is pushed in this direction.
-      Should only be used with pre-trained networks, and values <= 0.5 are disabled.
-    """
+        y: theano.tensor.TensorType
+          corresponds to a vector that gives for each example the correct label. Labels < 0 are ignored (e.g. can
+          be used for label propagation)
+
+        class_weights: theano.tensor.TensorType
+          weight vector of float32 of length  ``n_lab``. Values: ``1.0`` (default), ``w < 1.0`` (less important),
+          ``w > 1.0`` (more important class)
+
+        label_prop_thresh: float (0.5,1)
+          This threshold allows unsupervised label propagation (only for examples with negative/ignore labels).
+          If the predictive probability of the most likely class exceeds the threshold, this class is assumed to
+          be the correct label and the training is pushed in this direction.
+          Should only be used with pre-trained networks, and values <= 0.5 are disabled.
+        """
+
         # NOTE: This whole function has a ugly problem with NaN. They arise for pred values close to 0 or 1
         # (i.e. for NNs that make very confident and usually also correct predictions) because initially the log of
         # all the whole pred tensor is taken. Later we want to use only some indices of the tensor (mask) but
@@ -286,8 +218,7 @@ class PerceptronLayer(object):
         eps = 1e-6
         pred = self.class_probabilities  # predictive (bs, cl)
         y = y.dimshuffle(0, 'x')  # the labels (bs, 1)
-        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle(
-            'x', 0)  # available classes
+        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle('x', 0)  # available classes
         label_selection = T.eq(cls, y)  # selects correct labels
 
         if class_weights is None:
@@ -301,8 +232,7 @@ class PerceptronLayer(object):
 
         if label_prop_thresh is not None:  # Label propagation block
             above_thresh = pred > label_prop_thresh  # this is one for the class with highes prob
-            prop_mask = above_thresh * (1 - label_selection.sum(
-                axis=1))  # don't do where training labels are available
+            prop_mask = above_thresh * (1 - label_selection.sum(axis=1))  # don't do where training labels are available
             nll_inst_up_prop = -T.log(pred + pred) * prop_mask * class_weights
             N_up_prop = prop_mask.sum()
 
@@ -310,9 +240,7 @@ class PerceptronLayer(object):
             N_up += N_up_prop
 
         nll_inst = nll_inst_up
-        N_up = T.switch(
-            T.eq(N_up, 0), 1, N_up
-        )  # patch N to be not 0, when this is the case the sum is 0 anyway!
+        N_up = T.switch(T.eq(N_up, 0), 1, N_up)  # patch N to be not 0, when this is the case the sum is 0 anyway!
         nll = nll_inst.sum() / N_up
 
         return nll, nll_inst
@@ -323,23 +251,24 @@ class PerceptronLayer(object):
                  example_weights=None,
                  label_prop_thresh=None):
         """
-    Returns the symbolic mean and instance-wise negative log-likelihood of the prediction
-    of this model under a given target distribution.
+        Returns the symbolic mean and instance-wise negative log-likelihood of the prediction
+        of this model under a given target distribution.
 
-    y: theano.tensor.TensorType
-      corresponds to a vector that gives for each example the correct label. Labels < 0 are ignored (e.g. can
-      be used for label propagation)
+        y: theano.tensor.TensorType
+          corresponds to a vector that gives for each example the correct label. Labels < 0 are ignored (e.g. can
+          be used for label propagation)
 
-    class_weights: theano.tensor.TensorType
-      weight vector of float32 of length  ``n_lab``. Values: ``1.0`` (default), ``w < 1.0`` (less important),
-      ``w > 1.0`` (more important class)
+        class_weights: theano.tensor.TensorType
+          weight vector of float32 of length  ``n_lab``. Values: ``1.0`` (default), ``w < 1.0`` (less important),
+          ``w > 1.0`` (more important class)
 
-    label_prop_thresh: float (0.5,1)
-      This threshold allows unsupervised label propagation (only for examples with negative/ignore labels).
-      If the predictive probability of the most likely class exceeds the threshold, this class is assumed to
-      be the correct label and the training is pushed in this direction.
-      Should only be used with pre-trained networks, and values <= 0.5 are disabled.
-    """
+        label_prop_thresh: float (0.5,1)
+          This threshold allows unsupervised label propagation (only for examples with negative/ignore labels).
+          If the predictive probability of the most likely class exceeds the threshold, this class is assumed to
+          be the correct label and the training is pushed in this direction.
+          Should only be used with pre-trained networks, and values <= 0.5 are disabled.
+        """
+
         # NOTE: This whole function has a ugly problem with NaN. They arise for pred values close to 0 or 1
         # (i.e. for NNs that make very confident and usually also correct predictions) because initially the log of
         # all the whole pred tensor is taken. Later we want to use only some indices of the tensor (mask) but
@@ -354,8 +283,7 @@ class PerceptronLayer(object):
         eps = 1e-6
         pred = self.class_probabilities  # predictive (bs, cl)
         y = y.dimshuffle(0, 'x')  # the labels (bs, 1)
-        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle(
-            'x', 0)  # available classes
+        cls = T.arange(self.class_probabilities.shape[1]).dimshuffle('x', 0)  # available classes
         hard_labels = T.eq(cls, y)  # selects correct labels
 
         if class_weights is None:
@@ -370,50 +298,46 @@ class PerceptronLayer(object):
         N_up = T.sum(hard_labels)  # number of labelled examples
 
         nll_inst = nll_inst_up
-        N_up = T.switch(
-            T.eq(N_up, 0), 1, N_up
-        )  # patch N to be not 0, when this is the case the sum is 0 anyway!
+        N_up = T.switch(T.eq(N_up, 0), 1, N_up)  # patch N to be not 0, when this is the case the sum is 0 anyway!
         nll = nll_inst.sum() / N_up
 
         return nll, nll_inst
 
     def nll_mutiple_binary(self, y, class_weights=None):
         """
-    Returns the mean and instance-wise negative log-likelihood of the prediction
-    of this model under a given target distribution.
+        Returns the mean and instance-wise negative log-likelihood of the prediction
+        of this model under a given target distribution.
 
-    :type y: theano.tensor.TensorType
-    :param y: corresponds to a vector that gives for each example the
-              correct label
+        :type y: theano.tensor.TensorType
+        :param y: corresponds to a vector that gives for each example the
+                  correct label
 
-    Note: we use the mean instead of the sum so that
-          the learning rate is less dependent on the batch size
-    """
+        Note: we use the mean instead of the sum so that
+              the learning rate is less dependent on the batch size
+        """
         # y (bs, n_lab)
         eps = 1e-6
         act = self.lin_output  # (bs, n_lab)
         prob_0 = T.exp(act) / (T.exp(act) + 1)
         prob_1 = 1.0 - prob_0
 
-        self.class_probabilities = T.stack(prob_0, prob_1).dimshuffle(
-            1, 2, 0)  # (bs, n_lab, 2)
+        self.class_probabilities = T.stack(prob_0, prob_1).dimshuffle(1, 2, 0)  # (bs, n_lab, 2)
         self.class_prediction = T.argmax(self.class_probabilities, axis=2)
         if class_weights is None:
             class_weights = T.ones(2)
         else:
             class_weights = class_weights
 
-        nll_inst = (-T.log(prob_0 + eps) * (1 - y) * class_weights[0] -
-                    T.log(prob_1 + eps) * y * class_weights[1])
+        nll_inst = (-T.log(prob_0 + eps) * (1 - y) * class_weights[0] - T.log(prob_1 + eps) * y * class_weights[1])
         nll = T.mean(nll_inst)
         return nll, nll_inst
 
     def squared_distance(self, Target, Mask=None, return_instancewise=True):
         """
-    Target is the TARGET image (vectorized), -> shape(x) = (batchsize, n_target)
-    output: scalar float32
-    mask: vectorized, 1==hole, 0==no_hole (== DOES NOT TRAIN ON NON-HOLES)
-    """
+        Target is the TARGET image (vectorized), -> shape(x) = (batchsize, n_target)
+        output: scalar float32
+        mask: vectorized, 1==hole, 0==no_hole (== DOES NOT TRAIN ON NON-HOLES)
+        """
         if Mask is None:
             batch = T.mean((self.output - Target)**2)
             inst = (self.output - Target)**2
@@ -429,17 +353,16 @@ class PerceptronLayer(object):
 
     def errors(self, y):
         """
-    Returns classification accuracy
+        Returns classification accuracy
 
-    :type y: theano.tensor.TensorType
-    :param y: corresponds to a vector that gives for each example the
-              correct label
-    """
+        :type y: theano.tensor.TensorType
+        :param y: corresponds to a vector that gives for each example the
+                  correct label
+        """
         # check if y has same dimension of class_prediction
         if y.ndim != self.class_prediction.ndim:
-            raise TypeError(
-                'y should have the same shape as self.class_prediction',
-                ('y', y.type, 'class_prediction', self.class_prediction.type))
+            raise TypeError('y should have the same shape as self.class_prediction',
+                            ('y', y.type, 'class_prediction', self.class_prediction.type))
         # check if y is of the correct datatype
         if y.dtype.startswith('int'):
             # the T.neq operator returns a vector of 0s and 1s, where 1
@@ -467,9 +390,9 @@ class PerceptronLayer(object):
 
     def cross_entropy_array(self, Target, Mask=None, GaussianWindow=False):
         """
-    Target is the TARGET image (vectorized), -> shape(x) = (batchsize, imgsize**2)
-    the output is of length: <batchsize>, Use cross_entropy() to get a scalar output.
-    """
+        Target is the TARGET image (vectorized), -> shape(x) = (batchsize, imgsize**2)
+        the output is of length: <batchsize>, Use cross_entropy() to get a scalar output.
+        """
         if GaussianWindow:
             window = self.__make_window().reshape(1, -1)
         if Mask is None:
@@ -490,8 +413,8 @@ class PerceptronLayer(object):
 
     def cross_entropy(self, Target, Mask=None, GaussianWindow=False):
         """
-    Target is the TARGET image (vectorized), -> shape(x) = (batchsize, imgsize**2) output: scalar float32
-    """
+        Target is the TARGET image (vectorized), -> shape(x) = (batchsize, imgsize**2) output: scalar float32
+        """
         if GaussianWindow:
             window = self._make_window().reshape(1, -1)
         if Mask is None:
@@ -514,17 +437,17 @@ class PerceptronLayer(object):
 
 class RecurrentLayer(object):
     """
-  :type input: symbolic input carrying [time, batch, feat]
-  :param input: theano.tensor.ftensor3
+    :type input: symbolic input carrying [time, batch, feat]
+    :param input: theano.tensor.ftensor3
 
-  :type n_in: int
-  :param n_in: dimensionality of input
+    :type n_in: int
+    :param n_in: dimensionality of input
 
-  :type n_hid: int
-  :param n_hid: number of hidden units
+    :type n_hid: int
+    :param n_hid: number of hidden units
 
-  :type activation_func: string
-  :param activation_func: {'relu','sigmoid','tanh','abs'}
+    :type activation_func: string
+    :param activation_func: {'relu','sigmoid','tanh','abs'}
     """
 
     def __init__(self, input, n_in, n_hid, batch_size, activation_func='tanh'):
@@ -539,25 +462,11 @@ class RecurrentLayer(object):
 
         print "RecurrentLayer( #Inputs =", n_in, "#Hidden = ", n_hid, ")"
 
-        W_in_values = np.asarray(
-            initWeights(
-                (n_in, n_hid),
-                scale='glorot',
-                mode='uni'),
-            dtype=theano.config.floatX)
+        W_in_values = np.asarray(initWeights((n_in, n_hid), scale='glorot', mode='uni'), dtype=theano.config.floatX)
         self.W_in = theano.shared(W_in_values, name='W_in', borrow=True)
-        W_hid_values = np.asarray(
-            initWeights(
-                (n_hid, n_hid),
-                mode='rnn'),
-            dtype=theano.config.floatX)
+        W_hid_values = np.asarray(initWeights((n_hid, n_hid), mode='rnn'), dtype=theano.config.floatX)
         self.W_hid = theano.shared(W_hid_values, name='W_hid', borrow=True)
-        b_hid_values = np.asarray(
-            initWeights(
-                (n_hid, ),
-                scale=1e-6,
-                mode='fix-uni'),
-            dtype=theano.config.floatX)
+        b_hid_values = np.asarray(initWeights((n_hid, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
         self.b_hid = theano.shared(b_hid_values, name='b_hid', borrow=True)
         hid_0_values = np.zeros(n_hid, dtype=theano.config.floatX)
         self.hid_0 = theano.shared(hid_0_values, name='hid_0', borrow=True)
@@ -580,27 +489,21 @@ class RecurrentLayer(object):
             print "Warning: linear activation in recurrent layer with fanout-%i! Is this the output layer?" % n_hid
             act = lambda x: x
         else:
-            raise NotImplementedError(
-                "options are: activation_func=('relu'|'sigmoid'|'tanh'|'abs')")
+            raise NotImplementedError("options are: activation_func=('relu'|'sigmoid'|'tanh'|'abs')")
 
         def recurrence(x_t, hid_prev):
             hid_lin_t = T.dot(x_t, W_in) + T.dot(hid_prev, W_hid) + b_hid
             hid_t = act(hid_lin_t)
             return [hid_t, hid_lin_t]
 
-        outputs_info = [dict(initial=T.alloc(hid_0, input.shape[1], n_hid),
-                             taps=[-1]), dict()]
+        outputs_info = [dict(initial=T.alloc(hid_0, input.shape[1], n_hid), taps=[-1]), dict()]
         # shapes are [time, batch, feat]
         ([hid, hid_lin], updates) = theano.scan(fn=recurrence,
                                                 sequences=input,
                                                 outputs_info=outputs_info,
                                                 name='Recurrence')
-        hid_lin = hid_lin.dimshuffle(
-            1, 0, 2
-        )  # exchange batch and time  again --> [batch, time, hid/feat]
-        hid = act(
-            hid_lin
-        )  # I think this is needed for structural damping (calculating grad wrt hid_lin)
+        hid_lin = hid_lin.dimshuffle(1, 0, 2)  # exchange batch and time  again --> [batch, time, hid/feat]
+        hid = act(hid_lin)  # I think this is needed for structural damping (calculating grad wrt hid_lin)
 
         self.output = hid[:, -1]  # [batch, hid/feat]
         self.hid = hid
@@ -608,25 +511,11 @@ class RecurrentLayer(object):
 
     def randomizeWeights(self, scale_w=1.0):
         n_in, n_hid = self.n_in, self.n_hid
-        W_in_values = np.asarray(
-            initWeights(
-                (n_in, n_hid),
-                scale='glorot',
-                mode='uni'),
-            dtype=theano.config.floatX)
+        W_in_values = np.asarray(initWeights((n_in, n_hid), scale='glorot', mode='uni'), dtype=theano.config.floatX)
         self.W_in.set_value(W_in_values)
-        W_hid_values = np.asarray(
-            initWeights(
-                (n_in, n_hid),
-                mode='rnn'),
-            dtype=theano.config.floatX)
+        W_hid_values = np.asarray(initWeights((n_in, n_hid), mode='rnn'), dtype=theano.config.floatX)
         self.W_hid.set_value(W_hid_values)
-        b_hid_values = np.asarray(
-            initWeights(
-                (n_hid, ),
-                scale=1e-6,
-                mode='fix-uni'),
-            dtype=theano.config.floatX)
+        b_hid_values = np.asarray(initWeights((n_hid, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
         self.b_hid.set_value(b_hid_values)
         hid_0_values = np.zeros(n_hid, dtype=theano.config.floatX)
         self.hid_0.set_value(hid_0_values)

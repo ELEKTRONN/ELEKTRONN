@@ -154,21 +154,17 @@ def pooling3d(conv_out, pool_shape=(2, 2, 2), mode='max'):
 if __name__ == "__main__":
     import sys, os
     sys.path.append(os.path.expanduser("~/devel/ELEKTRONN/"))
-    from Training.trainutils import timeit
-    sym_input = T.TensorType(dtype=theano.config.floatX,
-                             broadcastable=[False] * 5)()
+    from elektronn.training.trainutils import timeit
+    sym_input = T.TensorType(dtype=theano.config.floatX, broadcastable=[False] * 5)()
     pool = (2, 2, 2)
 
-    sym_ret = my_max_pool_3d(sym_input, pool
-                             )  #my_max_pool_3d_stupid(sym_input)
+    sym_ret = my_max_pool_3d(sym_input, pool)  #my_max_pool_3d_stupid(sym_input)
     f_maxp_3d_ref = timeit(theano.function([sym_input], sym_ret), 4)
 
-    sym_ret = pooling3d(sym_input, pool, 'max'
-                        )  #my_max_pool_3d_stupid(sym_input)
+    sym_ret = pooling3d(sym_input, pool, 'max')  #my_max_pool_3d_stupid(sym_input)
     f_maxp_3d = timeit(theano.function([sym_input], sym_ret), 4)
 
-    sym_ret = pooling3d(sym_input, pool, 'maxabs'
-                        )  #my_max_pool_3d_stupid(sym_input)
+    sym_ret = pooling3d(sym_input, pool, 'maxabs')  #my_max_pool_3d_stupid(sym_input)
     f_maxp_3d_new = timeit(theano.function([sym_input], sym_ret), 4)
 
     #    sym_ret = maxabsPool3d(sym_input, pool)#my_max_pool_3d_stupid(sym_input)

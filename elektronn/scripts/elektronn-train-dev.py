@@ -14,16 +14,13 @@ from subprocess import check_call, CalledProcessError
 import matplotlib
 
 # prevent setting of mpl qt-backend on machines without X-server before other modules import mpl
-with open(
-        os.devnull,
-        'w') as devnull:  #  Redirect to /dev/null because xset output is unimportant
+with open(os.devnull, 'w') as devnull:  #  Redirect to /dev/null because xset output is unimportant
     try:
         # "xset q" will always succeed to run if an X server is currently running
         check_call(['xset', 'q'], stdout=devnull, stderr=devnull)
         print('X available')
         # Don't set backend explicitly, use system default...
-    except (OSError, CalledProcessError
-            ):  # if "xset q" fails, conclude that X is not running
+    except (OSError, CalledProcessError):  # if "xset q" fails, conclude that X is not running
         print('X unavailable')
         matplotlib.use('AGG')
 
@@ -32,8 +29,7 @@ from elektronn.training import trainutils  # contains import of mpl
 
 config_file = '/docs/devel/ELEKTRONN/elektronn/examples/MNIST_CNN_warp_config.py'
 gpu = default_config.device
-this_file = os.path.abspath(inspect.getframeinfo(inspect.currentframe(
-)).filename)
+this_file = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
 # commandline arguments override config_file and gpu if given as argv
 config_file, gpu = trainutils.parseargs_dev(sys.argv, config_file, gpu)
 # copies config, inits gpu (theano import)
