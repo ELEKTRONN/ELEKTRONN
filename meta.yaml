@@ -1,0 +1,31 @@
+package:
+  name: elektronn
+  version: 1.0.3
+
+source:
+    git_url: https://github.com/ELEKTRONN/ELEKTRONN.git
+    git_rev: v1.0.3
+
+requirements:
+  build:
+    - python 2.7*
+    - setuptools
+    - cython
+    - h5py
+    - matplotlib
+    - numpy
+    - scipy
+    - theano
+
+  run:
+    - python 2.7*
+    - h5py
+    - matplotlib
+    - numpy
+    - scipy
+    - theano
+
+about:
+  home: http://www.elektronn.org/
+  license: GPLv3
+  license_file: LICENSE.txt
