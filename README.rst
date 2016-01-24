@@ -1,8 +1,8 @@
-.. image:: http://anaconda.org/mdraw/elektronn/badges/installer/conda.svg
-   :target: http://conda.anaconda.org/mdraw
-
 .. image:: https://badge.fury.io/py/elektronn.svg
    :target: https://badge.fury.io/py/elektronn
+
+.. image:: http://anaconda.org/elektronn/elektronn/badges/version.svg
+   :target: http://anaconda.org/elektronn/elektronn
 
 .. image:: http://anaconda.org/elektronn/elektronn/badges/build.svg
    :target: http://anaconda.org/elektronn/elektronn/builds
