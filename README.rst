@@ -15,6 +15,8 @@ The package includes a sophisticated training pipeline designed for classificati
 
 Additionally, the toolkit offers training routines for tasks on non-image data.
 
+ELEKTRONN was created by Marius Killinger and Gregor Urban at the Max Planck Institute For Medical Research to solve connectomics tasks.
+
 .. image:: http://elektronn.org/downloads/combined_title.png
     :width: 1000px
     :alt: Logo+Example
