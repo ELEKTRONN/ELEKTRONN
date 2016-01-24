@@ -30,7 +30,7 @@ def read(fname):
 ext_modules = [
     Extension('elektronn.training._warping',
               sources=['elektronn/training/_warping.pyx'],
-              extra_compile_args=['-std=c11', '-O3', '-Wall', '-Wextra'])
+              extra_compile_args=['-std=c99', '-O3', '-Wall', '-Wextra'])
 ]
 
 setup(
