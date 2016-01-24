@@ -30,8 +30,8 @@ def sort_human(file_names):
 
 class Data(object):
     """
-  Load and prepare data, Base-Obj
-  """
+    Load and prepare data, Base-Obj
+    """
 
     def __init__(self, n_lab=None):
         self._pos = 0
@@ -52,8 +52,7 @@ class Data(object):
         self.example_shape = self.train_d[0].shape
         self.n_ch = self.example_shape[0]
 
-        self.rng = np.random.RandomState(np.uint32((time.time() * 0.0001 - int(
-            time.time() * 0.0001)) * 4294967295))
+        self.rng = np.random.RandomState(np.uint32((time.time() * 0.0001 - int(time.time() * 0.0001)) * 4294967295))
         self.pid = os.getpid()
         print self.__repr__()
         self._perm = self.rng.permutation(self._training_count)
@@ -63,13 +62,12 @@ class Data(object):
         current_pid = os.getpid()
         if current_pid != self.pid:
             self.pid = current_pid
-            self.rng.seed(np.uint32((time.time() * 0.0001 - int(time.time(
-            ) * 0.0001)) * 4294967295 + self.pid))
+            self.rng.seed(np.uint32((time.time() * 0.0001 - int(time.time() * 0.0001)) * 4294967295 + self.pid))
             print "Reseeding RNG in Process with PID:", self.pid
 
     def __repr__(self):
         return "%i-class Data Set: #training examples: %i and #validing: %i" \
-        %(self.n_lab, self._training_count, len(self.valid_d))
+        % (self.n_lab, self._training_count, len(self.valid_d))
 
     def getbatch(self, batch_size, source='train'):
         if source == 'train':
@@ -107,21 +105,11 @@ class Data(object):
         k = int(size * subset_ratio)
         return perm[:k]
 
-    def createCVSplit(self,
-                      data,
-                      label,
-                      n_folds=3,
-                      use_fold=2,
-                      shuffle=False,
-                      random_state=None):
+    def createCVSplit(self, data, label, n_folds=3, use_fold=2, shuffle=False, random_state=None):
         if not sklearn_avail:
             raise RuntimeError("Please install sklearn to create CV splits")
 
-        cv = cross_validation.KFold(
-            len(data),
-            n_folds,
-            shuffle=shuffle,
-            random_state=random_state)
+        cv = cross_validation.KFold(len(data), n_folds, shuffle=shuffle, random_state=random_state)
         for fold, (train_i, valid_i) in enumerate(cv):
             if fold == use_fold:
                 self.valid_d = data[valid_i]
@@ -162,8 +150,7 @@ class BalancedData(Data):
         if balanced:
             return self.getbatch_balanced(batch_size)  # only train
         else:
-            return super(BalancedData, self).getbatch(batch_size,
-                                                      source=source)
+            return super(BalancedData, self).getbatch(batch_size, source=source)
 
     def _init_balanced(self):
         self._b_mask = [(None)] * self.n_lab
@@ -195,8 +182,7 @@ class BalancedData(Data):
         label = np.empty((batch_size), dtype=np.int16)
         batch_size = batch_size // self.n_lab
 
-        for k, (mask, perm, pos) in enumerate(zip(self._b_mask, self._b_perm,
-                                                  self._b_pos)):
+        for k, (mask, perm, pos) in enumerate(zip(self._b_mask, self._b_perm, self._b_pos)):
             slice, pos = self._get_save_slice(perm, pos, batch_size)
             d = self.train_d[mask[slice]]
             l = self.train_l[mask[slice]]
@@ -220,8 +206,7 @@ class QueueData(Data):
         self._queue_prio = np.zeros(self._training_count)
         self._queue_last = np.zeros(self._training_count)
         self._queue_ix = np.arange(self._training_count)
-        self._queue_count = np.ones(
-            self._training_count)  # Initialise to one s.t. 1/count is possible
+        self._queue_count = np.ones(self._training_count)  # Initialise to one s.t. 1/count is possible
         self._batch_ix = None
 
     def queueget(self, n):
@@ -229,8 +214,7 @@ class QueueData(Data):
         slice = self._queue_ix[:n]  # indices of n highest elements
         self._batch_ix = slice  # store for updates
         if isinstance(self.train_d, np.ndarray):
-            ret = (self.train_d[slice], self.train_l[slice],
-                   self._queue_count[slice])
+            ret = (self.train_d[slice], self.train_l[slice], self._queue_count[slice])
         elif isinstance(self.train_d, list):
             data = [self.train_d[i] for i in slice]
             label = [self.train_l[i] for i in slice]
@@ -242,21 +226,19 @@ class QueueData(Data):
 
     def queueupdate(self, nlls, iteration):
         assert self._batch_ix.shape == nlls.shape, "Cannot update, indices not known"
-        self._queue_prio[self._batch_ix] = nlls/(1+0.017*self._queue_count[self._batch_ix]) - \
-                                                              0.004*(iteration - self._queue_last[self._batch_ix])
+        self._queue_prio[self._batch_ix] = nlls/(1+0.017*self._queue_count[self._batch_ix]) \
+                                                -0.004*(iteration - self._queue_last[self._batch_ix])
         #    for i,nll in zip(self._batch_ix, nlls): # Update priorities in original list
         #      p = nll/(1+0.017*self._queue_count[i]) - 0.004*(iteration - self._queue_last[i])
         #      self._queue_prio[i] = p
 
-        self._queue_ix = np.argsort(
-            self._queue_prio)[::-1]  # restore order, high prios first
+        self._queue_ix = np.argsort(self._queue_prio)[::-1]  # restore order, high prios first
         self._batch_ix = None
 
     def queuereset(self):
         self._queue_prio = np.zeros(self._training_count)
         self._queue_ix = np.arange(self._training_count)
-        self._queue_count = np.ones(
-            self._training_count)  # Initialise to one s.t. 1/count is possible
+        self._queue_count = np.ones(self._training_count)  # Initialise to one s.t. 1/count is possible
         self._batch_ix = None
 
     def _getdata(self):
@@ -290,41 +272,25 @@ class AdultData(Data):
     def __init__(self, path='~/devel/data/adult.pkl', create=False):
         path = os.path.expanduser(path)
         if create:
-            self._fields = 'age,workclass,fnlwgt,education,educationnum,maritalstatus,occupation,relationship,race,sex,capitalgain,capitalloss,hoursperweek,nativecountry,target'.split(
-                ',')
-            self._kinds = 'cont,cat,cat,cat,cont,cat,cat,cat,cat,cat,cont,cont,cont,cat,cat'.split(
-                ',')
+            self._fields = 'age,workclass,fnlwgt,education,educationnum,maritalstatus,occupation,relationship,race,sex,capitalgain,capitalloss,hoursperweek,nativecountry,target'.split(',')
+            self._kinds = 'cont,cat,cat,cat,cont,cat,cat,cat,cat,cat,cont,cont,cont,cat,cat'.split(',')
 
-            data_socket = urllib2.urlopen(
-                'http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data')
-            train_d = np.genfromtxt(data_socket,
-                                    skip_header=1,
-                                    delimiter=',',
-                                    names=self._fields,
-                                    dtype=None)
+            data_socket = urllib2.urlopen('http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data')
+            train_d = np.genfromtxt(data_socket, skip_header=1, delimiter=',', names=self._fields, dtype=None)
             train_d = self._normalise_adult(train_d)
-            self.train_l = train_d[:, -1].astype(
-                'int16')  # np.expand_dims(train_d[:,-1].astype('int16'), 1)
+            self.train_l = train_d[:, -1].astype('int16')  # np.expand_dims(train_d[:,-1].astype('int16'), 1)
             self.train_d = train_d[:, :-1]
 
-            test_socket = urllib2.urlopen(
-                'http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test')
-            valid_d = np.genfromtxt(test_socket,
-                                    skip_header=1,
-                                    delimiter=',',
-                                    names=self._fields,
-                                    dtype=None)
+            test_socket = urllib2.urlopen('http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test')
+            valid_d = np.genfromtxt(test_socket, skip_header=1, delimiter=',', names=self._fields, dtype=None)
             valid_d = self._normalise_adult(valid_d)
-            self.valid_l = valid_d[:, -1].astype(
-                'int16')  #np.expand_dims(valid_d[:,-1].astype('int16'), 1)
+            self.valid_l = valid_d[:, -1].astype('int16')  #np.expand_dims(valid_d[:,-1].astype('int16'), 1)
             self.valid_d = valid_d[:, :-1]
 
-            ut.pickleSave(
-                (self.train_d, self.train_l, self.valid_d, self.valid_l), path)
+            ut.pickleSave((self.train_d, self.train_l, self.valid_d, self.valid_l), path)
 
         else:
-            self.train_d, self.train_l, self.valid_d, self.valid_l = ut.pickleLoad(
-                path)
+            self.train_d, self.train_l, self.valid_d, self.valid_l = ut.pickleLoad(path)
 
         super(AdultData, self).__init__()
 
@@ -347,19 +313,12 @@ class AdultData(Data):
 
 
 class MNISTData(Data):
-    def __init__(self,
-                 path=None,
-                 convert2image=True,
-                 warp_on=False,
-                 shift_augment=True,
-                 center=True):
+    def __init__(self, path=None, convert2image=True, warp_on=False, shift_augment=True, center=True):
         if path is None:
-            (self.train_d, self.train_l), (self.valid_d, self.valid_l), (
-            self.test_d, self.test_l) = self.download()
+            (self.train_d, self.train_l), (self.valid_d, self.valid_l), (self.test_d, self.test_l) = self.download()
         else:
             path = os.path.expanduser(path)
-            (self.train_d, self.train_l), (self.valid_d, self.valid_l), (
-                self.test_d, self.test_l) = ut.pickleLoad(path)
+            (self.train_d, self.train_l), (self.valid_d, self.valid_l), (self.test_d, self.test_l) = ut.pickleLoad(path)
 
         self.warp_on = warp_on
         self.shif_augment = shift_augment
@@ -376,10 +335,7 @@ class MNISTData(Data):
         self.convert_to_image()
         if self.shif_augment:
             self._stripborder(1)
-            self.train_d, self.train_l = self._augmentMNIST(self.train_d,
-                                                            self.train_l,
-                                                            crop=2,
-                                                            factor=4)
+            self.train_d, self.train_l = self._augmentMNIST(self.train_d, self.train_l, crop=2, factor=4)
 
         super(MNISTData, self).__init__()
         if not convert2image:
@@ -464,23 +420,19 @@ class MNISTData(Data):
         stretch = stretch_max * 2 * (np.random.rand(4) - 0.5)
 
         ps = (d.shape[0], ) + d.shape[2:]
-        w = warping.warp3dFast(d, ps, rot, shear,
-                               (scale[0], scale[1], 1), stretch, twist)
+        w = warping.warp3dFast(d, ps, rot, shear, (scale[0], scale[1], 1), stretch, twist)
         return w
 
     def _augmentMNIST(self, data, label, crop=2, factor=4):
         """
-    Creates new data, by cropping/shifting data.
-    Control blow-up by factor and maximum offset by crop
-    """
+        Creates new data, by cropping/shifting data.
+        Control blow-up by factor and maximum offset by crop
+        """
         n = data.shape[-1]
         new_size = (n - crop)
-        new_data = np.zeros(
-            (0, 1, new_size, new_size),
-            dtype=np.float32)  # store new data in here
+        new_data = np.zeros((0, 1, new_size, new_size), dtype=np.float32)  # store new data in here
         new_label = np.zeros((0, ), dtype=np.int16)
-        pos = [(i % crop, int(i / crop) % crop)
-               for i in xrange(crop**2)]  # offests of different positions
+        pos = [(i % crop, int(i / crop) % crop) for i in xrange(crop**2)]  # offests of different positions
         perm = np.random.permutation(xrange(crop**2))
 
         for i in xrange(factor):  # create <factor> new version of data
@@ -493,11 +445,7 @@ class MNISTData(Data):
 
 
 class BuzzData(Data):
-    def __init__(self,
-                 path='~/devel/data/Buzz/Twitter/twitter.pkl',
-                 norm_targets=True,
-                 target_scale=9999,
-                 fold_no=0):
+    def __init__(self, path='~/devel/data/Buzz/Twitter/twitter.pkl', norm_targets=True, target_scale=9999, fold_no=0):
         path = os.path.expanduser(path)
         data, target = ut.pickleLoad(path)
         #    N = len(data)
@@ -522,10 +470,7 @@ class BuzzData(Data):
 
 
 class PianoData(Data):
-    def __init__(self,
-                 path='~/devel/data/PianoRoll/Nottingham_enc.pkl',
-                 n_tap=20,
-                 n_lab=58):
+    def __init__(self, path='~/devel/data/PianoRoll/Nottingham_enc.pkl', n_tap=20, n_lab=58):
         path = os.path.expanduser(path)
         (self.train_d, self.valid_d, self.test_d) = ut.pickleLoad(path)
         super(PianoData, self).__init__(n_lab=n_lab)
@@ -552,18 +497,14 @@ class PianoData(Data):
             data = self.test_d[:batch_size]
 
         lengths = np.array(map(len, data))
-        start_t = np.round(np.random.rand(batch_size) *
-                           (lengths - self.n_taps - 1)).astype(np.int)
-        x = np.array([d[t:t + self.n_taps].astype(np.float32)
-                      for d, t in zip(data, start_t)])
+        start_t = np.round(np.random.rand(batch_size) * (lengths - self.n_taps - 1)).astype(np.int)
+        x = np.array([d[t:t + self.n_taps].astype(np.float32) for d, t in zip(data, start_t)])
         y = np.array([d[t + self.n_taps] for d, t in zip(data, start_t)])
         return x, y
 
 
 class GeneData(Data):
-    def __init__(self,
-                 path='~/devel/data/GEMLeR_GeneExpression/Breast_Colon.pkl',
-                 fold_no=0):
+    def __init__(self, path='~/devel/data/GEMLeR_GeneExpression/Breast_Colon.pkl', fold_no=0):
         path = os.path.expanduser(path)
         data, target = ut.pickleLoad(path)
         super(GeneData, self).createCVSplit(data, target, use_fold=fold_no)
@@ -584,9 +525,7 @@ if __name__ == "__main__":
     #  d, l = data.getbatch(200, 'train')
     #  m = embedMatricesInGray(d[:,0])
     #  plt.imshow(m, interpolation='none', cmap='gray')
-    data = MNISTData(path=None,
-                     convert2image=False,
-                     shift_augment=False)
+    data = MNISTData(path=None, convert2image=False, shift_augment=False)
 
     #  data = PianoData(n_tap=20, n_lab=58)
     d, l = data.getbatch(10)

@@ -160,9 +160,7 @@ class Trainer(object):
         # --------------------------------------------------------------------------------------------------------
         if config.background_processes:
             n_proc = max(2, int(config.background_processes))
-            bg_worker = BackgroundProc(data.getbatch,
-                                       n_proc=n_proc,
-                                       target_kwargs=self.get_batch_kwargs)
+            bg_worker = BackgroundProc(data.getbatch, n_proc=n_proc, target_kwargs=self.get_batch_kwargs)
         # --------------------------------------------------------------------------------------------------------
         try:
             t0 = time.time()
@@ -179,9 +177,7 @@ class Trainer(object):
                         batch = batch + (config.label_prop_thresh, )
 
     #-----------------------------------------------------------------------------------------------------
-                    nll, nll_instance, t_per_train = cnn.trainingStep(
-                        *batch,
-                        mode=config.optimizer)  # Update step
+                    nll, nll_instance, t_per_train = cnn.trainingStep(*batch, mode=config.optimizer)  # Update step
                     #-----------------------------------------------------------------------------------------------------
                     t_per_it = time.time() - t0
                     t0 = time.time()
@@ -198,19 +194,15 @@ class Trainer(object):
                     t_pi = 0.8 * t_pi + 0.2 * t_per_it  # EMA
                     t_passed += t_per_it
                     batch_char = batch[1].mean()
-                    self.timeline.append([i, t_passed, nll_ema, nll, batch_char
-                                          ])
-                    if (t_passed - last_save_t
-                        ) / 3600 > config.param_save_h:  # every hour
+                    self.timeline.append([i, t_passed, nll_ema, nll, batch_char])
+                    if (t_passed - last_save_t) / 3600 > config.param_save_h:  # every hour
                         last_save_t = t_passed
                         time_string = '-' + str(save_time) + 'h'
-                        cnn.saveParameters(save_name + time_string + '.param',
-                                           show=False)
+                        cnn.saveParameters(save_name + time_string + '.param', show=False)
                         save_time += config.param_save_h
 
                     if self.preview_data is not None:
-                        if (t_passed-last_save_t2)/3600 > config.prev_save_h \
-                        or (t_passed/3600 > config.initial_prev_h and last_save_t2==0): # first time
+                        if (t_passed-last_save_t2)/3600 > config.prev_save_h or (t_passed/3600 > config.initial_prev_h and last_save_t2==0): # first time
                             last_save_t2 = t_passed
                             config.preview_kwargs['number'] = save_time2
                             save_time2 += config.prev_save_h
@@ -227,11 +219,9 @@ class Trainer(object):
                             next_LR_adjust = (None, None)
 
                     if i % 1000 == 0:  # update learning rate (exp. decay)
-                        cnn.setSGDLR(np.float32(cnn.SGD_LR.get_value() *
-                                                config.LR_decay))
+                        cnn.setSGDLR(np.float32(cnn.SGD_LR.get_value() * config.LR_decay))
 
-                    if (i % config.history_freq[0] ==
-                            0) and config.history_freq[0] != 0:
+                    if (i % config.history_freq[0] == 0) and config.history_freq[0] != 0:
                         lr = cnn.SGD_LR.get_value()
                         self.CG_timeline = cnn.CG_timeline
                         ### Training  & Valid Errors ###
@@ -243,38 +233,27 @@ class Trainer(object):
                             train_error *= 100
                             valid_error *= 100
 
-                        self.errors.append([i, t_passed, train_error,
-                                            valid_error])
-                        self.history.append(
-                            [i, t_passed, nll_ema, nll, train_nll, valid_nll,
-                             nll_gain, lr])
+                        self.errors.append([i, t_passed, train_error, valid_error])
+                        self.history.append([i, t_passed, nll_ema, nll, train_nll, valid_nll, nll_gain, lr])
                         if config.target == 'malis':
                             self.malisPreviewSlice(batch, name=i)
 
                             ### Monitoring / Output ###
                             #np.save('Backup/'+save_name+".DataHist",  np.array(self.data.HIST)) ### DEBUG
-                        cnn.saveParameters(save_name + '-LAST.param',
-                                           show=False)
+                        cnn.saveParameters(save_name + '-LAST.param', show=False)
 
                         if config.plot_on and i > 30:
-                            [p.join() for p in plotting_proc
-                             ]  # join before new plottings are started
+                            [p.join() for p in plotting_proc]  # join before new plottings are started
                             plotting_proc = []
                             p0 = Process(target=trainutils.plotInfo,
-                                         args=(self.timeline, self.history,
-                                               self.CG_timeline, self.errors,
-                                               save_name))
+                                         args=(self.timeline, self.history, self.CG_timeline, self.errors, save_name))
                             plotting_proc.extend([p0])
                             [p.start() for p in plotting_proc]
                         else:
-                            trainutils.saveHist(self.timeline, self.history,
-                                                self.CG_timeline, self.errors,
-                                                save_name)
+                            trainutils.saveHist(self.timeline, self.history, self.CG_timeline, self.errors, save_name)
 
                         if config.print_status:
-                            out = '%05i %sm=%.3f, train=%05.2f%s, valid=%05.3f%s, prev=%04.1f, NLLdiff=%+.1e, LR=%.5f, %.1f it/s, '\
-                            %(i, pp_loss, nll_ema, train_error, pp_err, valid_error, pp_err, batch_char*100, nll_gain,
-                              cnn.SGD_LR.get_value(), 1.0/t_pi)
+                            out = '%05i %sm=%.3f, train=%05.2f%s, valid=%05.3f%s, prev=%04.1f, NLLdiff=%+.1e, LR=%.5f, %.1f it/s, ' % (i, pp_loss, nll_ema, train_error, pp_err, valid_error, pp_err, batch_char*100, nll_gain, cnn.SGD_LR.get_value(), 1.0 / t_pi)
                             t = pprinttime(t_passed)
                             print out + t
 
@@ -282,7 +261,7 @@ class Trainer(object):
                 except KeyboardInterrupt:
                     out = '%05i %s=%.5f, NLL=%.4f, train=%.5f, valid=%.5f, train=%.3f%s, valid=%.3f%s,\n\
       LR=%.6f, MOM=%.6f, %.1f GPU-it/s, %.1f CPU-it/s, '\
-                    %(i, pp_loss, nll_ema, nll, train_nll, valid_nll, train_error, pp_err, valid_error, pp_err,
+                    % (i, pp_loss, nll_ema, nll, train_nll, valid_nll, train_error, pp_err, valid_error, pp_err,
                       cnn.SGD_LR.get_value(), cnn.SGD_momentum.get_value(),1.0/t_pt, 1.0/t_pi)
 
                     t = pprinttime(t_passed)
@@ -292,8 +271,7 @@ class Trainer(object):
                     trainutils.pprintmenu(save_name)
                     while True:
                         try:
-                            ret = trainutils.userInput(cnn,
-                                                       config.history_freq)
+                            ret = trainutils.userInput(cnn, config.history_freq)
                             plt.pause(0.001)
                             if ret is None or ret == "":
                                 continue
@@ -302,8 +280,7 @@ class Trainer(object):
                                 break
                             elif ret == 'kill':
                                 return
-                            elif ret in ['SGD', 'RPROP', 'CG', 'LBFGS', 'Adam'
-                                         ]:
+                            elif ret in ['SGD', 'RPROP', 'CG', 'LBFGS', 'Adam']:
                                 config.optimizer = ret
                             elif ret == 'q':
                                 print "Continuing Training"
@@ -317,24 +294,20 @@ class Trainer(object):
                                     exec('print ' + ret)
 
                         except:
-                            sys.excepthook(*sys.exc_info()
-                                           )  # show info on error
+                            sys.excepthook(*sys.exc_info())  # show info on error
 
                     if self.config.background_processes:
                         bg_worker.reset()
 
-                    t0 = time.time(
-                    )  # reset time after user interaction, otherwise time will appear as pause in plot
+                    t0 = time.time()  # reset time after user interaction, otherwise time will appear as pause in plot
 
     # End UI ###############################################################################################
-                if (t_passed > config.max_runtime
-                    ) or user_termination:  # This is in the epoch/UI loop
+                if (t_passed > config.max_runtime) or user_termination:  # This is in the epoch/UI loop
                     print 'Timeout or manual Termination'
                     break
             # This is OUTSIDE the training loop i.e. the last block of the function ``run``
             self.cnn.saveParameters(save_name + "_end.param")
-            trainutils.plotInfo(self.timeline, self.history, self.CG_timeline,
-                                self.errors, save_name)
+            trainutils.plotInfo(self.timeline, self.history, self.CG_timeline, self.errors, save_name)
             print 'End of Training'
             print '#' * 60 + '\n' + '#' * 60 + '\n'
             # -------------------end of run()---------------------------------------------------------------------------
@@ -377,8 +350,7 @@ class Trainer(object):
                 config.anisotropic_data, config.mode, config.zchxy_order,
                 config.border_mode, config.pre_process, config.upright_x, True
                 if config.target == 'regression' else False, config.target
-                if config.target in ['malis', 'affinity'] else
-                False)  # return affinity graph instead of boundaries
+                if config.target in ['malis', 'affinity'] else False)  # return affinity graph instead of boundaries
 
             self.data.addDataFromFile(config.data_path, config.label_path,
                                       config.d_files, config.l_files,
@@ -387,8 +359,7 @@ class Trainer(object):
 
             if self.config.preview_data_path is not None:
                 data = trainutils.h5Load(self.config.preview_data_path)
-                if not (isinstance(data, list) or isinstance(data,
-                                                             (tuple, list))):
+                if not (isinstance(data, list) or isinstance(data, (tuple, list))):
                     #data = np.transpose(data, (1,2,0)) # this was only a hack for I
                     data = [data, ]
 
@@ -401,11 +372,9 @@ class Trainer(object):
             self.get_batch_kwargs = dict(batch_size=config.batch_size)
             self.get_batch_kwargs.update(self.config.data_batch_kwargs)
             # the source is replaced in self.testModel to be valid
-            self.get_batch_kwargs_test = dict(
-                batch_size=config.monitor_batch_size)
+            self.get_batch_kwargs_test = dict(batch_size=config.monitor_batch_size)
             if isinstance(self.config.data_class_name, tuple):
-                Data = trainutils.import_variable_from_file(
-                    *self.config.data_class_name)
+                Data = trainutils.import_variable_from_file(*self.config.data_class_name)
             else:
                 Data = getattr(traindata, self.config.data_class_name)
 
@@ -414,31 +383,29 @@ class Trainer(object):
 
     def createNet(self):
         """
-    Creates CNN according to config
-    """
+        Creates CNN according to config
+        """
         n_lab = self.data.n_lab
         if self.config.class_weights is not None:
             if self.config.target == 'nll':
                 assert len(self.config.class_weights) == n_lab,\
-                "The number of class weights must equal the number of classes"
+                       "The number of class weights must equal the number of classes"
 
         if self.config.mode != 'vect-scalar':  # image training
             n_ch = self.data.n_ch
-            self.cnn = createNet(self.config, self.config.patch_size, n_ch,
-                                 n_lab, self.config.dimensions)
+            self.cnn = createNet(self.config, self.config.patch_size, n_ch, n_lab, self.config.dimensions)
         else:  # non-image training
             n_ch = None
             if self.config.rnn_layer_kwargs is not None:
                 n_ch = self.data.n_taps  # must be None if the data should be repeated
 
-            self.cnn = createNet(self.config, self.data.example_shape, n_ch,
-                                 n_lab, None)
+            self.cnn = createNet(self.config, self.data.example_shape, n_ch, n_lab, None)
 
     def debugGetCNNBatch(self):
         """
-    Executes ``getbatch`` but with un-strided labels and always returning info. The first batch example
-    is plotted and the whole batch is returned for inspection.
-    """
+        Executes ``getbatch`` but with un-strided labels and always returning info. The first batch example
+        is plotted and the whole batch is returned for inspection.
+        """
         if self.config.mode == 'img-img':
             batch = self.data.getbatch(
                 self.config.monitor_batch_size,
@@ -477,28 +444,25 @@ class Trainer(object):
 
     def testModel(self, data_source):
         """
-    Computes NLL and error/accuracy on batch with ``monitor_batch_size``
-    
+        Computes NLL and error/accuracy on batch with ``monitor_batch_size``
 
-    Parameters
-    ----------
 
-    data_source: string
-        'train' or 'valid'
+        Parameters
+        ----------
 
-    Returns
-    -------
-    NLL, error:
+        data_source: string
+            'train' or 'valid'
 
-    """
+        Returns
+        -------
+        NLL, error:
+
+        """
         if data_source == 'valid':
-            if not hasattr(self.data, 'valid_d') \
-            or not hasattr(self.data.valid_d, '__len__') \
-            or len(self.data.valid_d)==0:
+            if not hasattr(self.data, 'valid_d') or not hasattr(self.data.valid_d, '__len__') or len(self.data.valid_d) == 0:
                 return np.nan, np.nan  # 0, 0
 
-        kwargs = dict(self.get_batch_kwargs_test
-                      )  # copy because it is modified in next line!
+        kwargs = dict(self.get_batch_kwargs_test)  # copy because it is modified in next line!
         kwargs['source'] = data_source
         batch = self.data.getbatch(**kwargs)
 
@@ -515,15 +479,12 @@ class Trainer(object):
         nll = 0
         error = 0
         for j in xrange(int(np.ceil(np.float(n) / self.config.batch_size))):
-            d = batch[0][j * self.config.batch_size:(j + 1) *
-                         self.config.batch_size]  # data
-            l = batch[1][j * self.config.batch_size:(j + 1) *
-                         self.config.batch_size]  # label
+            d = batch[0][j * self.config.batch_size:(j + 1) * self.config.batch_size]  # data
+            l = batch[1][j * self.config.batch_size:(j + 1) * self.config.batch_size]  # label
             if len(batch) > 2:
                 aux = []
                 for b in batch[2:]:
-                    aux.append(b[j * self.config.batch_size:(j + 1) *
-                                 self.config.batch_size])
+                    aux.append(b[j * self.config.batch_size:(j + 1) * self.config.batch_size])
 
                 nl, er, pred = self.cnn.get_error(d, l, *(aux + y_aux))
             else:
@@ -535,27 +496,22 @@ class Trainer(object):
         self.cnn.setDropoutRates(rates)  # restore old rates
         return nll, error
 
-    def predictAndWrite(self,
-                        raw_img,
-                        number=0,
-                        export_class='all',
-                        block_name='',
-                        z_thick=5):
+    def predictAndWrite(self, raw_img, number=0, export_class='all', block_name='', z_thick=5):
         """
-    Predict and and save a slice as preview image
-    
-    Parameters
-    ----------
-    
-    raw_img : np.ndarray
-      raw data in the format (ch, x, y, z)
-    number: int/float
-      consecutive number for the save name (i.e. hours, iterations etc.)
-    export_class: str or int
-      'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
-    block_name: str
-      Name/number to distinguish different raw_imges
-    """
+        Predict and and save a slice as preview image
+
+        Parameters
+        ----------
+
+        raw_img : np.ndarray
+          raw data in the format (ch, x, y, z)
+        number: int/float
+          consecutive number for the save name (i.e. hours, iterations etc.)
+        export_class: str or int
+          'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
+        block_name: str
+          Name/number to distinguish different raw_imges
+        """
 
         block_name = str(block_name)
         pred = self.cnn.predictDense(raw_img)  # returns (k, x, y(, z))
@@ -566,61 +522,48 @@ class Trainer(object):
             print "WARNING: hack active for affinity previews"
             pred[0] = pred.min(axis=0)
 
-        pred = pred[:, :, :, (z_sh - z_thick) // 2:(z_sh - z_thick) // 2 +
-                    z_thick]
+        pred = pred[:, :, :, (z_sh - z_thick) // 2:(z_sh - z_thick) // 2 + z_thick]
 
         save_name = self.config.save_name
         for z in xrange(pred.shape[3]):
             if export_class == 'all':
                 for c in xrange(pred.shape[0]):
-                    plt.imsave('%s-pred-%s-c%i-z%i-%shrs.png'\
-                    %(save_name, block_name, c, z, number), pred[c,:,:,z], cmap='gray')
+                    plt.imsave('%s-pred-%s-c%i-z%i-%shrs.png' % (save_name, block_name, c, z, number), pred[c,:,:,z], cmap='gray')
             elif export_class in ['malis', 'affinity']:
-                plt.imsave('%s-pred-%s-aff-z%i-%shrs.png'\
-                %(save_name, block_name, z, number),
+                plt.imsave('%s-pred-%s-aff-z%i-%shrs.png' % (save_name, block_name, z, number),
                 np.transpose(pred[0:6:2,:,:,z],(1,2,0)), cmap='gray')
             else:
                 if isinstance(export_class, (list, tuple)):
                     for c in export_class:
-                        plt.imsave('%s-pred-%s-c%i-z%i-%shrs.png'\
-                        %(save_name, block_name, c, z, number), pred[c,:,:,z], cmap='gray')
+                        plt.imsave('%s-pred-%s-c%i-z%i-%shrs.png' % (save_name, block_name, c, z, number), pred[c,:,:,z], cmap='gray')
 
                 else:
                     c = int(export_class)
-                    plt.imsave('%s-pred-%s-c%i-z%i-%shrs.png'\
-                    %(save_name, block_name, c, z, number), pred[c,:,:,z], cmap='gray')
+                    plt.imsave('%s-pred-%s-c%i-z%i-%shrs.png' % (save_name, block_name, c, z, number), pred[c,:,:,z], cmap='gray')
 
         if not self.saved_raw_preview:  # only do once
-            z_off = 0 if len(self.config.dimensions.offset) == 2 else int(
-                self.config.dimensions.offset[0])
+            z_off = 0 if len(self.config.dimensions.offset) == 2 else int(self.config.dimensions.offset[0])
             for z in xrange(pred.shape[3]):
-                plt.imsave('%s-raw-%s-z%i.png' % (save_name, block_name, z),
-                           raw_img[0, :, :, z + z_off],
-                           cmap='gray')
+                plt.imsave('%s-raw-%s-z%i.png' % (save_name, block_name, z), raw_img[0, :, :, z + z_off], cmap='gray')
 
-    def previewSliceFromTrainData(self,
-                                  cube_i=0,
-                                  off=(0, 0, 0),
-                                  sh=(10, 400, 400),
-                                  number=0,
-                                  export_class='all'):
+    def previewSliceFromTrainData(self, cube_i=0, off=(0, 0, 0), sh=(10, 400, 400), number=0, export_class='all'):
         """
-    Predict and and save a selected slice from the training data as preview
-    
-    Parameters
-    ----------
-    
-    cube_i: int
-      index of source cube in CNNData
-    off: 3-tuple of int
-      start index of slice to cut from cube (z,x,y)
-    sh: 3-tuple of int
-      shape of cube to cut (z,x,y)
-    number: int
-      consecutive number for the save name (i.e. hours, iterations etc.)
-    export_class: str or int
-      'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
-    """
+        Predict and and save a selected slice from the training data as preview
+
+        Parameters
+        ----------
+
+        cube_i: int
+          index of source cube in CNNData
+        off: 3-tuple of int
+          start index of slice to cut from cube (z,x,y)
+        sh: 3-tuple of int
+          shape of cube to cut (z,x,y)
+        number: int
+          consecutive number for the save name (i.e. hours, iterations etc.)
+        export_class: str or int
+          'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
+        """
         if not self.config.mode == 'img-img':
             print "This funciton is only available for 'img-img' training mode"
             return
@@ -632,28 +575,26 @@ class Trainer(object):
                 sh[0] = min_z
 
         raw_img = self.data.train_d[cube_i]
-        raw_img = raw_img[off[0]:off[0] + sh[0], :, off[1]:off[1] + sh[1], off[
-            1]:off[1] + sh[1]]
+        raw_img = raw_img[off[0]:off[0] + sh[0], :, off[1]:off[1] + sh[1], off[1]:off[1] + sh[1]]
 
-        raw_img = np.transpose(raw_img,
-                               (1, 2, 3, 0))  # (z,ch,x,y) --> (ch,x,y,z)
+        raw_img = np.transpose(raw_img, (1, 2, 3, 0))  # (z,ch,x,y) --> (ch,x,y,z)
         self.predictAndWrite(raw_img, number, export_class)
         self.saved_raw_preview = True
 
     def previewSlice(self, number=0, export_class='all', max_z_pred=5):
         """
-    Predict and and save a data from a separately loaded file as preview
-    
-    Parameters
-    ----------
-    
-    number: int/float
-      consecutive number for the save name (i.e. hours, iterations etc.)
-    export_class: str or int
-      'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
-    max_z_pred: int
-      approximate maximal number of z-slices to produce (depends on CNN architecture)
-    """
+        Predict and and save a data from a separately loaded file as preview
+
+        Parameters
+        ----------
+
+        number: int/float
+          consecutive number for the save name (i.e. hours, iterations etc.)
+        export_class: str or int
+          'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
+        max_z_pred: int
+          approximate maximal number of z-slices to produce (depends on CNN architecture)
+        """
         if not self.config.mode == 'img-img':
             print "This funciton is only available for 'img-img' training mode"
             return
@@ -665,30 +606,24 @@ class Trainer(object):
                 strd_z = self.cnn.output_strides[0]
                 out_z = self.cnn.output_shape[2] * strd_z
                 min_z = self.cnn.input_shape[1] + strd_z - 1
-                z_thick = min_z if out_z > max_z_pred else min_z + strd_z * int(
-                    np.ceil(float(max_z_pred - out_z) / strd_z))
+                z_thick = min_z if out_z > max_z_pred else min_z + strd_z * int(np.ceil(float(max_z_pred - out_z) / strd_z))
             else:
                 z_thick = max_z_pred
 
             assert z_thick <= z_sh, "The preview slices are too small in z-direction for this CNN"
 
             if raw_img.ndim == 3:
-                raw_img = raw_img[None, :, :, (z_sh - z_thick) // 2:(
-                    z_sh - z_thick) // 2 + z_thick]
+                raw_img = raw_img[None, :, :, (z_sh - z_thick) // 2:(z_sh - z_thick) // 2 + z_thick]
             elif raw_img.ndim == 4:
-                raw_img = raw_img[:, :, :, (z_sh - z_thick) // 2:(
-                    z_sh - z_thick) // 2 + z_thick]
+                raw_img = raw_img[:, :, :, (z_sh - z_thick) // 2:(z_sh - z_thick) // 2 + z_thick]
 
-            self.predictAndWrite(raw_img, number, export_class, example_no,
-                                 max_z_pred)
+            self.predictAndWrite(raw_img, number, export_class, example_no, max_z_pred)
 
         self.saved_raw_preview = True
 
     def malisPreviewSlice(self, batch, name='A'):
         pred = self.cnn.class_probabilities(batch[0])[0]  # (6, z, x,y)
-        malis = self.cnn.malis_stats(
-            *batch[:3]
-        )  # nll, n_pos, n_neg, n_tot, false_splits, false_merges, rand_index, pos_count, neg_count, labels
+        malis = self.cnn.malis_stats(*batch[:3])  # nll, n_pos, n_neg, n_tot, false_splits, false_merges, rand_index, pos_count, neg_count, labels
         nll, n_pos, n_neg, n_tot, false_splits, false_merges, rand_index, pos_count, neg_count = malis
         data, aff_gt, seg_gt = batch[:3]
 
@@ -708,6 +643,4 @@ class Trainer(object):
         aff_gt = np.transpose(aff_gt[0], (1, 2, 3, 0))
         seg_gt = seg_gt[0]
 
-        trainutils.pickleSave(
-            [pred_slices, aff_gt, pos_slices, neg_slices, seg_gt,
-             data], 'MALIS-%s.pkl' % (name, ))
+        trainutils.pickleSave([pred_slices, aff_gt, pos_slices, neg_slices, seg_gt, data], 'MALIS-%s.pkl' % (name, ))

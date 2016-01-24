@@ -53,7 +53,7 @@ def create_predncnn(config_file,
       (z,x,y)!!! (only for CNN)
     param_file: string/None
       If other parameters than "*-Last.param" should be loaded, this can specify the param file.
-  """
+    """
     config_file = os.path.expanduser(config_file)
     if gpu == None:
         gpu = default_config.device
@@ -68,8 +68,7 @@ def create_predncnn(config_file,
     from elektronn.net.netcreation import createNet  # import after gpu init
 
     os.chdir(config.save_path)  # The trainer works directly in the save dir
-    cnn = createNet(config, config.dimensions.input, n_ch, n_lab,
-                    config.dimensions)  # 1 ch 2 label
+    cnn = createNet(config, config.dimensions.input, n_ch, n_lab, config.dimensions)  # 1 ch 2 label
     if param_file is None:
         path = "%s-LAST.param" % config.save_name
     else:

@@ -20,97 +20,88 @@ from _warping import warp2dFast, warp3dFast, _warp2dFastLab, _warp3dFastLab
 
 def warp2dJoint(img, lab, patch_size, rot, shear, scale, stretch):
     """
-  Warp image and label data jointly. Non-image labels are ignored i.e. lab must be 3d to be warped
-  
-  Parameters
-  ----------
-  
-  img: array
-    Image data
-    The array must be 3-dimensional (ch,x,y) and larger/equal the patch size
-  lab: array
-    Label data (with offsets subtracted)
-  patch_size: 2-tuple
-    Patch size *excluding* channel for the image: (px, py).
-    The warping result of the input image is cropped to this size
-  rot: float
-    Rotation angle in deg for rotation around z-axis
-  shear: float
-    Shear angle in deg for shear w.r.t xy-diagonal
-  scale: 3-tuple of float
-    Scale per axis
-  stretch: 4-tuple of float
-    Fraction of perspective stretching from the center (where stretching is always 1)
-    to the outer border of image per axis. The 4 entry correspond to:
-    
-    - X stretching depending on Y
-    - Y stretching depending on X
+    Warp image and label data jointly. Non-image labels are ignored i.e. lab must be 3d to be warped
 
-  Returns
-  -------
-  
-  img, lab: np.ndarrays
-    Warped image and labels (cropped to patch_size)
-  
-  """
+    Parameters
+    ----------
+
+    img: array
+      Image data
+      The array must be 3-dimensional (ch,x,y) and larger/equal the patch size
+    lab: array
+      Label data (with offsets subtracted)
+    patch_size: 2-tuple
+      Patch size *excluding* channel for the image: (px, py).
+      The warping result of the input image is cropped to this size
+    rot: float
+      Rotation angle in deg for rotation around z-axis
+    shear: float
+      Shear angle in deg for shear w.r.t xy-diagonal
+    scale: 3-tuple of float
+      Scale per axis
+    stretch: 4-tuple of float
+      Fraction of perspective stretching from the center (where stretching is always 1)
+      to the outer border of image per axis. The 4 entry correspond to:
+
+      - X stretching depending on Y
+      - Y stretching depending on X
+
+    Returns
+    -------
+
+    img, lab: np.ndarrays
+      Warped image and labels (cropped to patch_size)
+
+    """
     if len(lab.shape) == 2:
-        lab = _warp2dFastLab(lab, patch_size, img.shape[1:], rot, shear, scale,
-                             stretch)
+        lab = _warp2dFastLab(lab, patch_size, img.shape[1:], rot, shear, scale, stretch)
 
     img = warp2dFast(img, patch_size, rot, shear, scale, stretch)
     return img, lab
 
 
-def warp3dJoint(img,
-                lab,
-                patch_size,
-                rot=0,
-                shear=0,
-                scale=(1, 1, 1),
-                stretch=(0, 0, 0, 0),
-                twist=0):
+def warp3dJoint(img, lab, patch_size, rot=0, shear=0, scale=(1, 1, 1), stretch=(0, 0, 0, 0), twist=0):
     """
-  Warp image and label data jointly. Non-image labels are ignored i.e. lab must be 3d to be warped
-  
-  Parameters
-  ----------
-  
-  img: array
-    Image data
-    The array must be 4-dimensional (z,ch,x,y) and larger/equal the patch size
-  lab: array
-    Label data (with offsets subtracted)
-  patch_size: 3-tuple
-    Patch size *excluding* channel for the image: (pz, px, py).
-    The warping result of the input image is cropped to this size
-  rot: float
-    Rotation angle in deg for rotation around z-axis
-  shear: float
-    Shear angle in deg for shear w.r.t xy-diagonal
-  scale: 3-tuple of float
-    Scale per axis
-  stretch: 4-tuple of float
-    Fraction of perspective stretching from the center (where stretching is always 1)
-    to the outer border of image per axis. The 4 entry correspond to:
-    
-    - X stretching depending on Y
-    - Y stretching depending on X
-    - X stretching depending on Z
-    - Y stretching depending on Z
-    
-  twist: float
-    Dependence of the rotation angle on z in deg from center to outer border
-  
-  Returns
-  -------
-  
-  img, lab: np.ndarrays
-    Warped image and labels (cropped to patch_size)
-  
-  """
+    Warp image and label data jointly. Non-image labels are ignored i.e. lab must be 3d to be warped
+
+    Parameters
+    ----------
+
+    img: array
+      Image data
+      The array must be 4-dimensional (z,ch,x,y) and larger/equal the patch size
+    lab: array
+      Label data (with offsets subtracted)
+    patch_size: 3-tuple
+      Patch size *excluding* channel for the image: (pz, px, py).
+      The warping result of the input image is cropped to this size
+    rot: float
+      Rotation angle in deg for rotation around z-axis
+    shear: float
+      Shear angle in deg for shear w.r.t xy-diagonal
+    scale: 3-tuple of float
+      Scale per axis
+    stretch: 4-tuple of float
+      Fraction of perspective stretching from the center (where stretching is always 1)
+      to the outer border of image per axis. The 4 entry correspond to:
+
+      - X stretching depending on Y
+      - Y stretching depending on X
+      - X stretching depending on Z
+      - Y stretching depending on Z
+
+    twist: float
+      Dependence of the rotation angle on z in deg from center to outer border
+
+    Returns
+    -------
+
+    img, lab: np.ndarrays
+      Warped image and labels (cropped to patch_size)
+
+    """
     if len(lab.shape) == 3:
-        lab = _warp3dFastLab(lab, patch_size, np.array(img.shape)[[0, 2, 3]],
-                             rot, shear, scale, stretch, twist)
+        lab = _warp3dFastLab(lab, patch_size, np.array(img.shape)[[0, 2, 3]], rot, shear, scale, stretch, twist)
 
     img = warp3dFast(img, patch_size, rot, shear, scale, stretch, twist)
     return img, lab
@@ -125,8 +116,7 @@ def getCornerIx(sh):
     def getGrayCode(n, n_dim):
         if n == 0:
             return np.zeros(n_dim, dtype=np.int)
-        return np.array([(n // 2**i) % 2
-                         for i in range(max(n_dim, int(np.ceil(np.log2(n)))))])
+        return np.array([(n // 2**i) % 2 for i in range(max(n_dim, int(np.ceil(np.log2(n)))))])
 
     sh = np.array(sh) - 1  ###TODO
     n_dim = len(sh)
@@ -139,16 +129,10 @@ def getCornerIx(sh):
     return corners
 
 
-def _warpCorners2d(sh,
-                   corners,
-                   rot=0,
-                   shear=0,
-                   scale=(1, 1),
-                   stretch=(0, 0),
-                   plot=False):
+def _warpCorners2d(sh, corners, rot=0, shear=0, scale=(1, 1), stretch=(0, 0), plot=False):
     """
-  Create warped coordinates of corners
-  """
+    Create warped coordinates of corners
+    """
     rot = rot * np.pi / 180
     shear = shear * np.pi / 180
     scale = np.array(scale)
@@ -185,16 +169,10 @@ def _warpCorners2d(sh,
     return np.array([u, v]).T
 
 
-def _warpCorners3d(sh,
-                   corners,
-                   rot=0,
-                   shear=0,
-                   scale=(1, 1, 1),
-                   stretch=(0, 0, 0, 0),
-                   twist=0):
+def _warpCorners3d(sh, corners, rot=0, shear=0, scale=(1, 1, 1), stretch=(0, 0, 0, 0), twist=0):
     """
-  Create warped coordinates of corners
-  """
+    Create warped coordinates of corners
+    """
     rot = rot * np.pi / 180
     shear = shear * np.pi / 180
     twist = twist * np.pi / 180
@@ -230,37 +208,30 @@ def _warpCorners3d(sh,
 
 def getRequiredPatchSize(patch_size, rot, shear, scale, stretch, twist=None):
     """
-  Given desired patch size and warping parameters:
-  return required size for warping input patch
-  """
+    Given desired patch size and warping parameters:
+    return required size for warping input patch
+    """
     patch_size = np.array(patch_size)
     corners = getCornerIx(patch_size)
 
     if len(patch_size) == 2:
-        coords = _warpCorners2d(patch_size, corners, rot, shear, scale,
-                                stretch)
+        coords = _warpCorners2d(patch_size, corners, rot, shear, scale, stretch)
     elif len(patch_size) == 3:
-        coords = _warpCorners3d(patch_size, corners, rot, shear, scale,
-                                stretch, twist)
+        coords = _warpCorners3d(patch_size, corners, rot, shear, scale, stretch, twist)
 
-    eff_size = np.ceil(coords.max(axis=0) - coords.min(axis=0)
-                       )  # effective range
-    left_exc = np.floor(np.abs(np.minimum(
-        coords.min(axis=0),
-        0)))  # how much image needs to be added left
+    eff_size = np.ceil(coords.max(axis=0) - coords.min(axis=0))  # effective range
+    left_exc = np.floor(np.abs(np.minimum(coords.min(axis=0), 0)))  # how much image needs to be added left
     right_exc = np.ceil(np.maximum(coords.max(axis=0) - patch_size + 1, 0))
-    total_exc = np.maximum(left_exc, right_exc
-                           )  # how much image must be added centrally
+    total_exc = np.maximum(left_exc, right_exc)  # how much image must be added centrally
     req_size = patch_size + 2 * total_exc
 
-    return req_size.astype(np.int), eff_size.astype(np.int), left_exc.astype(
-        np.int)
+    return req_size.astype(np.int), eff_size.astype(np.int), left_exc.astype(np.int)
 
 
 def getWarpParams(patch_size, amount=1.0):
     """
-  To be called from CNNData. Get warping parameters + required warping input patch size.
-  """
+    To be called from CNNData. Get warping parameters + required warping input patch size.
+    """
     if amount > 1:
         print 'WARNING: warpAugment amount > 1 this requires more than 1.4 bigger patches before warping'
     rot_max = 15 * amount
@@ -353,10 +324,7 @@ if __name__ == "__main__":
                                                                     amount=1.0)
         t = []
         for i in xrange(10000):
-            ext_size, rot, shear, scale, stretch, twist = getWarpParams(
-                ps,
-                amount=1.0)
-            t.append(ext_size)
+            ext_size, rot, shear, scale, stretch, twist = getWarpParams(ps, amount=1.0); t.append(ext_size)
     #  img_in = maketestimage(eff_size)
     #  img_in = paddImage(img_in, ext_size, left_exc)[None]
         img_in = maketestimage(ext_size)[None]
@@ -374,9 +342,7 @@ if __name__ == "__main__":
 
     if False:  # visual 2d
         #out  = _warp2d_c(test_img, 20, 10, (1,1.1), (0.1, 0))
-        test_img = np.concatenate(
-            (test_img[None], np.exp(test_img[None])),
-            axis=0)
+        test_img = np.concatenate((test_img[None], np.exp(test_img[None])), axis=0)
         out2 = warp2dFast(test_img, (512, 512), 20, 10, (1, 1.1), (0.1, 0))
         plt.figure()
         plt.subplot(121)
@@ -429,8 +395,7 @@ if __name__ == "__main__":
             plt.imsave('/tmp/%i-ref.png' % i, wow1[:, :, i] / 255)
 
         wow2 = _warp3dFastLab(img_s[20:-20, 20:-20], (s1 - 40, s2 - 40, n),
-                              (s1, s2, n), 0, 0, (1, 1, 1),
-                              (0.1, 0.1, 0.1, -0.1), 10)
+                              (s1, s2, n), 0, 0, (1, 1, 1), (0.1, 0.1, 0.1, -0.1), 10)
         for i in xrange(wow2.shape[2]):
             plt.imsave('/tmp/%i.png' % i, wow2[:, :, i] / 255)
 
@@ -439,7 +404,6 @@ if __name__ == "__main__":
         test = np.random.rand(s, s, s).astype(np.float32)
         test2 = np.random.rand(s * 2, s * 2, s * 2).astype(np.float32)
         t0 = time.time()
-        wow1 = warp3dFast(test[None], (s, s, s), 20, 5, (1, 1, 1),
-                          (0.1, 0.1, 0.1, 0.1), 10)
+        wow1 = warp3dFast(test[None], (s, s, s), 20, 5, (1, 1, 1), (0.1, 0.1, 0.1, 0.1), 10)
         #wow1 = warp3dFast(test[None], (s,s,s))
         print time.time() - t0

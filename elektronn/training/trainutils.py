@@ -45,8 +45,7 @@ def parseargs(gpu):
     parser = argparse.ArgumentParser(
     usage="elektronn-train </path/to_config_file> [--gpu={Auto|False|<int>}]")
     
-    parser.add_argument("--gpu", default=gpu, type=convert,
-                        choices=['auto',False,None]+range(0,100))
+    parser.add_argument("--gpu", default=gpu, type=convert, choices=['auto', False, None]+range(0,100))
     parser.add_argument("config", type=str)
     parsed = parser.parse_args()
     return parsed.config, parsed.gpu
@@ -55,10 +54,10 @@ def parseargs(gpu):
 
 def parseargs_dev(args, config_file, gpu):
     """
-  Parses the commandline arguments if ``elektronn-train`` is called as:
+    Parses the commandline arguments if ``elektronn-train`` is called as:
 
-  "elektronn-train [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
-  """
+    "elektronn-train [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
+    """
     for arg in args:
         if arg.startswith('gpu='):
             arg = arg.replace('gpu=', '')
@@ -77,9 +76,7 @@ def parseargs_dev(args, config_file, gpu):
                     gpu = int(gpu)
                 except:
                     sys.excepthook(*sys.exc_info())
-                    raise ValueError(
-                        "Invalid GPU argument %s (maybe no free GPU?)" %
-                        str(gpu))
+                    raise ValueError("Invalid GPU argument %s (maybe no free GPU?)" % str(gpu))
 
         elif arg.startswith('config='):
             # Override above default configuration parameters with config-file
@@ -143,9 +140,9 @@ def initGPU(gpu):
 
 def xyz2zyx(shapes):
     """
-  Swaps dimension order for list of (filter) shapes.
-  This is needed to allow users to specify 2d and 3d filters in the same order.
-  """
+    Swaps dimension order for list of (filter) shapes.
+    This is needed to allow users to specify 2d and 3d filters in the same order.
+    """
     if not hasattr(shapes[0], '__len__'):
         return shapes
     else:
@@ -156,9 +153,9 @@ def xyz2zyx(shapes):
 
 def _SMA(c, n):
     """
-  Returns box-SMA of c with box length n, the returned array has the same
-  length as c and is const-padded at the beginning
-  """
+    Returns box-SMA of c with box length n, the returned array has the same
+    length as c and is const-padded at the beginning
+    """
     if n == 0: return c
     ret = np.cumsum(c, dtype=float)
     ret[n:] = (ret[n:] - ret[:-n]) / n
@@ -169,19 +166,19 @@ def _SMA(c, n):
 
 def plotInfoFromFiles(path, save_name, autoscale=True):
     """
-  Create the plots from backup files in the CNN directory (e.g. if plotting was not on during training).
-  The plots are generated as pngs in the current working directory and will not show up.
+    Create the plots from backup files in the CNN directory (e.g. if plotting was not on during training).
+    The plots are generated as pngs in the current working directory and will not show up.
 
-  Parameters
-  ----------
+    Parameters
+    ----------
 
-  path: string
-    Path to CNN-folder
-  save_name: string
-    name of cnn / file prefix
-  autoscale: Bool
-    If true axis are optimised for value read-off, if false, mpl default scaling is used
-  """
+    path: string
+      Path to CNN-folder
+    save_name: string
+      name of cnn / file prefix
+    autoscale: Bool
+      If true axis are optimised for value read-off, if false, mpl default scaling is used
+    """
     os.chdir(path)
     timeline = np.load('Backup/' + save_name + ".timeline.npy")
     if timeline.shape[1] == 4:
@@ -278,16 +275,11 @@ def plotInfo(timeline,
         plt.figure(figsize=(16, 12))
         plt.subplot(211)
         plt.plot(timeline[:, 1], timeline[:, 3], 'b-', label='Update NLL')
-        plt.plot(timeline[:, 1],
-                 timeline[:, 2],
-                 'k-',
-                 label='Smooth update NLL',
-                 linewidth=3)
+        plt.plot(timeline[:, 1], timeline[:, 2], 'k-', label='Smooth update NLL', linewidth=3)
 
         if autoscale:
             plt.ylim(0, nll_cap)
-            plt.xlim(0, timeline[-1, 1]
-                     )  # 105% of time (leave some white to the right)
+            plt.xlim(0, timeline[-1, 1])  # 105% of time (leave some white to the right)
 
         plt.legend(loc=0)
         nll = timeline[-30:, 2].mean()
@@ -299,11 +291,7 @@ def plotInfo(timeline,
 
         # NLL vs Prevalence
         plt.subplot(212)
-        plt.scatter(timeline[:, 4],
-                    timeline[:, 3],
-                    c=timeline[:, 0],
-                    cmap='binary',
-                    edgecolors='none')
+        plt.scatter(timeline[:, 4], timeline[:, 3], c=timeline[:, 0], cmap='binary', edgecolors='none')
         if autoscale:
             plt.ylim(0, 1)
             plt.xlim(-0.01, 1)
@@ -317,22 +305,10 @@ def plotInfo(timeline,
         # History NLL
         plt.figure(figsize=(16, 12))
         plt.subplot(211)
-        plt.plot(history[:, 1],
-                 history[:, 2],
-                 'b-',
-                 label='Smooth update NLL',
-                 linewidth=3)
+        plt.plot(history[:, 1], history[:, 2], 'b-', label='Smooth update NLL', linewidth=3)
         #plt.plot(history[:,1], history[:,3], 'k-', label = 'Update NLL')
-        plt.plot(history[:, 1],
-                 history[:, 4],
-                 'g-',
-                 label='Train NLL',
-                 linewidth=3)
-        plt.plot(history[:, 1],
-                 history[:, 5],
-                 'r-',
-                 label='Valid NLL',
-                 linewidth=3)
+        plt.plot(history[:, 1], history[:, 4], 'g-', label='Train NLL', linewidth=3)
+        plt.plot(history[:, 1], history[:, 5], 'r-', label='Valid NLL', linewidth=3)
         if autoscale:
             plt.ylim(0, nll_cap)
             plt.xlim(0, history[-1, 1])
@@ -345,10 +321,7 @@ def plotInfo(timeline,
 
         # History NLL gains
         plt.subplot(212)
-        plt.plot(history[:, 1],
-                 history[:, 6],
-                 'b-',
-                 label='NLL Gain at update')
+        plt.plot(history[:, 1], history[:, 6], 'b-', label='NLL Gain at update')
 
         plt.hlines(0, 0, history[-1:, 1], linestyles='dotted')
         plt.xlabel("time [min] (%s)" % runtime)
@@ -358,9 +331,7 @@ def plotInfo(timeline,
 
         std = history[3:, 6].std() * 2 if len(history) > 3 else 1.0
         if autoscale:
-            plt.ylim(
-                -std, std + 1e-10
-            )  # add epsilon to suppress matplotlib warning in case of CG
+            plt.ylim(-std, std + 1e-10)  # add epsilon to suppress matplotlib warning in case of CG
             plt.xlim(0, history[-1, 1])
 
         plt.savefig(save_name + ".history.png", bbox_inches='tight')
@@ -387,9 +358,7 @@ def plotInfo(timeline,
             step = CG_timeline[:, 1].mean()
             std = CG_timeline[:, 1].std()
             count = CG_timeline[:, 3].mean()
-            plt.title(
-                "Step size vs. conjugacy coeff, avg_step=%.6f, step_std=%8f, avg_count=%.1f"
-                % (step, std, count))
+            plt.title("Step size vs. conjugacy coeff, avg_step=%.6f, step_std=%8f, avg_count=%.1f" % (step, std, count))
             plt.savefig(save_name + ".CGtimeline.png", bbox_inches='tight')
 
         #---------------------------------------------------------------------------------------------------------
@@ -404,27 +373,11 @@ def plotInfo(timeline,
                 err_cap = errors[:, 2].mean() * 3
 
             plt.figure(figsize=(16, 6))
-            plt.plot(errors[:, 1],
-                     errors[:, 2],
-                     'g--',
-                     label='Train error',
-                     linewidth=1)
-            plt.plot(errors[:, 1],
-                     errors[:, 3],
-                     'r--',
-                     label='Valid Error',
-                     linewidth=1)
-            plt.plot(errors[:, 1],
-                     _SMA(errors[:, 2], 8),
-                     'g-',
-                     label='Smooth train error',
-                     linewidth=3)
+            plt.plot(errors[:, 1], errors[:, 2], 'g--', label='Train error', linewidth=1)
+            plt.plot(errors[:, 1], errors[:, 3], 'r--', label='Valid Error', linewidth=1)
+            plt.plot(errors[:, 1], _SMA(errors[:, 2], 8), 'g-', label='Smooth train error', linewidth=3)
             if not np.any(np.isnan(_SMA(errors[:, 3], 8))):
-                plt.plot(errors[:, 1],
-                         _SMA(errors[:, 3], 8),
-                         'r-',
-                         label='Smooth valid Error',
-                         linewidth=3)
+                plt.plot(errors[:, 1], _SMA(errors[:, 3], 8), 'r-', label='Smooth valid Error', linewidth=3)
             if autoscale:
                 plt.ylim(0, err_cap)
                 plt.xlim(0, errors[-1, 1])
@@ -444,28 +397,22 @@ def plotInfo(timeline,
         print "An error occoured durint plotting"
 
 
-def previewDiffPlot(names,
-                    root_dir='~/CNN_Training/3D',
-                    block_name=0,
-                    c=1,
-                    z=0,
-                    number=1,
-                    save=True):
+def previewDiffPlot(names, root_dir='~/CNN_Training/3D', block_name=0, c=1, z=0, number=1, save=True):
     """
-  Visualisation tool to compare the predictions of 2 or multiple CNNs
-  It is assumed that
-  
-  Parameters
-  ----------
-  
-  names: list of str
-    Folder/Save names of the CNNs
-  root_dir: str
-    path in which the CNN folders are located
-  block_name: int/str
-    Number/Name of the prediction preview example ("...pred_<i>_c..")
-  
-  """
+    Visualisation tool to compare the predictions of 2 or multiple CNNs
+    It is assumed that
+
+    Parameters
+    ----------
+
+    names: list of str
+      Folder/Save names of the CNNs
+    root_dir: str
+      path in which the CNN folders are located
+    block_name: int/str
+      Number/Name of the prediction preview example ("...pred_<i>_c..")
+
+    """
 
     def getDiff(p1, p2):
         plt.ion()
@@ -499,10 +446,8 @@ def previewDiffPlot(names,
     count = 1
     for i in xrange(len(names)):
         for j in xrange(i + 1, len(names)):
-            p1 = "%s/%s/%s-pred-%s-c%i-z%i-%ihrs.png" % (
-                root_dir, names[i], names[i], block_name, c, z, number)
-            p2 = "%s/%s/%s-pred-%s-c%i-z%i-%ihrs.png" % (
-                root_dir, names[j], names[j], block_name, c, z, number)
+            p1 = "%s/%s/%s-pred-%s-c%i-z%i-%ihrs.png" % (root_dir, names[i], names[i], block_name, c, z, number)
+            p2 = "%s/%s/%s-pred-%s-c%i-z%i-%ihrs.png" % (root_dir, names[j], names[j], block_name, c, z, number)
             diff = getDiff(p1, p2)
 
             plt.subplot(n, m, count)
@@ -510,14 +455,11 @@ def previewDiffPlot(names,
             plt.imshow(diff, interpolation='none')
             plt.title("%s (green) vs. %s (blue)" % (names[i], names[j]))
             if save:
-                plt.imsave("%s_vs_%s_pred-%s-c%i-z%i-%ihrs.png" %
-                          (names[i], names[j], block_name, c, z, number), diff)
+                plt.imsave("%s_vs_%s_pred-%s-c%i-z%i-%ihrs.png" % (names[i], names[j], block_name, c, z, number), diff)
 
     plt.show()
     if save:
-        plt.savefig("Compare_pred-%s-c%i-z%i-%ihrs.png" %
-                    (block_name, c, z, number),
-                    bbox_inches='tight')
+        plt.savefig("Compare_pred-%s-c%i-z%i-%ihrs.png" % (block_name, c, z, number), bbox_inches='tight')
     plt.ioff()
 
 
@@ -562,7 +504,7 @@ def userInput(cnn, history_freq):
             cnn.saveParameters(words[1])
         print "Saving done"
     elif words[0] == "load":
-        if (len(words) == 1):
+        if len(words) == 1:
             cnn.loadParameters()
         else:
             cnn.loadParameters(words[1])
@@ -583,11 +525,9 @@ def userInput(cnn, history_freq):
         n = len(cnn.layers)
         for j in range(len(cnn.params)):
             pa = cnn.params[j].get_value()
-            print 'Layer  ' + str(n - int(
-                j / 2)) + ': filter_shape =', np.shape(pa)
+            print 'Layer  ' + str(n - int(j / 2)) + ': filter_shape =', np.shape(pa)
             print 'Layer {0:2d}: np.mean(abs)={1:2.6e}, np.std={1:2.6e} np.median(abs)={2:2.6e}  '.format(
-                n - int(j / 2), np.mean(abs(pa)), np.std(pa),
-                np.median(abs(pa)))
+                n - int(j / 2), np.mean(abs(pa)), np.std(pa), np.median(abs(pa)))
 
     else:
         return user_input_string  # this string will be executed in main
@@ -597,14 +537,14 @@ def userInput(cnn, history_freq):
 
 def pickleSave(data, file_name):
     """
-  Writes one or many objects to pickle file
-  
-  data:
-    single objects to save or iterable of objects to save.
-    For iterable, all objects are written in this order to the file.
-  file_name: string
-    path/name of destination file
-  """
+    Writes one or many objects to pickle file
+
+    data:
+      single objects to save or iterable of objects to save.
+      For iterable, all objects are written in this order to the file.
+    file_name: string
+      path/name of destination file
+    """
     with open(file_name, 'wb') as f:
         if not hasattr(data, '__len__'):
             pkl.dump(data, f, protocol=2)
@@ -615,9 +555,9 @@ def pickleSave(data, file_name):
 
 def pickleLoad(file_name):
     """
-  Loads all object that are saved in the pickle file.
-  Multiple objects are returned as list.
-  """
+    Loads all object that are saved in the pickle file.
+    Multiple objects are returned as list.
+    """
     ret = []
     try:
         with open(file_name, 'rb') as f:
@@ -658,28 +598,25 @@ def pickleLoad(file_name):
 
 def h5Save(data, file_name, keys='None', compress=True):
     """
-  Writes one or many arrays to h5 file
-  
-  data:
-    single array to save or iterable of arrays to save.
-    For iterable all arrays are written to the file.
-  file_name: string
-    path/name of destination file
-  keys: string / list thereof
-    For single arrays this is a single string which is used as a name for the data set.
-    For multiple arrays each dataset is named by the corresponding key.
-    If keys is ``None``, the dataset names created by enumeration: ``data%i``
-  compress: Bool
-    Whether to use lzf compression, defaults to ``True``. Most useful for label arrays.
-  """
+    Writes one or many arrays to h5 file
+
+    data:
+      single array to save or iterable of arrays to save.
+      For iterable all arrays are written to the file.
+    file_name: string
+      path/name of destination file
+    keys: string / list thereof
+      For single arrays this is a single string which is used as a name for the data set.
+      For multiple arrays each dataset is named by the corresponding key.
+      If keys is ``None``, the dataset names created by enumeration: ``data%i``
+    compress: Bool
+      Whether to use lzf compression, defaults to ``True``. Most useful for label arrays.
+    """
 
     compr = 'lzf' if compress else None
     f = h5py.File(file_name, "w")
-    if isinstance(data, list) or isinstance(
-            data,
-            tuple):  #hasattr(keys, '__len__') and not isinstance(keys, str):
+    if isinstance(data, list) or isinstance(data, tuple):  #hasattr(keys, '__len__') and not isinstance(keys, str):
         for i, d in enumerate(data):
-
             f.create_dataset(keys[i], data=d, compression=compr)
     else:
         if keys is None:
@@ -691,15 +628,15 @@ def h5Save(data, file_name, keys='None', compress=True):
 
 def h5Load(file_name, keys=None):
     """
-  Loads data sets from h5 file
-  
-  file_name: string
-    destination file
-  keys: string / list thereof
-    Load only data sets specified in keys and return as list in the order of ``keys``
-    For a single key the data is returned directly - not as list
-    If keys is ``None`` all datasets that are listed in the keys-attribute of the h5 file are loaded.
-  """
+    Loads data sets from h5 file
+
+    file_name: string
+      destination file
+    keys: string / list thereof
+      Load only data sets specified in keys and return as list in the order of ``keys``
+      For a single key the data is returned directly - not as list
+      If keys is ``None`` all datasets that are listed in the keys-attribute of the h5 file are loaded.
+    """
     ret = []
     try:
         f = h5py.File(file_name, "r")
@@ -736,8 +673,7 @@ def timeit(foo, n=1):
         ret = foo(*args, **kwargs)
         t = time.time() - t0
         if hasattr(foo, '__name__'):
-            print "Function <%s> took %.5f s averaged over %i execs" % (
-                foo.__name__, t / n, n)
+            print "Function <%s> took %.5f s averaged over %i execs" % (foo.__name__, t / n, n)
         else:
             print "Function took %.5f s averaged over %i execs" % (t / n, n)
         return ret
@@ -752,8 +688,7 @@ if __name__ == "__main__":
     #  previewDiffPlot(names, block_name=3, number=23)
     #   plotInfoFromFiles("/home/mfk/CNN_Training/3D/NewDeepBlind/", "NewDeepBlind")
     #   plotInfoFromFiles("/home/mfk/CNN_Training/MLP/Piano", "Piano")
-    plotInfoFromFiles("/home/mfk/CNN_Training/MLP/MNIST_MLP_warp",
-                      "MNIST_MLP_warp")
+    plotInfoFromFiles("/home/mfk/CNN_Training/MLP/MNIST_MLP_warp", "MNIST_MLP_warp")
 #  print "Testing CNN-Training Configuration and Backup of Scripts"
 #  conf = ConfigObj("../Quick_config.py", 0, "../elektronn-train")
 

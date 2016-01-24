@@ -45,20 +45,21 @@ class SharedMem(object):
     @staticmethod
     def shm2ndarray(mp_array, shape=None):
         """
-      Parameters
-      ----------
-      
-      mp_array: a mp.Array
-      shape:    (optional) the returned np.ndarray is reshaped to this shape, flat otherwise
-      
-      Returns
-      -------
-      
-      array: np.ndarray
-       That can be normally used but changes are reflected in shared mem
-       
-      Note: the returned array is still pointing to the sharedmem, data might be changed by another process!
-      """
+        Parameters
+        ----------
+
+        mp_array: a mp.Array
+        shape:    (optional) the returned np.ndarray is reshaped to this shape, flat otherwise
+
+        Returns
+        -------
+
+        array: np.ndarray
+         That can be normally used but changes are reflected in shared mem
+
+        Note: the returned array is still pointing to the sharedmem, data might be changed by another process!
+        """
+
         #if not hasattr(mp_array, '_type_'):
         #  mp_array = mp_array.get_obj()
 
@@ -74,20 +75,17 @@ class SharedMem(object):
     @staticmethod
     def ndarray2shm(np_array, lock=False):
         """
-          Parameters
-          ----------
-
-          np_array: np.ndarray
-            array of arbitrary shape
-          lock: Bool
-            Whether to create a multiprocessing.Lock
-
-          Returns
-          -------
-
-          handle: mp.Array:
-            flat with data from ndarray copied to it
-          """
+        Parameters
+        ----------
+        np_array: np.ndarray
+          array of arbitrary shape
+        lock: Bool
+          Whether to create a multiprocessing.Lock
+        Returns
+        -------
+        handle: mp.Array:
+          flat with data from ndarray copied to it
+        """
         array1d = np_array.ravel(order='A')
 
         try:
@@ -101,23 +99,23 @@ class SharedMem(object):
 
     def puthandle(self, dtype, shape, data=None, lock=False):
         """
-    Creates new shared memory and puts it on the queue. Other sub-processes can write to it.
-    
-    Parameters
-    ----------
-    dtype: np.dtype
-      Type of data to store in array
-    shape: tuple
-      Properties of shared mem to be created
-    data: np.ndarray
-     (optional) values to fill shared array with
-    lock: Bool
-      Whether to create a multiprocessing.Lock on the shared variable
+        Creates new shared memory and puts it on the queue. Other sub-processes can write to it.
 
-    Returns
-    -------
-    sharedmem handle: mp.array
-    """
+        Parameters
+        ----------
+        dtype: np.dtype
+          Type of data to store in array
+        shape: tuple
+          Properties of shared mem to be created
+        data: np.ndarray
+         (optional) values to fill shared array with
+        lock: Bool
+          Whether to create a multiprocessing.Lock on the shared variable
+
+        Returns
+        -------
+        sharedmem handle: mp.array
+        """
         t0 = time.clock()
         size = np.prod(shape)
         try:
@@ -143,9 +141,9 @@ class SharedMem(object):
 
 class Proc(mp.Process):
     """
-  A *reusable* and *configurable* background process, that does the same job every time
-  ``events['new']`` is set and signals that is has finished one iteration by setting ``events['ready']``
-  """
+    A *reusable* and *configurable* background process, that does the same job every time
+    ``events['new']`` is set and signals that is has finished one iteration by setting ``events['ready']``
+    """
 
     def __init__(self, mp_arrays, shapes, events, target, target_args,
                  target_kwargs, profile):
@@ -166,22 +164,18 @@ class Proc(mp.Process):
     def run(self):
         while True:
             try:
-                self.events['new'].wait(
-                )  # wait till host has fetched data from shm and demands new data from this proc
+                self.events['new'].wait()  # wait till host has fetched data from shm and demand new data from this proc
                 self.events['new'].clear()
                 t0 = time.clock()
                 result = self.target(*self.target_args, **self.target_kwargs)
                 for a, r in zip(self.arrays, result):
                     a[:] = r
 
-                self.events['ready'].set(
-                )  # signal host that task is done and data is ready in shm
+                self.events['ready'].set()  # signal host that task is done and data is ready in shm
                 t1 = time.clock()
                 if self.profile:
                     t_exec = t1 - t0
-                    self.logger.info(
-                        'Executing Target and writing to shm %g ms' %
-                        (t_exec * 1000))
+                    self.logger.info('Executing Target and writing to shm %g ms' % (t_exec * 1000))
             except KeyboardInterrupt:
                 pass
 
@@ -196,45 +190,45 @@ class BackgroundProc(SharedMem):
                  target_kwargs={},
                  profile=False):
         """
-    Data structure to manage repeated background tasks by reusing a fixed number of *initially* created
-    background process with the same arguments at every time. (E.g. retrieving an augmented batch)
-    Remember to call ``BackgroundProc.shutdown`` after use to avoid zombie process and RAM clutter.
-  
-    Parameters
-    ----------
-  
-    dtypes:
-      list of dtypes of the target return values
-    shapes:
-      list of shapes of the target return values
-    n_proc: int
-      number of background procs to use
-    target: callable
-      target function for background proc. Can even be a method of an object, if object\
-    data is read-only (then data will not be copied in RAM and the new process is lean). If\
-    several procs use random modules, new seeds must be created inside target because they\
-    have the same random state at the beginning.
-    target_args:  tuple
-      Proc args (constant)
-    target_kwargs: dict
-      Proc kwargs (constant)
-    profile: Bool
-      Whether to print timing results in to stdout
-  
-    Examples
-    --------
-  
-    Use case to retrieve batches from a data structure ``D``:
-  
-      >>> data, label = D.getbatch(2, strided=False,
-      flip=True, grey_augment_channels=[0])
-      >>> kwargs = {'strided': False, 'flip': True, 'grey_augment_channels': [0]}
-      >>> bg = BackgroundProc([np.float32, np.int16], [data.shape,label.shape],
-      D.getbatch,n_proc=2, target_args=(2,), target_kwargs=kwargs, profile=False)
-      >>> for i in xrange(100):
-      >>>   data, label = bg.get()
-  
-    """
+        Data structure to manage repeated background tasks by reusing a fixed number of *initially* created
+        background process with the same arguments at every time. (E.g. retrieving an augmented batch)
+        Remember to call ``BackgroundProc.shutdown`` after use to avoid zombie process and RAM clutter.
+
+        Parameters
+        ----------
+
+        dtypes:
+          list of dtypes of the target return values
+        shapes:
+          list of shapes of the target return values
+        n_proc: int
+          number of background procs to use
+        target: callable
+          target function for background proc. Can even be a method of an object, if object\
+        data is read-only (then data will not be copied in RAM and the new process is lean). If\
+        several procs use random modules, new seeds must be created inside target because they\
+        have the same random state at the beginning.
+        target_args:  tuple
+          Proc args (constant)
+        target_kwargs: dict
+          Proc kwargs (constant)
+        profile: Bool
+          Whether to print timing results in to stdout
+
+        Examples
+        --------
+
+        Use case to retrieve batches from a data structure ``D``:
+
+          >>> data, label = D.getbatch(2, strided=False,
+          flip=True, grey_augment_channels=[0])
+          >>> kwargs = {'strided': False, 'flip': True, 'grey_augment_channels': [0]}
+          >>> bg = BackgroundProc([np.float32, np.int16], [data.shape,label.shape],
+          D.getbatch,n_proc=2, target_args=(2,), target_kwargs=kwargs, profile=False)
+          >>> for i in xrange(100):
+          >>>   data, label = bg.get()
+
+        """
         self.dtypes = dtypes
         self.shapes = shapes
         self.target = target
@@ -263,20 +257,17 @@ class BackgroundProc(SharedMem):
             self.mp_arrays.append(a)
             self.events.append({'new': mp.Event(), 'ready': mp.Event()})
 
-        for shm, e in zip(
-                self.mp_arrays,
-                self.events):  # initialise the procs and give them their mp-arrays
-            p = Proc(shm, shapes, e, target, target_args, target_kwargs,
-                     profile)
+        for shm, e in zip(self.mp_arrays, self.events):  # initialise the procs and give them their mp-arrays
+            p = Proc(shm, shapes, e, target, target_args, target_kwargs, profile)
             p.start()
             e['new'].set()
             self.procs.append(p)
 
     def get(self):
         """
-    This gets the next result from a background process and blocks until the corresponding proc
-    has finished.
-    """
+        This gets the next result from a background process and blocks until the corresponding proc
+        has finished.
+        """
         k = self.i
         self.i = (self.i + 1) % self.n_proc  # advance index of next item
         result = []
@@ -285,8 +276,7 @@ class BackgroundProc(SharedMem):
         self.events[k]['ready'].clear()
         t1 = time.clock()
         for shm, shp in zip(self.mp_arrays[k], self.shapes):
-            result.append(SharedMem.shm2ndarray(shm, shp).copy()
-                          )  # copy! Otherwise a proc will write to result
+            result.append(SharedMem.shm2ndarray(shm, shp).copy())  # copy! Otherwise a proc will write to result
 
         self.events[k]['new'].set()
         t2 = time.clock()
@@ -294,8 +284,7 @@ class BackgroundProc(SharedMem):
             t_wait = t1 - t0
             t_write = t2 - t1
             self.logger.info(
-                'Waiting for subprocess %g ms, converting to numpy %g ms' %
-                (t_wait * 1000, t_write * 1000))
+                'Waiting for subprocess %g ms, converting to numpy %g ms' % (t_wait * 1000, t_write * 1000))
 
         return tuple(result)
 
@@ -306,54 +295,54 @@ class BackgroundProc(SharedMem):
 
     def reset(self):
         """
-    Should be called after an exception (e.g. by pressing ctrl+c) was raised.
-    """
+        Should be called after an exception (e.g. by pressing ctrl+c) was raised.
+        """
         for e in self.events:
             e['new'].set()
 
 
 class SharedQ(SharedMem):
     """
-  FIFO Queue to process np.ndarrays in the background (also pre-loading of data from disk)
+    FIFO Queue to process np.ndarrays in the background (also pre-loading of data from disk)
 
-  procs must accept list of ``mp.Array`` and make items ``np.ndarray`` using ``SharedQ.shm2ndarray``,\
-  for this the shapes are required as too. The target requires the signature::
+    procs must accept list of ``mp.Array`` and make items ``np.ndarray`` using ``SharedQ.shm2ndarray``,\
+    for this the shapes are required as too. The target requires the signature::
 
-     >>> target(mp_arrays, shapes, *args, **kwargs)
+       >>> target(mp_arrays, shapes, *args, **kwargs)
 
-  Whereas mp_array and shape are *automatically* added internally
-  
-  All parameters are optional:
+    Whereas mp_array and shape are *automatically* added internally
 
-  Parameters
-  ----------
-  
+    All parameters are optional:
 
-  n_proc: int 
-    If larger than 0, a message is printed if to few processes are running
-  default_target: callable
-    Default background proc callable
-  default_args: tuple
-    Default background proc and their parameters
-  default_kwargs: dict
-    Default background proc kwargs
-  profile: Bool
-    Whether to print timing results in terminal
+    Parameters
+    ----------
 
-  Examples
-  ---------
 
-  Automatic use:
+    n_proc: int
+      If larger than 0, a message is printed if to few processes are running
+    default_target: callable
+      Default background proc callable
+    default_args: tuple
+      Default background proc and their parameters
+    default_kwargs: dict
+      Default background proc kwargs
+    profile: Bool
+      Whether to print timing results in terminal
 
-    >>> Q = SharedQ(n_proc=2)
-    >>> Q.startproc(target=, shape= args=, kwargs=)
-    >>> Q.startproc(target=, shape= args=, kwargs=)
-    >>> for i in xrange(5):
-    >>>   Q.startproc(target=, shape= args=, kwargs=)
-    >>>   item = Q.get() # starts as many new jobs as to maintain n_proc
-    >>>   dosomehtingelse(item) # processes work in background to pre-fetch data for next iteration
+    Examples
+    ---------
 
-  """
+    Automatic use:
+
+      >>> Q = SharedQ(n_proc=2)
+      >>> Q.startproc(target=, shape= args=, kwargs=)
+      >>> Q.startproc(target=, shape= args=, kwargs=)
+      >>> for i in xrange(5):
+      >>>   Q.startproc(target=, shape= args=, kwargs=)
+      >>>   item = Q.get() # starts as many new jobs as to maintain n_proc
+      >>>   dosomehtingelse(item) # processes work in background to pre-fetch data for next iteration
+
+    """
 
     def __init__(self,
                  n_proc=0,
@@ -377,15 +366,15 @@ class SharedQ(SharedMem):
                   target_args=(),
                   target_kwargs={}):
         """
-    Starts a new process
+        Starts a new process
 
-    procs must accept list of ``mp.Array`` and make items ``np.ndarray`` using ``SharedQ.shm2ndarray``,\
-    for this the shapes are required as too. The target requires the signature::
+        procs must accept list of ``mp.Array`` and make items ``np.ndarray`` using ``SharedQ.shm2ndarray``,\
+        for this the shapes are required as too. The target requires the signature::
 
-       target(mp_arrays, shapes, *args, **kwargs)
+           target(mp_arrays, shapes, *args, **kwargs)
 
-    Whereas mp_array  and shape are *automatically* added internally
-    """
+        Whereas mp_array  and shape are *automatically* added internally
+        """
 
         data = target_kwargs.get('data')
 
@@ -414,10 +403,10 @@ class SharedQ(SharedMem):
 
     def get(self):
         """
-    This gets the first results in the queue and blocks until the corresponding proc
-    has finished. If a n_proc value is defined this then new procs must be started *before* to
-    avoid a warning message.
-    """
+        This gets the first results in the queue and blocks until the corresponding proc
+        has finished. If a n_proc value is defined this then new procs must be started *before* to
+        avoid a warning message.
+        """
         mp_arrays, shapes, proc = self.data.popleft()
         self.len -= 1
         missing = self.n_proc - self.len
@@ -436,8 +425,7 @@ class SharedQ(SharedMem):
         if self.profile:
             t_join = t1 - t0
             t_conv = t2 - t1
-            self.logger.info('Join %g ms, Shared2Numpy %g ms' %
-                             (t_join * 1000, t_conv * 1000))
+            self.logger.info('Join %g ms, Shared2Numpy %g ms' % (t_join * 1000, t_conv * 1000))
 
         return result
 
