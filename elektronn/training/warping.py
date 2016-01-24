@@ -265,10 +265,7 @@ def test():
         out = warp2dFast(img_s, (11, 11), 0, 0, (1, 1), (0.0, 0.0))
     except Exception as e:
         print """%s
-    Warping is broken. Most likeley the distributed _warping.so is not binary compatible to your system.
-    You can try to compile it manually in "<install_dir>/elektronn/training/":
-    "gcc warping.c -shared -fPIC -o _warping.so -O3".
-    """ % (e, )
+        Warping is broken. Most likeley the distributed _warping.so is not binary compatible to your system.""" % (e, )
 
 
 test()
