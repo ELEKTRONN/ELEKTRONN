@@ -35,7 +35,7 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.4',
+    version='1.0.5',
     packages=find_packages(),
     scripts=['elektronn/scripts/elektronn-train',
              'elektronn/scripts/elektronn-profile',
@@ -53,9 +53,9 @@ setup(
     extras_require={'cross-validation': ['scikit-learn']},
     author="Marius Killinger, Gregor Urban",
     author_email="Marius.Killinger@mailbox.org",
-    description=("ELEKTRONN is a highly configurable toolkit for training 3d/2d CNNs and general Neural Networks"),
+    description=("A highly configurable toolkit for training 3d/2d CNNs and general Neural Networks"),
     long_description=read('README.rst'),
-    license="GPL",
+    license="GPLv3",
     keywords="cnn theano convolutional neural network machine learning classification",
     url="http://www.elektronn.org/",
     classifiers=[

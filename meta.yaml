@@ -1,10 +1,10 @@
 package:
   name: elektronn
-  version: 1.0.4
+  version: 1.0.5
 
 source:
     git_url: https://github.com/ELEKTRONN/ELEKTRONN.git
-    git_rev: v1.0.4
+    git_rev: v1.0.5
 
 requirements:
   build:
