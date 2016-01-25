@@ -7,7 +7,7 @@ System Requirements & Installation
 ==================================
 
 * Python 2.7
-* The whole toolkit was designed and tested on Linux systems (in particular Debian, Ubuntu, CentOS)
+* The whole toolkit was designed and tested on Linux systems (in particular Debian, Ubuntu, CentOS, Arch)
 * Theano creates CUDA binaries. Hence only Nvidia-GPUs will work (alternatively it can use the CPU, but this might be too slow for large nets and CNNs).
 * If you wish to use ELEKTRONN on Windows or with Python 3 (or if you want to help making it portable) please contact us.
 
@@ -28,10 +28,10 @@ Basic Recipe for CNN Training with Images
 =========================================
 
 .. Note::
-  This section is addressed to people interested into large scale image processing tasks (such as found in connectomics). For smaller toy examples and processing of non-image data have a look at the:ref:`examples <examples>`.
+  This section is addressed to people interested into large scale image processing tasks (such as found in connectomics). For smaller toy examples and processing of non-image data have a look at the :ref:`examples <examples>`.
 
 
-* CNN training requires a data set of spatial input data (2D/3D, with an optional fourth axis for (colour) channels) and *labels* (also called: ground truth, annotations, targets). The labels correspond to the individual pixels in the images or to whole images. The labels can be integers encoding class membership - or alternatively floats for regression targets. Illustrations of training labels can be found :ref`here <modes>`.
+* CNN training requires a data set of spatial input data (2D/3D, with an optional fourth axis for (colour) channels) and *labels* (also called: ground truth, annotations, targets). The labels correspond to the individual pixels in the images or to whole images. The labels can be integers encoding class membership - or alternatively floats for regression targets. Illustrations of training labels can be found :ref:`here <modes>`.
 
 * Transform your data arrays to h5 data sets in separate files for images and labels.
 	- images: shape (x,y,z)  or (ch,x,y,z)
