@@ -5,11 +5,14 @@
 # Max-Planck-Institute for Medical Research, Heidelberg, Germany
 # Authors: Marius Killinger, Gregor Urban
 
-import os, shutil
+import os
+import shutil
+
 import numpy as np
 
 from elektronn.net import netutils
 import trainutils
+import elektronn.examples
 
 
 class MasterConfig(object):
@@ -254,6 +257,15 @@ class Config(object):
         # read and process the config parameters
         self.default_config = default_config
         self.config_file = os.path.expanduser(config_file)
+
+        # If file is not found, look if it's an example file:
+        if not os.path.isfile(self.config_file):
+            example_path = os.path.join(os.path.dirname(elektronn.examples.__file__), config_file)
+            if os.path.isfile(example_path):
+                self.config_file = example_path
+            else:
+                raise RuntimeError('Config file %s could not be found.' % config_file)
+
         custom_dict = self.parseConfig()
         self.fixValues()
         self.typeChecks()
