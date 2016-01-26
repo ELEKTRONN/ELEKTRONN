@@ -26,41 +26,6 @@ requirements:
     - scipy
     - theano
 
-test:
-  imports:
-    - h5py
-    - matplotlib
-    - numpy
-    - sklearn
-    - scipy
-    - theano
-    - elektronn
-    - elektronn.examples
-    - elektronn.examples.config_template
-    - elektronn.examples.MNIST_CNN_warp_config
-    - elektronn.examples.MNIST_MLP_config
-    - elektronn.net
-    - elektronn.net.convlayer2d
-    - elektronn.net.convlayer3d
-    - elektronn.net.convnet
-    - elektronn.net.gaborfilters
-    - elektronn.net.introspection
-    - elektronn.net.netcreation
-    - elektronn.net.netutils
-    - elektronn.net.optimizer
-    - elektronn.net.perceptronlayer
-    - elektronn.net.pooling
-    - elektronn.training
-    - elektronn.training.config
-    - elektronn.training.CNNData
-    - elektronn.training.parallelisation
-    - elektronn.training.predictor
-    - elektronn.training.traindata
-    - elektronn.training.trainer
-    - elektronn.training.trainutils
-    - elektronn.training.warping
-    - elektronn.utils
-
 about:
   home: http://www.elektronn.org/
   license: GPLv3
