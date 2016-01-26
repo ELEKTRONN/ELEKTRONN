@@ -11,9 +11,7 @@ ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general N
 
 It is written in Python 2 and based on Theano, which allows CUDA-enabled GPUs to significantly accelerate the pipeline.
 
-The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images.
-
-Additionally, the toolkit offers training routines for tasks on non-image data.
+The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally, the toolkit offers training routines for tasks on non-image data.
 
 ELEKTRONN was created by Marius Killinger and Gregor Urban at the Max Planck Institute For Medical Research to solve connectomics tasks.
 
