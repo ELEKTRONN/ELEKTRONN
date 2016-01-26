@@ -15,7 +15,7 @@ The package includes a sophisticated training pipeline designed for classificati
 
 ELEKTRONN was created by Marius Killinger and Gregor Urban at the Max Planck Institute For Medical Research to solve connectomics tasks.
 
-.. image:: http://elektronn.org/downloads/combined_title.png
+.. image:: http://elektronn.org/downloads/combined_title.jpg
     :width: 1000px
     :alt: Logo+Example
     :target: http://elektronn.org/
