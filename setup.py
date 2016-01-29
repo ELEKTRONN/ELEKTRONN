@@ -43,6 +43,7 @@ setup(
     ext_modules=ext_modules,
     setup_requires=['cython>=0.23'],
     install_requires=[
+        'cython>=0.23',
         'numpy>=1.8',
         'scipy>=0.14',
         'matplotlib>=1.4',

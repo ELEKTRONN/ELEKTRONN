@@ -19,6 +19,7 @@ requirements:
 
   run:
     - python 2.7*
+    - cython
     - h5py
     - matplotlib
     - numpy
