@@ -35,7 +35,7 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.7',
+    version='1.0.8',
     packages=find_packages(),
     scripts=['elektronn/scripts/elektronn-train',
              'elektronn/scripts/elektronn-profile',
@@ -48,7 +48,6 @@ setup(
         'matplotlib>=1.4',
         'h5py>=2.2',
         'theano>=0.7',
-        'cython>=0.23',
     ],
     extras_require={'cross-validation': ['scikit-learn']},
     author="Marius Killinger, Gregor Urban",
