@@ -1,106 +1,12 @@
 /*
 ELEKTRONN - Neural Network Toolkit
-Copyright (c) 2015 Gregor Urban, Marius Killinger
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software for non-commercial purposes, including
-the rights to use, copy, modify, merge, publish, distribute, the Software,
-and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The Software shall neither be used as part or facilitating factor of military
-applications, nor be used to develop or facilitate the development
-of military applications.
-The Software and derivative work is not used commercially.
-The above copyright notice and this permission notice shall be included in
-all copies and all derivative work of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+Copyright (c) 2014 - now
+Max-Planck-Institute for Medical Research, Heidelberg, Germany
+Authors: Marius Killinger, Gregor Urban
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <math.h>
-#include <time.h>
 
-typedef int bool;
-#define True 1
-#define False 0
-typedef float (*interpolateFunc2d)(float *, float, float, int, int, int);
-
-// Linear Interpolation
-/// Returns either interpolation of both values if available, or single if available or 0 if not avail
-inline float linearInterpolate(float p[2], bool avail[2], float x) {
-    float ret = 0;
-    if (avail[0]) {
-        if (avail[1])
-            ret = (1 - x) * p[0] + x * p[1];
-        else
-            ret = p[0];
-    } else if (avail[1])
-        ret = p[1];
-    return ret;
-}
-
-inline float bilinearInterpolate(const float *src, float u, float v, int w_x, int w_y) {
-    int x_l = floor(u);
-    int x_r = ceil(u);
-    int y_l = floor(v);
-    int y_r = ceil(v);
-
-    float ret;
-
-    float p[2][2] = {{0, 0}, {0, 0}}; // ll, lr, rl, rr
-    bool avail[2][2] = {{False, False}, {False, False}};
-
-    if (x_l < w_x && y_l < w_y && x_l >= 0 && y_l >= 0) {
-        p[0][0] = src[x_l * w_y + y_l];
-        avail[0][0] = True;
-    }
-    if (x_l < w_x && y_r < w_y && x_l >= 0 && y_r >= 0) {
-        p[0][1] = src[x_l * w_y + y_r];
-        avail[0][1] = True;
-    }
-    if (x_r < w_x && y_l < w_y && x_r >= 0 && y_l >= 0) {
-        p[1][0] = src[x_r * w_y + y_l];
-        avail[1][0] = True;
-    }
-    if (x_r < w_x && y_r < w_y && x_r >= 0 && y_r >= 0) {
-        p[1][1] = src[x_r * w_y + y_r];
-        avail[1][1] = True;
-    }
-
-    if (!(avail[0][0] || avail[0][1] || avail[1][0] || avail[1][1]))
-        ret = 0;
-    else {
-        float x = u - x_l;
-        float y = v - y_l;
-        // ret=bilinearInterpolate(p, avail, dx, dy);
-        float tmp[2];
-        tmp[0] = linearInterpolate(p[0], avail[0], y);
-        tmp[1] = linearInterpolate(p[1], avail[1], y);
-
-        bool avail_tmp[2] = {False, False};
-        if (avail[0][0] || avail[0][1])
-            avail_tmp[0] = True;
-        if (avail[1][0] || avail[1][1])
-            avail_tmp[1] = True;
-        ret = linearInterpolate(tmp, avail_tmp, x);
-    }
-    return ret;
-}
-
-/************************************************************************************************************/
 
 void NN2d(const float *src, float u, float v, int ch, const int sh[3],
                   const int strd_src[2], float *ret) {
@@ -241,3 +147,4 @@ int fastwarp3d_opt_zxy(const float *src, float *dest_d,
     }
     return 0;
 }
+
