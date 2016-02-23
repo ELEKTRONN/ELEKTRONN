@@ -141,7 +141,7 @@ class ConvLayer3d(object):
                             scale='glorot',
                             mode='normal',
                             pool=pool),
-                dtype=theano.config.floatX)
+                dtype='float32')
             self.W = theano.shared(W_values, name='W_conv', borrow=True)
         else:
             if isinstance(W, np.ndarray):
@@ -160,7 +160,7 @@ class ConvLayer3d(object):
             norm = filter_shape[1] * filter_shape[3] * filter_shape[4]  #
             b_values = np.ones(
                 (filter_shape[0], ),
-                dtype=theano.config.floatX) / norm
+                dtype='float32') / norm
         if b is None:
             n_out = filter_shape[0]
             if activation_func == 'relu' or activation_func == 'ReLU':
@@ -170,21 +170,21 @@ class ConvLayer3d(object):
                         (n_out, ),
                         scale=1.0 / norm,
                         mode='const'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             elif activation_func == 'sigmoid':
                 b_values = np.asarray(
                     initWeights(
                         (n_out, ),
                         scale=0.5,
                         mode='const'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             else:  # activation_func=='tanh':
                 b_values = np.asarray(
                     initWeights(
                         (n_out, ),
                         scale=1e-6,
                         mode='fix-uni'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
 
             self.b = theano.shared(value=b_values, borrow=True, name='b_conv')
 
@@ -235,7 +235,7 @@ class ConvLayer3d(object):
                  pooled_out.shape[4]),
                 1,
                 p,
-                dtype=theano.config.floatX)
+                dtype='float32')
             pooled_out = pooled_out * self.dropout_gate.dimshuffle(('x', 0, 'x', 1, 2))
 
         lin_output = pooled_out + self.b.dimshuffle('x', 'x', 0, 'x', 'x')
@@ -334,7 +334,7 @@ class ConvLayer3d(object):
     def fragmentstodense(self, sh):
         mfp_strides = self.mfp_strides
         example_stride = np.prod(mfp_strides)  # This stride is conceptually unneeded but theano-grad fails otherwise
-        zero = np.array((0), dtype=theano.config.floatX)
+        zero = np.array((0), dtype='float32')
         embedding = T.alloc(zero, 1, sh[0], sh[2] * mfp_strides[0], sh[3] *
                             mfp_strides[1], sh[4] * mfp_strides[2])
         ix = self.mfp_offsets
@@ -358,28 +358,28 @@ class ConvLayer3d(object):
                     (n_out, ),
                     scale=1.0 / norm,
                     mode='const'),
-                dtype=theano.config.floatX)
+                dtype='float32')
         elif self.activation_func == 'sigmoid':
             b_values = np.asarray(
                 initWeights(
                     (n_out, ),
                     scale=0.5,
                     mode='const'),
-                dtype=theano.config.floatX)
+                dtype='float32')
         else:  #self.activation_func=='tanh':
             b_values = np.asarray(
                 initWeights(
                     (n_out, ),
                     scale=1e-6,
                     mode='fix-uni'),
-                dtype=theano.config.floatX)
+                dtype='float32')
 
         W_values = np.asarray(
             initWeights(self.filter_shape,
                         scale,
                         mode,
                         pool=self.pool),
-            dtype=theano.config.floatX)
+            dtype='float32')
 
         self.W.set_value(W_values)
         self.b.set_value(b_values)
@@ -631,19 +631,19 @@ class AffinityLayer3d(object):
                         scale='glorot',
                         mode='normal',
                         pool=pool),
-            dtype=theano.config.floatX)
+            dtype='float32')
         W_values2 = np.asarray(
             initWeights(filter_shape,
                         scale='glorot',
                         mode='normal',
                         pool=pool),
-            dtype=theano.config.floatX)
+            dtype='float32')
         W_values3 = np.asarray(
             initWeights(filter_shape,
                         scale='glorot',
                         mode='normal',
                         pool=pool),
-            dtype=theano.config.floatX)
+            dtype='float32')
 
         W_values = np.concatenate([W_values1, W_values2, W_values3], axis=0)
         self.W = theano.shared(W_values, name='W_conv', borrow=True)
@@ -651,7 +651,7 @@ class AffinityLayer3d(object):
         # the bias is a 1D tensor -- one bias per output feature map
         if activation_func in ['ReLU', 'relu']:
             norm = filter_shape[1] * filter_shape[3] * filter_shape[4]
-            b_values = np.ones((filter_shape[0], ), dtype=theano.config.floatX) / norm
+            b_values = np.ones((filter_shape[0], ), dtype='float32') / norm
         if b is None:
             n_out = filter_shape[0]
             if activation_func == 'relu' or activation_func == 'ReLU':
@@ -661,21 +661,21 @@ class AffinityLayer3d(object):
                         (n_out, ),
                         scale=1.0 / norm,
                         mode='const'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             elif activation_func == 'sigmoid':
                 b_values = np.asarray(
                     initWeights(
                         (n_out, ),
                         scale=0.5,
                         mode='const'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             else:  # activation_func=='tanh':
                 b_values = np.asarray(
                     initWeights(
                         (n_out, ),
                         scale=1e-6,
                         mode='fix-uni'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
 
             b_values = np.concatenate([b_values, b_values, b_values], axis=0)
             self.b = theano.shared(value=b_values, borrow=True, name='b_conv')

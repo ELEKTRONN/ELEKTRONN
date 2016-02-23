@@ -155,7 +155,7 @@ if __name__ == "__main__":
     import sys, os
     sys.path.append(os.path.expanduser("~/devel/ELEKTRONN/"))
     from elektronn.training.trainutils import timeit
-    sym_input = T.TensorType(dtype=theano.config.floatX, broadcastable=[False] * 5)()
+    sym_input = T.TensorType(dtype='float32', broadcastable=[False] * 5)()
     pool = (2, 2, 2)
 
     sym_ret = my_max_pool_3d(sym_input, pool)  #my_max_pool_3d_stupid(sym_input)

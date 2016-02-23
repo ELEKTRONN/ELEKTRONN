@@ -19,7 +19,7 @@ The design goals of ELEKTRONN are twofold:
 
 .. TODO put some nice pictures etc. here
 
-.. image:: http://elektronn.org/downloads/combined_title.png
+.. image:: http://elektronn.org/downloads/combined_title.jpg
    :width: 1000px
    :alt: Logo+Example
    :target: http://elektronn.org/

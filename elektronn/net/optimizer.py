@@ -93,7 +93,7 @@ class Optimizer(object):
                 if p in self.params[:i]:
                     print "Detected shared param: param[%i]" % i
                 else:
-                    self.last_grads.append(theano.shared(np.zeros(p.get_value().shape, dtype=theano.config.floatX),
+                    self.last_grads.append(theano.shared(np.zeros(p.get_value().shape, dtype='float32'),
                                                          name=p.name + str('_LG'), borrow=False))
 
         if hasattr(model_obj, 'global_weightdecay'):
@@ -277,7 +277,7 @@ class compileRPROP(Optimizer):
             else:
                 self.LRs.append(theano.shared(
                     np.float32(optimizer_params['initial_update_size']) *
-                    np.ones(para.get_value().shape, dtype=theano.config.floatX),
+                    np.ones(para.get_value().shape, dtype='float32'),
                     name=para.name + str('_RPROP'),
                     borrow=0))
 
@@ -336,7 +336,7 @@ class compileCG(Optimizer):
         for para in self.params:
             para_shape = para.get_value().shape
             self.direc.append(theano.shared(
-                np.zeros(para_shape, dtype=theano.config.floatX),
+                np.zeros(para_shape, dtype='float32'),
                 name=para.name + '_CG_direc',
                 borrow=False))
 

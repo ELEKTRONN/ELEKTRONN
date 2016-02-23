@@ -83,17 +83,17 @@ class PerceptronLayer(object):
             theano_rng = RandomStreams(rng.randint(2**30))
             # apply multiplicative noise to input
             #self.input = theano_rng.binomial(size=input.shape, n=1, p=1-self.input_noise,
-            #                                                                dtype=theano.config.floatX) * input
+            #                                                                dtype='float32') * input
             # apply additive noise to input
             self.input = input + theano_rng.normal(size=input.shape,
                                                    avg=0,
                                                    std=input_noise,
-                                                   dtype=theano.config.floatX)
+                                                   dtype='float32')
         else:  # no input noise
             self.input = input
 
         if W is None:
-            W_values = np.asarray(initWeights((n_in, n_out), scale='glorot', mode='uni'), dtype=theano.config.floatX)
+            W_values = np.asarray(initWeights((n_in, n_out), scale='glorot', mode='uni'), dtype='float32')
             self.W = theano.shared(value=W_values, name='W_perceptron' + str(n_in) + '.' + str(n_out), borrow=True)
         else:
             print "Directly using fixed/shared W (", W, "), no Training on it in this layer!"
@@ -106,13 +106,13 @@ class PerceptronLayer(object):
                 self.W = W
 
         if b is None:
-            #b_values = np.asarray(np.random.uniform(-1e-8,1e-8,(n_out,)), dtype=theano.config.floatX)
+            #b_values = np.asarray(np.random.uniform(-1e-8,1e-8,(n_out,)), dtype='float32')
             if activation_func == 'relu' or activation_func == 'ReLU':
-                b_values = np.asarray(initWeights((n_out, ), scale=1.0, mode='const'), dtype=theano.config.floatX)
+                b_values = np.asarray(initWeights((n_out, ), scale=1.0, mode='const'), dtype='float32')
             elif activation_func == 'sigmoid':
-                b_values = np.asarray(initWeights((n_out, ), scale=0.5, mode='const'), dtype=theano.config.floatX)
+                b_values = np.asarray(initWeights((n_out, ), scale=0.5, mode='const'), dtype='float32')
             else:  # activation_func=='tanh':
-                b_values = np.asarray(initWeights((n_out, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
+                b_values = np.asarray(initWeights((n_out, ), scale=1e-6, mode='fix-uni'), dtype='float32')
 
             self.b = theano.shared(value=b_values, name='b_perceptron' + str(n_in) + '.' + str(n_out), borrow=True)
 
@@ -133,7 +133,7 @@ class PerceptronLayer(object):
             self.activation_noise = theano.shared(np.float32(0.5), name='Dropout Rate')
             rng = T.shared_randomstreams.RandomStreams(int(time.time()))
             p = 1 - self.activation_noise
-            self.dropout_gate = 1.0 / p * rng.binomial((n_out, ), 1, p, dtype=theano.config.floatX)
+            self.dropout_gate = 1.0 / p * rng.binomial((n_out, ), 1, p, dtype='float32')
             lin_output = lin_output * self.dropout_gate.dimshuffle(('x', 0))
 
         lin_output = lin_output + self.b
@@ -173,13 +173,13 @@ class PerceptronLayer(object):
         n_in = self.n_in
         n_out = self.output_shape[1]
         if self.activation_func == 'relu':
-            b_values = np.asarray(initWeights((n_out, ), scale=1.0, mode='const'), dtype=theano.config.floatX)
+            b_values = np.asarray(initWeights((n_out, ), scale=1.0, mode='const'), dtype='float32')
         elif self.activation_func == 'sigmoid':
-            b_values = np.asarray(initWeights((n_out, ), scale=0.5, mode='const'), dtype=theano.config.floatX)
+            b_values = np.asarray(initWeights((n_out, ), scale=0.5, mode='const'), dtype='float32')
         else:  #self.activation_func=='tanh':
-            b_values = np.asarray(initWeights((n_out, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
+            b_values = np.asarray(initWeights((n_out, ), scale=1e-6, mode='fix-uni'), dtype='float32')
 
-        W_values = np.asarray(initWeights((n_in, n_out), scale, mode), dtype=theano.config.floatX)
+        W_values = np.asarray(initWeights((n_in, n_out), scale, mode), dtype='float32')
 
         self.W.set_value(W_values)
         self.b.set_value(b_values)
@@ -396,7 +396,7 @@ class PerceptronLayer(object):
         if GaussianWindow:
             window = self.__make_window().reshape(1, -1)
         if Mask is None:
-            #XX = window#T.TensorConstant(T.TensorType(theano.config.floatX,[True,False])(),data=window)
+            #XX = window#T.TensorConstant(T.TensorType('float32',[True,False])(),data=window)
             return -T.mean(
                 (1. if GaussianWindow == False else window) *
                 (T.log(self.class_probabilities) * Target +
@@ -418,7 +418,7 @@ class PerceptronLayer(object):
         if GaussianWindow:
             window = self._make_window().reshape(1, -1)
         if Mask is None:
-            #XX = window#T.TensorConstant(T.TensorType(theano.config.floatX,[True,False])(),data=window)
+            #XX = window#T.TensorConstant(T.TensorType('float32',[True,False])(),data=window)
             return -T.mean(
                 (1. if GaussianWindow == False else window) *
                 (T.log(self.class_probabilities) * Target +
@@ -462,13 +462,13 @@ class RecurrentLayer(object):
 
         print "RecurrentLayer( #Inputs =", n_in, "#Hidden = ", n_hid, ")"
 
-        W_in_values = np.asarray(initWeights((n_in, n_hid), scale='glorot', mode='uni'), dtype=theano.config.floatX)
+        W_in_values = np.asarray(initWeights((n_in, n_hid), scale='glorot', mode='uni'), dtype='float32')
         self.W_in = theano.shared(W_in_values, name='W_in', borrow=True)
-        W_hid_values = np.asarray(initWeights((n_hid, n_hid), mode='rnn'), dtype=theano.config.floatX)
+        W_hid_values = np.asarray(initWeights((n_hid, n_hid), mode='rnn'), dtype='float32')
         self.W_hid = theano.shared(W_hid_values, name='W_hid', borrow=True)
-        b_hid_values = np.asarray(initWeights((n_hid, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
+        b_hid_values = np.asarray(initWeights((n_hid, ), scale=1e-6, mode='fix-uni'), dtype='float32')
         self.b_hid = theano.shared(b_hid_values, name='b_hid', borrow=True)
-        hid_0_values = np.zeros(n_hid, dtype=theano.config.floatX)
+        hid_0_values = np.zeros(n_hid, dtype='float32')
         self.hid_0 = theano.shared(hid_0_values, name='hid_0', borrow=True)
 
         W_in, W_hid, b_hid, hid_0 = self.W_in, self.W_hid, self.b_hid, self.hid_0
@@ -511,11 +511,11 @@ class RecurrentLayer(object):
 
     def randomizeWeights(self, scale_w=1.0):
         n_in, n_hid = self.n_in, self.n_hid
-        W_in_values = np.asarray(initWeights((n_in, n_hid), scale='glorot', mode='uni'), dtype=theano.config.floatX)
+        W_in_values = np.asarray(initWeights((n_in, n_hid), scale='glorot', mode='uni'), dtype='float32')
         self.W_in.set_value(W_in_values)
-        W_hid_values = np.asarray(initWeights((n_in, n_hid), mode='rnn'), dtype=theano.config.floatX)
+        W_hid_values = np.asarray(initWeights((n_in, n_hid), mode='rnn'), dtype='float32')
         self.W_hid.set_value(W_hid_values)
-        b_hid_values = np.asarray(initWeights((n_hid, ), scale=1e-6, mode='fix-uni'), dtype=theano.config.floatX)
+        b_hid_values = np.asarray(initWeights((n_hid, ), scale=1e-6, mode='fix-uni'), dtype='float32')
         self.b_hid.set_value(b_hid_values)
-        hid_0_values = np.zeros(n_hid, dtype=theano.config.floatX)
+        hid_0_values = np.zeros(n_hid, dtype='float32')
         self.hid_0.set_value(hid_0_values)

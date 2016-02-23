@@ -428,7 +428,7 @@ class MixedConvNN(object):
             assert isinstance(iterations, int)
             bs = layer_input_shape[0] if (layer_input_shape[0] is not None) else 1
             broadcaster = (bs, iterations, layer_input_shape[1])
-            layer_input = layer_input.dimshuffle(0, 'x', 1) * T.ones(broadcaster, dtype=theano.config.floatX)
+            layer_input = layer_input.dimshuffle(0, 'x', 1) * T.ones(broadcaster, dtype='float32')
             layer_input_shape = (layer_input_shape[0], iterations, layer_input_shape[1])
         elif len(layer_input_shape) != 3:
             raise ValueError('Used invalid input dimension for Recurrent layer')
@@ -744,12 +744,12 @@ class MixedConvNN(object):
         print '\t'.join([str(len(x)) for x in (self.params, self._last_grads)])
         for para, lg in zip(self.params, self._last_grads):
             sp = para.get_value().shape
-            lg.set_value(np.zeros(sp, dtype=theano.config.floatX), borrow=0)
+            lg.set_value(np.zeros(sp, dtype='float32'), borrow=0)
 
         try:
             for para, rp in zip(self.params, self._RPROP_LRs, ):
                 sp = para.get_value().shape
-                rp.set_value(1e-3 * np.ones(sp, dtype=theano.config.floatX), borrow=0)
+                rp.set_value(1e-3 * np.ones(sp, dtype='float32'), borrow=0)
         except:
             pass
 

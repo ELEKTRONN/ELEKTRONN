@@ -134,7 +134,7 @@ class ConvLayer2d(object):
                             scale='glorot',
                             mode='normal',
                             pool=pool),
-                dtype=theano.config.floatX)
+                dtype='float32')
             self.W = theano.shared(W_values, name='W_conv', borrow=True)
         else:
             if isinstance(W, np.ndarray):
@@ -155,21 +155,21 @@ class ConvLayer2d(object):
                         (n_out, ),
                         scale=1.0 / norm,
                         mode='const'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             elif activation_func == 'sigmoid':
                 b_values = np.asarray(
                     initWeights(
                         (n_out, ),
                         scale=0.5,
                         mode='const'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             else:  # activation_func=='tanh':
                 b_values = np.asarray(
                     initWeights(
                         (n_out, ),
                         scale=1e-6,
                         mode='fix-uni'),
-                    dtype=theano.config.floatX)
+                    dtype='float32')
             self.b = theano.shared(value=b_values, borrow=True, name='b_conv')
         else:
             if isinstance(b, np.ndarray):
@@ -214,7 +214,7 @@ class ConvLayer2d(object):
                 (pooled_out.shape[2], pooled_out.shape[3]),
                 1,
                 p,
-                dtype=theano.config.floatX)
+                dtype='float32')
             pooled_out = pooled_out * self.dropout_gate.dimshuffle(('x', 'x', 0, 1))
 
         # add the bias term. Since the bias is a vector (1D array), we first
@@ -295,7 +295,7 @@ class ConvLayer2d(object):
     def fragmentstodense(self, sh):
         mfp_strides = self.mfp_strides
         example_stride = np.prod(mfp_strides)  # This stride is conceptually unneeded but theano-grad fails otherwise
-        zero = np.array((0), dtype=theano.config.floatX)
+        zero = np.array((0), dtype='float32')
         embedding = T.alloc(zero, 1, sh[0], sh[1] * mfp_strides[0], sh[2] * mfp_strides[1])
         ix = self.mfp_offsets
         for i, (n, m) in enumerate(ix):
@@ -313,28 +313,28 @@ class ConvLayer2d(object):
                     (n_out, ),
                     scale=1.0 / norm,
                     mode='const'),
-                dtype=theano.config.floatX)
+                dtype='float32')
         elif self.activation_func == 'sigmoid':
             b_values = np.asarray(
                 initWeights(
                     (n_out, ),
                     scale=0.5,
                     mode='const'),
-                dtype=theano.config.floatX)
+                dtype='float32')
         else:  #self.activation_func=='tanh':
             b_values = np.asarray(
                 initWeights(
                     (n_out, ),
                     scale=1e-6,
                     mode='fix-uni'),
-                dtype=theano.config.floatX)
+                dtype='float32')
 
         W_values = np.asarray(
             initWeights(self.filter_shape,
                         scale,
                         mode,
                         pool=self.pool),
-            dtype=theano.config.floatX)
+            dtype='float32')
 
         self.W.set_value(W_values)
         self.b.set_value(b_values)
@@ -359,7 +359,7 @@ class ConvLayer2d(object):
         for i in xrange(3):  # replicate filters for all colour channels
             filters[:, i, :, :] = ga
 
-        self.W.set_value(np.asarray(filters, dtype=theano.config.floatX))
+        self.W.set_value(np.asarray(filters, dtype='float32'))
 
 #  def negative_log_likelihood(self, y):
 #    """
