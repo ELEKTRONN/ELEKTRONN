@@ -619,8 +619,9 @@ class CNNData(object):
 
                 if self.mode == 'img-img':
                     d, l = _randomFlip(d, l, self.rng, self.aniso, self.upright_x)
-                else:
-                    d, _ = _randomFlip(d, d, self.rng, self.aniso, self.upright_x)  # lazy hack to exclude labels from transform
+                else: # lazy hack to exclude labels from transform
+                    dummy_l = d[0] if self.n_dim==2 else d[:,0]
+                    d, _ = _randomFlip(d, dummy_l, self.rng, self.aniso, self.upright_x) 
 
             if source == "train":  # no grey augmentation for testing
                 d = _greyAugment(d, grey_augment_channels, self.rng)
