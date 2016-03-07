@@ -440,7 +440,7 @@ class Trainer(object):
 
             return data, label, info1, info2
         else:
-            print "This funciton is only available for 'img-img' training mode"
+            print "debugGetCNNBatch(): This function is only available for 'img-img' training mode"
 
     def testModel(self, data_source):
         """
@@ -565,7 +565,7 @@ class Trainer(object):
           'all' writes images of all classes, otherwise only the class with index ``export_class`` (int) is saved.
         """
         if not self.config.mode == 'img-img':
-            print "This funciton is only available for 'img-img' training mode"
+            print "previewSliceFromTrainData(): This function is only available for 'img-img' training mode"
             return
 
         if self.cnn.n_dim == 3:
@@ -596,7 +596,7 @@ class Trainer(object):
           approximate maximal number of z-slices to produce (depends on CNN architecture)
         """
         if not self.config.mode == 'img-img':
-            print "This funciton is only available for 'img-img' training mode"
+            print "previewSlice(): This function is only available for 'img-img' training mode"
             return
 
         assert self.preview_data is not None, "You must provide preview data in order to call this function"
