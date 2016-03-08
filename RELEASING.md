@@ -35,6 +35,8 @@
 
         $ git clone https://github.com/ELEKTRONN/ELEKTRONN.git elektronn-release
         $ cd elektronn-release
+        $ git checkout <version-tag>
+          # where <version-tag> is the string you entered in step 3.
 
 6. Upload to pypi (**Attention: This can not be undone. You will never be able to upload a package with the same version string again!**):
 
