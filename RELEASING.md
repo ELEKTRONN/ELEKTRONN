@@ -9,25 +9,33 @@
 
         $ conda install conda-build anaconda-client
 
+4. A running bash or zsh session. Other shells (fish, etc.) are currently unsupported.
+All commands prefixed with "$" signs should be entered in bash or zsh.
+
 
 ### Test:
-1. Make new virtualenvs and conda envs, `cd` to them and run:
+1. Test in new virtual environments:
 
         $ cd <elektronn-source-root>
-        $ source <virtualenv2-root>/bin/activate
+        $ python2 -m virtualenv /tmp/venv2a
+        $ source /tmp/venv2a/bin/activate
+        $ python2 setup.py check --restructuredtext --strict
+          # (PyPi won't render RSTs with any warnings. README.rst has to be perfect.)
         $ python2 -m pip install .
         $ elektronn-train MNIST_CNN_warp_config.py # make sure training works
-
+        $ deactivate
+        
         $ source <anaconda-root>/bin/activate <new-env>
           # e.g. source activate ~/anaconda2/bin/activate root
         $ conda install .
         $ elektronn-train MNIST_CNN_warp_config.py
+        $ source deactivate
 
 2. Erase these new environments. They are only confusing if they stay around.
 
 
 ### Release:
-1. Update version strings in "setup.py"" and in "meta.yaml" to "`<major>.<minor>.<fix>`", e.g. "1.1.2" and commit changes ([example](https://github.com/ELEKTRONN/ELEKTRONN/commit/1d5d0cbd805eeb843471b5309e4b623c201d7969)).
+1. Update version strings in "setup.py" and in "meta.yaml" to "`<major>.<minor>.<fix>`", e.g. "1.1.2" and commit changes ([example](https://github.com/ELEKTRONN/ELEKTRONN/commit/1d5d0cbd805eeb843471b5309e4b623c201d7969)).
 2. Go to https://github.com/ELEKTRONN/ELEKTRONN/releases and click "Draft a new release".
 3. Enter "Tag version" in the format "`v<major>.<minor>.<fix>`", e.g. "v1.1.2". (Mind the "v" prefix!)
 4. Publish release.
@@ -44,7 +52,6 @@
           # result should be "Server response (200): OK".
 
 7. Upload to anaconda.org:
-In a bash-compatible shell (not tcsh or fish or xonsh etc.) run
 
         $ source <anaconda-root>/bin/activate <env>
         $ anaconda login
@@ -55,17 +62,21 @@ In a bash-compatible shell (not tcsh or fish or xonsh etc.) run
         $ anaconda upload --user elektronn <path-to-elektronn.tar.bz2>
           # You find the <path-to-elektronn.tar.bz2> argument by looking at the last lines of "conda build ."'s output.
           # (Do not just copy-paste the proposed command. The "--user elektronn" flag is needed.)
+        $ source deactivate
+
 8. Test everything again as if you were a new user: Install ELEKTRONN in a clean virtual environment and run some tests:
 
-        # Make and change to new virtualenvs and conda envs and run:
-        $ source <virtualenv2-root>/bin/activate
+        $ python2 -m virtualenv /tmp/venv2b
+        $ source /tmp/venv2b/bin/activate
         $ python2 -m pip install elektronn
         $ elektronn-train MNIST_CNN_warp_config.py
-
+        $ deactivate
+        
         $ source <anaconda-root>/bin/activate <new-env>
         $ conda install elektronn
         $ elektronn-train MNIST_CNN_warp_config.py
-
+        $ source deactivate
+        
         # Remember to remove the new virtualenvs and conda envs after you are done testing.
 
 9. Update AUR package (https://aur.archlinux.org/packages/elektronn/):
