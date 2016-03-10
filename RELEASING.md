@@ -14,7 +14,6 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
 
 
 ### Test:
-1. Test in new virtual environments:
 
         $ cd <elektronn-source-root>
         $ python2 -m virtualenv /tmp/venv2a
@@ -25,13 +24,16 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ elektronn-train MNIST_CNN_warp_config.py # make sure training works
         $ deactivate
         
-        $ source <anaconda-root>/bin/activate <new-env>
-          # e.g. source activate ~/anaconda2/bin/activate root
+        $ conda create -p /tmp/cenv2a -c elektronn python=2.7
+        $ source <anaconda-root>/bin/activate /tmp/cenv2a
+          # e.g. source activate ~/anaconda2/bin/activate /tmp/cenv2a
         $ conda install .
         $ elektronn-train MNIST_CNN_warp_config.py
         $ source deactivate
-
-2. Erase these new environments. They are only confusing if they stay around.
+        
+        # Remove the new virtualenvs and conda envs after you are done testing:
+        $ rm -rf /tmp/venv2a
+        $ rm -rf /tmp/cenv2a
 
 
 ### Release:
@@ -53,18 +55,18 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
 
 7. Upload to anaconda.org:
 
-        $ source <anaconda-root>/bin/activate <env>
+        $ source <anaconda-root>/bin/activate root
         $ anaconda login
           # (only necessary if you are not already logged in)
-          # enter your private username, e.g xeray or mdraw. Do not enter elektronn.
-          # (your username has to be registered under the elektronn organization though.)
+          # Enter your private username, e.g xeray or mdraw. Do not enter elektronn.
+          # Your username has to be registered under the elektronn organization, though.
         $ conda build .
         $ anaconda upload --user elektronn <path-to-elektronn.tar.bz2>
           # You find the <path-to-elektronn.tar.bz2> argument by looking at the last lines of "conda build ."'s output.
           # (Do not just copy-paste the proposed command. The "--user elektronn" flag is needed.)
         $ source deactivate
 
-8. Test everything again as if you were a new user: Install ELEKTRONN in a clean virtual environment and run some tests:
+8. Verify the published packages:
 
         $ python2 -m virtualenv /tmp/venv2b
         $ source /tmp/venv2b/bin/activate
@@ -72,12 +74,16 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ elektronn-train MNIST_CNN_warp_config.py
         $ deactivate
         
-        $ source <anaconda-root>/bin/activate <new-env>
+        $ conda create -p /tmp/cenv2b -c elektronn python=2.7
+        $ source <anaconda-root>/bin/activate /tmp/cenv2b
+        $ conda config --add channels elektronn
         $ conda install elektronn
         $ elektronn-train MNIST_CNN_warp_config.py
         $ source deactivate
         
-        # Remember to remove the new virtualenvs and conda envs after you are done testing.
+        # Remove the new virtualenvs and conda envs after you are done testing:
+        $ rm -rf /tmp/venv2b
+        $ rm -rf /tmp/cenv2b
 
 9. Update AUR package (https://aur.archlinux.org/packages/elektronn/):
     * See https://wiki.archlinux.org/index.php/Arch_User_Repository#Creating_a_new_package for initial setup
