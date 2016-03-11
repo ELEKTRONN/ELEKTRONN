@@ -3,8 +3,14 @@
 
 ### Requirements:
 
-1. Existing installation of Python 2.7.x with virtualenv >= 15.0 (older versions may work, but they are untested).
-2. Anaconda or Miniconda installed under the `<anaconda-root>` directory.
+1. Python 2.7.x with virtualenv >= 15.0 (older versions may work, but they are untested).
+2. [Anaconda](https://www.continuum.io/downloads) or [Miniconda](http://conda.pydata.org/miniconda.html),
+   with its `bin/` directory prepended to your shell's $PATH. If conda is not in your $PATH,
+   you can set it up temporarily by running
+
+        $ PATH="<anaconda-root>/bin:$PATH"
+          # e.g. $ PATH="~/anaconda2/bin:$PATH"
+
 3. The Anaconda environment needs the conda-build and anaconda-client packages. Install them via
 
         $ conda install conda-build anaconda-client
@@ -25,8 +31,7 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ deactivate
         
         $ conda create -p /tmp/cenv2a -c elektronn python=2.7
-        $ source <anaconda-root>/bin/activate /tmp/cenv2a
-          # e.g. source activate ~/anaconda2/bin/activate /tmp/cenv2a
+        $ source activate /tmp/cenv2a
         $ conda install .
         $ elektronn-train MNIST_CNN_warp_config.py
         $ source deactivate
@@ -57,7 +62,7 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
 
 7. Upload to anaconda.org:
 
-        $ source <anaconda-root>/bin/activate root
+        $ source activate root
         $ anaconda login
           # (only necessary if you are not already logged in)
           # Enter your private username, e.g xeray or mdraw. Do not enter elektronn.
@@ -77,7 +82,7 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ deactivate
         
         $ conda create -p /tmp/cenv2b -c elektronn python=2.7
-        $ source <anaconda-root>/bin/activate /tmp/cenv2b
+        $ source activate /tmp/cenv2b
         $ conda config --add channels elektronn
         $ conda install elektronn
         $ elektronn-train MNIST_CNN_warp_config.py
