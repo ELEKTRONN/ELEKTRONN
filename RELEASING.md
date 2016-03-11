@@ -3,7 +3,7 @@
 
 ### Requirements:
 
-1. Existing installation of python2.7 with setuptools 18.0 or higher
+1. Existing installation of Python 2.7.x with virtualenv >= 15.0 (older versions may work, but they are untested).
 2. Anaconda or Miniconda installed under the `<anaconda-root>` directory.
 3. The Anaconda environment needs the conda-build and anaconda-client packages. Install them via
 
@@ -37,7 +37,8 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
 
 
 ### Release:
-1. Update version strings in "setup.py" and in "meta.yaml" to "`<major>.<minor>.<fix>`", e.g. "1.1.2" and commit changes ([example](https://github.com/ELEKTRONN/ELEKTRONN/commit/1d5d0cbd805eeb843471b5309e4b623c201d7969)).
+1. Update version strings in "setup.py" and in "meta.yaml" to "`<major>.<minor>.<fix>`", e.g. "1.1.2" and commit
+   changes ([example](https://github.com/ELEKTRONN/ELEKTRONN/commit/1d5d0cbd805eeb843471b5309e4b623c201d7969)).
 2. Go to https://github.com/ELEKTRONN/ELEKTRONN/releases and click "Draft a new release".
 3. Enter "Tag version" in the format "`v<major>.<minor>.<fix>`", e.g. "v1.1.2". (Mind the "v" prefix!)
 4. Publish release.
@@ -48,7 +49,8 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ git checkout <version-tag>
           # where <version-tag> is the string you entered in step 3.
 
-6. Upload to pypi (**Attention: This can not be undone. You will never be able to upload a package with the same version string again!**):
+6. Upload to pypi (**Attention: This can not be undone.
+   You will never be able to upload a package with the same version string again!**):
 
         $ python2 setup.py sdist upload -r pypi
           # result should be "Server response (200): OK".
@@ -62,7 +64,7 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
           # Your username has to be registered under the elektronn organization, though.
         $ conda build .
         $ anaconda upload --user elektronn <path-to-elektronn.tar.bz2>
-          # You find the <path-to-elektronn.tar.bz2> argument by looking at the last lines of "conda build ."'s output.
+          # You find the <path-to-elektronn.tar.bz2> argument in the last lines of "conda build ."'s output.
           # (Do not just copy-paste the proposed command. The "--user elektronn" flag is needed.)
         $ source deactivate
 
