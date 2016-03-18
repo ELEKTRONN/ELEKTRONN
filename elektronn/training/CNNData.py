@@ -660,7 +660,7 @@ class CNNData(object):
         if self.gc_count % 1000 == 0:
             gc.collect()
 
-        return ret
+        return tuple(ret)
 
     def _warpAugment(self, d, l, warp_on, ignore_thresh, upright_x):
         if (warp_on is True) or (warp_on == 1):  # always warp
