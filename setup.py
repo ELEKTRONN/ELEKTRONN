@@ -35,7 +35,7 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.8',
+    version='1.0.9',
     packages=find_packages(),
     scripts=['elektronn/scripts/elektronn-train',
              'elektronn/scripts/elektronn-profile',
