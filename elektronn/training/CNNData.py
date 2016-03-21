@@ -873,7 +873,7 @@ class CNNData(object):
                 m = 1
 
             d = np.ascontiguousarray(d, dtype=np.float32) / m
-            if (self.ldtype is not l.dtype):
+            if (self.ldtype is not l.dtype and np.issubdtype(l.dtype, np.integer)):
                 m = l.max()
                 M = np.iinfo(self.ldtype).max
                 if m > M:
