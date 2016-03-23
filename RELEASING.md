@@ -17,6 +17,7 @@
 
 4. A running bash or zsh session. Other shells (fish, etc.) are currently unsupported.
 All commands prefixed with "$" signs should be entered in bash or zsh.
+5. `~/.pypirc` configured according to https://docs.python.org/2/distutils/packageindex.html#the-pypirc-file
 
 
 ### Test:
