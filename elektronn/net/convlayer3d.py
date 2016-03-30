@@ -587,7 +587,9 @@ class ConvLayer3d(object):
         :param y: corresponds to a vector that gives for each example the
                       correct label
         """
-        return T.mean((self.output - y)**2)
+        se_inst = (self.output - y)**2
+        mse = T.mean(se_inst)        
+        return mse, se_inst
 
     def errors(self, y):
         """

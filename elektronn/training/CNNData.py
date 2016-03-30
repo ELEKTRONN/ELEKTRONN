@@ -548,7 +548,10 @@ class CNNData(object):
                                   patch_size[1] - 2 * off[1], patch_size[2] - 2 * off[2]),
                                   dtype=self.ldtype)
             else:
-                label = np.zeros((batch_size, ), dtype=self.ldtype)
+                if self.train_l[0].size>1: # non-image but more than 1 --> vector
+                    label = np.zeros((batch_size, self.train_l[0].size), dtype=self.ldtype)
+                else:
+                    label = np.zeros((batch_size, ), dtype=self.ldtype)
 
         return images, label
 
