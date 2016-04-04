@@ -623,6 +623,7 @@ class ConvLayer2d(object):
         :param y: corresponds to a vector that gives for each example the
                       correct label
         """
+        y = y.dimshuffle(0, 'x', 1, 2,) # add "class" axis
         se_inst = (self.output - y)**2
         mse = T.mean(se_inst)        
         return mse, se_inst

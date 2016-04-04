@@ -27,7 +27,7 @@ with open(os.devnull, 'w') as devnull:  #  Redirect to /dev/null because xset ou
 from elektronn.training.config import default_config, Config  # the global user-set config
 from elektronn.training import trainutils  # contains import of mpl
 
-config_file = '/docs/devel/ELEKTRONN/elektronn/examples/MNIST_CNN_warp_config.py'
+config_file = '/home/mfk/CNN_Training/CNN_imgLbl_config.py'#'/docs/devel/ELEKTRONN/elektronn/examples/MNIST_CNN_warp_config.py'
 gpu = default_config.device
 this_file = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
 # commandline arguments override config_file and gpu if given as argv

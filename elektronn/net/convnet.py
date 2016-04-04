@@ -611,6 +611,9 @@ class MixedConvNN(object):
         # Define Target functions
         if target == 'regression':
             n_dim_regression = len(layer_last.output_shape)
+            if isinstance(layer_last, (ConvLayer2d, ConvLayer3d)):
+                n_dim_regression -= 1 # spatial input has no channel...
+                
             self._y = T.TensorType('float32', (False,) * n_dim_regression, name='y_cnn_regression_targets')()
             self._loss, self._loss_instance = layer_last.squared_distance(self._y)
             ret = [self._loss, T.sqrt(self._loss), layer_last.output]
