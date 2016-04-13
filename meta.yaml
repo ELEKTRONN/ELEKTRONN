@@ -1,31 +1,33 @@
 package:
   name: elektronn
-  version: 1.0.9
+  version: 1.0.10
 
 source:
   path: ./
 
 requirements:
   build:
-    - python 2.7*
-    - setuptools
-    - cython
-    - h5py
-    - matplotlib
-    - numpy
-    - scikit-learn
-    - scipy
-    - theano
+    - python >=2.7,<3
+    - setuptools >=18.0
+    - cython >=0.23
+    - h5py >=2.5
+    - matplotlib >=1.5
+    - numpy >=1.8
+    - scikit-learn >=0.14
+    - scipy >=0.16
+    - theano >=0.7
+    - gcc >=4.8
 
   run:
-    - python 2.7*
-    - cython
-    - h5py
-    - matplotlib
-    - numpy
-    - scikit-learn
-    - scipy
-    - theano
+    - python >=2.7,<3
+    - cython >=0.23
+    - h5py >=2.5
+    - matplotlib >=1.5
+    - numpy >=1.8
+    - scikit-learn >=0.14
+    - scipy >=0.16
+    - theano >=0.7
+    - libgcc >=4.8  # https://github.com/ContinuumIO/anaconda-issues/issues/686
 
 about:
   home: http://www.elektronn.org/

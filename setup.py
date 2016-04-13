@@ -3,18 +3,23 @@
 
 import os
 import setuptools
+import sys
 from setuptools import setup, find_packages, Extension
 from pkg_resources import parse_version
 
+if sys.version_info[:2] != (2, 7):
+    print('\nSorry, only Python 2.7 is currently supported.')
+    print('Python 3 support is planned for the next major release.')
+    print('\nYour current Python version is {}'.format(sys.version))
+    sys.exit(1)
+
 # Setuptools >=18.0 is needed for Cython to work correctly.
 if parse_version(setuptools.__version__) < parse_version('18.0'):
-    raise ImportError(
-        'Your installed Setuptools version is too old.\n'
-        '  Please upgrade it to at least 18.0, e.g. by running\n'
-        '  "pip2 install --upgrade setuptools"\n'
-        '  or if that fails:\n'
-        '  "pip install --upgrade setuptools".\n'
-        '  If both of them fail, try additionally passing the "--user" switch to the install commands, or use Anaconda2.')
+    print('\nYour installed Setuptools version is too old.')
+    print('Please upgrade it to at least 18.0, e.g. by running')
+    print('$ python2 -m pip install --upgrade setuptools')
+    print('If this fails, try additionally passing the "--user" switch to the install command, or use Anaconda2.')
+    sys.exit(1)
 
 
 def read(fname):
@@ -35,13 +40,15 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.9',
+    version='1.0.10',
     packages=find_packages(),
     scripts=['elektronn/scripts/elektronn-train',
              'elektronn/scripts/elektronn-profile',
     ],
     ext_modules=ext_modules,
-    setup_requires=['cython>=0.23'],
+    setup_requires=[
+        'cython>=0.23',
+    ],
     install_requires=[
         'cython>=0.23',
         'numpy>=1.8',
@@ -50,7 +57,9 @@ setup(
         'h5py>=2.2',
         'theano>=0.7',
     ],
-    extras_require={'cross-validation': ['scikit-learn']},
+    extras_require={
+        'cross-validation': ['scikit-learn>=0.14'],
+    },
     author="Marius Killinger, Gregor Urban",
     author_email="Marius.Killinger@mailbox.org",
     description=("A highly configurable toolkit for training 3d/2d CNNs and general Neural Networks"),
