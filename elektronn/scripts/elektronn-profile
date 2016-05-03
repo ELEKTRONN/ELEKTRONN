@@ -20,17 +20,12 @@ from elektronn.training.config import default_config, Config  # the global user-
 from elektronn.training import trainutils  # contains import of mpl
 
 config_file, gpu = trainutils.parseargs(default_config.device)
-# copies config, inits gpu (theano import)
 this_file = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
-config = Config(config_file, gpu, this_file)
 # copies config, inits gpu (theano import)
-
 config = Config(config_file, gpu, this_file, use_existing_dir=True)
-
 
 class Data(object):
     pass
-
 
 from elektronn.training import trainer  # contains import of theano
 os.chdir(config.save_path)  # The trainer works directly in the save dir
