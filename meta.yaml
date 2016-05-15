@@ -1,6 +1,6 @@
 package:
   name: elektronn
-  version: 1.0.11
+  version: 1.0.12
 
 source:
   path: ./
@@ -14,7 +14,7 @@ requirements:
     - matplotlib >=1.5
     - numpy >=1.8
     - scikit-learn >=0.14
-    - scipy >=0.16
+    - scipy >=0.17.1
     - theano >=0.7
     - gcc >=4.8
 
@@ -25,9 +25,8 @@ requirements:
     - matplotlib >=1.5
     - numpy >=1.8
     - scikit-learn >=0.14
-    - scipy >=0.16
+    - scipy >=0.17.1
     - theano >=0.7
-    - libgfortran <3.0  # https://github.com/ContinuumIO/anaconda-issues/issues/686
 
 about:
   home: http://www.elektronn.org/
