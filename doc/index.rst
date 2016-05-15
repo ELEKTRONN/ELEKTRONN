@@ -8,11 +8,9 @@ Welcome to the ELEKTRONN documentation!
 =======================================
 
 
-ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general Neural Networks.
+ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general Neural Networks. The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally, the toolkit offers training routines for tasks on non-image data.
 
 It is written in Python 2 and based on `theano <http://deeplearning.net/software/theano>`_, which allows CUDA-enabled GPUs to significantly accelerate the pipeline.
-
-The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally, the toolkit offers training routines for tasks on non-image data.
 
 ELEKTRONN was created by Marius Killinger and Gregor Urban at the `Max Planck Institute For Medical Research <http://www.mpimf-heidelberg.mpg.de/en>`_ to solve connectomics tasks.
 
@@ -44,7 +42,7 @@ Main Features
   - Classification or regression outputs
   - Common activation functions (relu, tanh, sigmoid, abs, linear, maxout)
   - Dropout
-  - Max Fragment Pooling for :ref:`*rapid predictions* <mfp>`
+  - Max Fragment Pooling for :ref:`rapid predictions <mfp>`
   - Helper function to design valid architectures
 
 * Optimisation:
@@ -65,9 +63,9 @@ Main Features
       - Histogram distortions
       - *All done online in background processes*
 
-  - Training with :ref:`*lazy labels* <lazy labels>` (partially labelled data)
+  - Training with :ref:`lazy labels <lazy-labels>` (partially labelled data)
   - Console interaction during training (allows e.g. to change optimiser meta-parameters)
-  - Visualisation of training progress (graphs and preview prediction)
+  - Visualisation of training progress (plots and preview predictions)
 
 
 Contents

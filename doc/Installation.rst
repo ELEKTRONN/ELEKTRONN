@@ -11,7 +11,7 @@ Setup
 Anaconda
 ########
 
-A comfortable way to setup a python environment with common scientific python packages is the `Anaconda distribution<https://store.continuum.io/cshop/anaconda/>`_ by Continuum  (make sure to use the Python 2.7 version). If you don't want to install the whole Anaconda distribution you can use Miniconda instead.
+A comfortable way to setup a python environment with common scientific python packages is the `Anaconda distribution <https://store.continuum.io/cshop/anaconda/>`_ by Continuum  (make sure to use the Python 2.7 version). If you don't want to install the whole Anaconda distribution you can use Miniconda instead.
 
 * Install ELEKTRONN using  ``conda``::
 
