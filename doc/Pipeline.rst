@@ -174,7 +174,7 @@ Multi Layer Perceptron (MLP) and Others
 ======================= =======	======================= =============== ===========
 Name			Mode	Type			Default		Explanation
 ======================= =======	======================= =============== ===========
-rnn_layer_kwargs        $       ``dict``/``None``	``None``	This can install a recurrent layer before MLP-layers, the kwargs are passed to :py:meth:`net.MixedConvNN.addRecurrentLayer`. It does not together with conv-layers.
+rnn_layer_kwargs        $       ``dict``/``None``	``None``	This can install a recurrent layer before MLP-layers, the kwargs are passed to :py:meth:`elektronn.net.MixedConvNN.addRecurrentLayer`. It does not together with conv-layers.
 MLP_layers              !       list of ``int``		``[]``          Numbers of neurons for fully connected layers after conv layers. Empty for img-img training and required for img-scalar training
 target                          ``string``		'nll'		Loss function, 'nll' or 'regression'
 ======================= =======	======================= =============== ===========

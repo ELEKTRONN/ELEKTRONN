@@ -37,12 +37,13 @@ Basic Recipe for CNN Training with Images
 * Transform your data arrays to h5 data sets in separate files for images and labels.
 	- images: shape (x,y,z)  or (ch,x,y,z)
 	- labels: shape (x,y,z)
+	- do not cut image patches manually. If the shape of the training data is greater than the CNN input patch size, the pipeline automatically cuts patches from random locations in the images.
 	- for classification: labels contain integer numbers, ranging from 0 to (#classes-1)
 	- for regression: labels contain float numbers
 	- for 2D images the dimension ``z`` can be viewed as the axis along which the instances of the training set are stacked
 	- for whole image classification the labels must be 1d
 
-* Find a valid CNN architecture by using :py:func:`elektronn.net.netutils.CNNCalculator`.
+* Find a valid CNN architecture by using :py:func:`elektronn.net.netutils.CNNCalculator`. For *img-img* tasks it advisable to make select an input patch size such that in the final layer a few 100 - 1000 output neurons/pixel remain, this is a good trade-off between gradient noise and iteration speed.
 
 * Edit ``config_template.py`` as a new file to specify your :ref:`training scenario <configuration>`.
 

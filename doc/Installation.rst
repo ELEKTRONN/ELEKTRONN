@@ -83,10 +83,9 @@ If you let our setup install theano, you nonetheless have to do the configuratio
 		root = /usr/local/cuda-7.5/
 
 
-	The linker option disables garbage collection. This increases GPU-RAM usage but gives a significant performance boost. If you run out of GPU-RAM, remove this option (or set it to ``cvm``).
-
     .. Note::
-      If you want to use the command line option of ``elektronn-train`` to select a GPU device you can leave out setting a device value here
+      1. If you want to use the command line option of ``elektronn-train`` to select a GPU device you can leave out setting a device value here
+      2. 	The linker option disables garbage collection. This increases GPU-RAM usage but gives a significant performance boost. If you run out of GPU-RAM, remove this option (or set it to ``cvm``).
 
   * You might be interested into using cuDNN which is an optimised CUDA library for CNNs (`theano's instructions <http://www.deeplearning.net/software/theano/library/sandbox/cuda/dnn.html?highlight=cudnn>`_).
 

@@ -19,12 +19,12 @@ NNs can outperform many other models but they are rather difficult to handle. In
 
 .. _modes:
 
-Classification Modes in ELEKTRONN
-=================================
+Operation Modes in ELEKTRONN
+============================
 
 Generally there are three *modes* of training set ups, supported by the built-in pipeline:
 
-	- **img-img**: input data **and** output data are image-like (i.e. there exist neighbourhood relations between adjacent elements (pixels) in the data arrays. This property is irrespective of dimensionality and can also be seen as neighbourhoods of temporal nature). E.g. for connectomic membrane segmentation the inputs are 3D EM-images and the labels images too, that have ``1`` for pixels in which a membrane is present and ``0`` for background.
+	- **img-img**: input data **and** output data are image-like (i.e. there exist neighbourhood relations between adjacent elements (pixels) in the data arrays. This property is irrespective of dimensionality and can also be seen as neighbourhoods of temporal nature). E.g. for neuron membrane segmentation the inputs are 3D EM-images and the labels images too, that have ``1`` for pixels in which a membrane is present and ``0`` for background.
 
   .. figure::  images/Img-Img.png
    :align:   center

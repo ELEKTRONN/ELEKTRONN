@@ -10,7 +10,7 @@ Prediction speed benefits greatly from larger input patch sizes and MFP (see bel
 The returned CNN can be used in your own prediction script, which just has to provide your data in the correct format:
 
   * For images the convenience method :py:meth:`elektronn.net.convnet.MixedConvNN.predictDense` is available which creates *dense* predictions for images/volumes of arbitrary sizes (the input image must however be larger than the input patch size). Normally predictions  on onbly be made with some offset w.r.t to the input image extent (due to the convolutions) but this method provides option to mirror the raw data such that the returned prediction covers the full extent of the input image (this might however introduce some artifacts because mirroring is not a natural continuation of the image).
-  * For non-image data predictions can be made using :py:meth:`elektronn.net.convnet.MixedConvNN.class_probabilities` (make sure to prepare your test data in the required input shape).
+  * For non-image data predictions can be made using :py:attr:`elektronn.net.convnet.MixedConvNN.class_probabilities` (make sure to prepare your test data in the required input ``(batch size, features)`` ).
 
 
 Theoretically predicting the whole image in a single patch, instead of several tiles, would be fastest. For each tile some calculations have to be repeated and the larger the tiles, the more intermediate results can be shared. But this is obviously impossible due to limited GPU-RAM.
