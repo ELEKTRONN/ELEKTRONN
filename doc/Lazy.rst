@@ -25,7 +25,7 @@ Lazy labelled training images should only be used to supplement densely labelled
 Application
 -----------
 
-The exact effect of the masks is precisely described in the API documentation of the loss function (:py:meth:`net.convlayer2D.ConvLayer2D.NLL` or :py:meth:`net.convlayer3D.ConvLayer3D.NLL`).
+The exact effect of the masks is precisely described in the API documentation of the loss function (:py:meth:`elektronn.net.convlayer2D.ConvLayer2D.NLL` or :py:meth:`elektronn.net.convlayer3D.ConvLayer3D.NLL`).
 
 To use lazy labels 2 things must be done:
 	1. Turn the option ``lazy_labels`` in the configuration

@@ -15,9 +15,9 @@ How it works
 
 After you set up the configuration and run ``elektronn-train``:
 
-	- The configuration file is parsed and some consistency checks are made (but not every possible combination of anything...). From the architecture parameters a :py:func:`net.netutils.CNNCalculator` object is created (this checks the architecture and gives a list of valid input sizes, from which the closest is chosen automatically).
+	- The configuration file is parsed and some consistency checks are made (but not every possible combination of anything...). From the architecture parameters a :py:func:`elektronn.net.netutils.CNNCalculator` object is created (this checks the architecture and gives a list of valid input sizes, from which the closest is chosen automatically).
 	- A save directory is created, the ``cwd`` is set to this directory, the configuration file is copied to a ``Backup`` sub-directory in the save directory.
-	- A :py:class:`training.CNNData.CNNData` object is created. All CNN relevant architecture parameters (input size, offsets, strides etc.) are passed over, such that suitable patches for training can be created. The data is read from disk into (CPU-)RAM. The required RAM is approx. (number of training image pixels) * 32bit + (number of training label pixels) * 16bit. The sub-processes for don't copy the data, so using the does not increase the physical RAM usage a lot.
+	- A :py:class:`elektronn.training.CNNData.CNNData` object is created. All CNN relevant architecture parameters (input size, offsets, strides etc.) are passed over, such that suitable patches for training can be created. The data is read from disk into (CPU-)RAM. The required RAM is approx. (number of training image pixels) * 32bit + (number of training label pixels) * 16bit. The sub-processes for don't copy the data, so using the does not increase the physical RAM usage a lot.
 	- The CNN is created and the training functions are compiled. Compilation of the gradient can take up to several minutes the first time. For subsequent runs, parts of the binaries are cached and compilation becomes significantly faster.
 	- The training loop starts. In each iteration:
 		* From the whole training data set a batch is created by sampling random locations in the image arrays and "cutting" patches from these locations. The patches are augmented randomly according to the configuration.
@@ -65,12 +65,12 @@ Transform your data arrays to h5 data sets in separate files for images and labe
 
 In the configuration file **two** lists must be specified consisting of tuples of the form *(<file name>, <h5 data set name/key in that file>)*. One list for the images and one for the labels, both must have the **same** order.
 
-The data types are preferably ``uint8`` which makes files small and loading fast (255 gray values for images). For the labels it pays off to use the compression option of h5 (they might be compressible by a great factor). Note that in :py:class:`training.CNNData.CNNData` the integer image data is internally converted to ``float32`` and divided by 255 (to normalise it to [0,1]); the labels to ``int16`` for classification or ``float32`` for regression.
+The data types are preferably ``uint8`` which makes files small and loading fast (255 gray values for images). For the labels it pays off to use the compression option of h5 (they might be compressible by a great factor). Note that in :py:class:`elektronn.training.CNNData.CNNData` the integer image data is internally converted to ``float32`` and divided by 255 (to normalise it to [0,1]); the labels to ``int16`` for classification or ``float32`` for regression.
 
 Offsets for *img-img* Training
 ------------------------------
 
-CNNs can only make predictions with offsets from the image border (see the image :ref:`below <batch>`. The offset is cause by convolutions with boundary mode "valid" (the size of the offset can be calculated using :py:func:`net.netutils.CNNCalculator`). This implies that for a given labelled image area the raw image area required is larger. So if possible, provide images that are larger than the labels by at least the offset, to make *full use* of you labelled data. Or conversely never label your data in the offset stripes!
+CNNs can only make predictions with offsets from the image border (see the image :ref:`below <batch>`. The offset is cause by convolutions with boundary mode "valid" (the size of the offset can be calculated using :py:func:`elektronn.net.netutils.CNNCalculator`). This implies that for a given labelled image area the raw image area required is larger. So if possible, provide images that are larger than the labels by at least the offset, to make *full use* of you labelled data. Or conversely never label your data in the offset stripes!
 The only important condition is that the labels and images must be symmetrically registered to their center. Then the images are cropped or the labels are 0-padded depending on the offset automatically. A 1d example: label.shape=(5) and image.shape=(7) ---> the offset is 1 (on either side) and image[i+1] corresponds to label[i]; in particular image[3] corresponds to label[2], the centers of both arrays.
 
 
@@ -78,11 +78,11 @@ The only important condition is that the labels and images must be symmetrically
 
 .. _configuration:
 
-Configuration of Parameters 
+Configuration of Parameters
 ===========================
 
 There are three levels of parameter configuration, **higher levels override previous levels**:
-  1. The master *default* values are hardcoded into python code in :py:class:`training.config.MasterConfig`.
+  1. The master *default* values are hardcoded into python code in :py:class:`elektronn.training.config.MasterConfig`.
   2. Users can set their own *default* values by editing the file ``examples/config_template.py`` (which is just a template and otherwise **ignored**). The user file must be put into the home directory as ``~/.elektronn.config``, from there is automatically read and overrides the master defaults. The *default* values found in the template are intended to provide guidance on some meta-parameters (e.g. learning rate, momentum) and to define certain behaviour of the pipeline (e.g. default save path, save intervals), see section :ref:`Pipeline Setup <setup>`.
   3. *Specific* values for training a particular CNN/NN configuration should be set in a different file (again by editing ``config_template.py`` as new file). The path of this file is given as the ``config`` argument to the ``elektronn-train``-script. *Specific* values can override any default values and are mainly used to specify the CNN architecture and the training data options. Some values are mandatory to be provided specifically for each training (e.g. network architecture, data files, save name) - if such a value is not provided a warning is shown.
 
@@ -178,7 +178,7 @@ rnn_layer_kwargs        $       ``dict``/``None``	``None``	This can install a re
 MLP_layers              !       list of ``int``		``[]``          Numbers of neurons for fully connected layers after conv layers. Empty for img-img training and required for img-scalar training
 target                          ``string``		'nll'		Loss function, 'nll' or 'regression'
 ======================= =======	======================= =============== ===========
-	
+
 
 
 
@@ -240,12 +240,12 @@ preview_kwargs    			``dict``					Specification of preview to create, see :py:me
 Alternative / *vect-scalar* Data Options
 ++++++++++++++++++++++++++++++++++++++++
 
-These replace the options from the image section, and import a data class from :py:mod:`training.TrainData`.
+These replace the options from the image section, and import a data class from :py:mod:`elektronn.training.TrainData`.
 
 ======================= =======	========================== 	=============== ===========
 Name			Mode	Type				Default		Explanation
 ======================= =======	========================== 	=============== ===========
-data_class_name      		``string``			``None``        Name of data class in :py:mod:`training.TrainData` or ``tuple`` for implementation in user file (<file_path>, <class_name_in_file>) e.g. ``('~/MyData.py', 'MyClass')``
+data_class_name      		``string``			``None``        Name of data class in :py:mod:`elektronn.training.TrainData` or ``tuple`` for implementation in user file (<file_path>, <class_name_in_file>) e.g. ``('~/MyData.py', 'MyClass')``
 data_load_kwargs     		``dict``			``dict()``      Arguments to init data class
 data_batch_kwargs    		``dict``			``dict()``      Arguments for ``getbach`` method of data class (e.g. special augmentations). The batch_size argument is added automatically and needn't be specified here
 ======================= =======	========================== 	=============== ===========
@@ -261,7 +261,7 @@ Name			Mode	Type				Default		Explanation
 ======================= =======	============================== 	=============== ===========
 n_steps			!	``int``				``undefined``	Number of maximal update steps
 max_runtime		!	``int``				``undefined``	Maximal training time in seconds, may lead to termination before ``n_steps``. Measured is the total time including batch creation and performance estimates
-history_freq		!	list of  1 ``int`` (!)		[2000]		Every ``history_freq`` training steps several values (NLL, training error, validation error if available etc.) are calculated and stored in an internal hisotry file. If the corresponding options are activated these values are also printed and plots are created. 
+history_freq		!	list of  1 ``int`` (!)		[2000]		Every ``history_freq`` training steps several values (NLL, training error, validation error if available etc.) are calculated and stored in an internal hisotry file. If the corresponding options are activated these values are also printed and plots are created.
 monitor_batch_size		``int``				10		Number of patches to test model for online performance estimation (on training set and if available on validation set)
 weight_decay          	$	``bool`` or ``float``		``False``       L2-penalty on weights with this weight relative to the gradient of the loss. ``False`` is equal to 0.0
 class_weights			list of ``float``/``None``	``None``	Importance weights for the classes (must have length ``n_lab``), will be normalised internally. Weighting disabled by ``None``.
@@ -322,7 +322,7 @@ During training various changes to the setup can be made using the console which
 	    Change Training Optimizer :('SGD','CG', 'RPROP', 'LBFGS')
 	    For everything else enter a command in the command line
 
-	mfk@ELEKTRONN: 
+	mfk@ELEKTRONN:
 
 The following manipulations are possible:
 	- Typing any of the above keywords (with optional arguments) and press `Enter`
@@ -341,11 +341,11 @@ The following manipulations are possible:
 	>>> 0.00995
 
 	- Value assignments and variable instantiation are possible, too
-	- The command line resides within the scope of the training loop (``run`` method) of :py:class:`training.trainer.Trainer` the and has access to:
+	- The command line resides within the scope of the training loop (``run`` method) of :py:class:`elektronn.training.trainer.Trainer` the and has access to:
 		* The trainer object by ``self``
-		* An instance of :py:func:`net.convnet.MixedConvNN` by ``cnn``
-		* An instance of :py:func:`training.trainutils.Config` by ``config``
-		* An instance of :py:func:`training.CNNData.CNNData` by ``data``
+		* An instance of :py:func:`elektronn.net.convnet.MixedConvNN` by ``cnn``
+		* An instance of :py:func:`elektronn.training.trainutils.Config` by ``config``
+		* An instance of :py:func:`elektronn.training.CNNData.CNNData` by ``data``
 
 The purpose of the command line is to allow the change of meta-parameters during training and to allow the inspection of the state of variables/parameters.
 

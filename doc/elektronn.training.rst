@@ -3,9 +3,6 @@
 elektronn.training package
 ==========================
 
-Submodules
-----------
-
 elektronn.training.CNNData module
 ---------------------------------
 

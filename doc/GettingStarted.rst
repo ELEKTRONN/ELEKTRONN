@@ -8,8 +8,8 @@ System Requirements & Installation
 
 * Python 2.7
 * The whole toolkit was designed and tested on Linux systems (in particular Debian, Ubuntu, CentOS, Arch)
-* Theano creates CUDA binaries. Hence only Nvidia-GPUs will work (alternatively it can use the CPU, but this might be too slow for large nets and CNNs).
-* If you wish to use ELEKTRONN on Windows or with Python 3 (or if you want to help making it portable) please contact us.
+* Theano creates CUDA binaries. Hence only Nvidia-GPUs will work (as a fallback it can use any CPU, but this might be too slow for large nets and CNNs).
+* Windows and Python3 support is planned for a major update.
 
 For installation instructions see :ref:`installation <installation>`.
 
@@ -31,7 +31,8 @@ Basic Recipe for CNN Training with Images
   This section is addressed to people interested into large scale image processing tasks (such as found in connectomics). For smaller toy examples and processing of non-image data have a look at the :ref:`examples <examples>`.
 
 
-* CNN training requires a data set of spatial input data (2D/3D, with an optional fourth axis for (colour) channels) and *labels* (also called: ground truth, annotations, targets). The labels correspond to the individual pixels in the images or to whole images. The labels can be integers encoding class membership - or alternatively floats for regression targets. Illustrations of training labels can be found :ref:`here <modes>`.
+* CNN training requires a training data set of spatial input data (2D/3D, optional with a fourth axis for (colour) channels) and *labels* (also called: ground truth, annotations, targets) that correspond to the individual pixels in the images. The labels can be classes - then each pixel contains an integer number encoding the class membership - or alternatively floats for regression targets. Illustrations of training labels can be found :ref:`here <modes>`
+
 
 * Transform your data arrays to h5 data sets in separate files for images and labels.
 	- images: shape (x,y,z)  or (ch,x,y,z)
@@ -41,11 +42,11 @@ Basic Recipe for CNN Training with Images
 	- for 2D images the dimension ``z`` can be viewed as the axis along which the instances of the training set are stacked
 	- for whole image classification the labels must be 1d
 
-* Find a valid CNN architecture by using :py:func:`net.netutils.CNNCalculator`.
+* Find a valid CNN architecture by using :py:func:`elektronn.net.netutils.CNNCalculator`.
 
 * Edit ``config_template.py`` as a new file to specify your :ref:`training scenario <configuration>`.
 
-* Run the script ``elektronn-train`` from command line (or from an IDE like spyder)::
+* Run the script ``elektronn-train``::
 
     elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
 

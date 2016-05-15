@@ -60,9 +60,10 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'3DCNN'
-copyright = u'2015, Gregor Urban, Marius F Killinger'
+copyright = u'Marius F Killinger, Gregor Urban, 2015'
 
-# The version info for the project you're documenting, acts as replacement for
+# The version info for ls
+# the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #

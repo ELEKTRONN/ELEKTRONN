@@ -3,8 +3,6 @@
 elektronn.net package
 =====================
 
-Submodules
-----------
 
 elektronn.net.convlayer2d module
 --------------------------------

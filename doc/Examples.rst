@@ -4,7 +4,7 @@
 Examples
 ********
 
-This page gives examples other than using the "big" :ref:`data pipeline <pipeline>`. They examples are also intended to give an idea of ways how custom network architectures could be created and trained. To understand the examples basic knowledge of neural networks (e.g. from :ref:`training`) is required.
+This page gives examples other than using the "big" :ref:`data pipeline <pipeline>`. Besides, the examples are intended to give an idea of ways how custom network architectures could be created and trained. To understand the examples, basic knowledge of neural networks (e.g. from :ref:`training`) is required.
 
 .. contents::
 	 :local:
@@ -15,15 +15,15 @@ This page gives examples other than using the "big" :ref:`data pipeline <pipelin
 MNIST Example
 =============
 
-MNIST is a benchmark data set for digit recognition/classification. State of the art benchmarks for comparison can be found `here <http://yann.lecun.com/exdb/mnist/>`_. The data will be automatically downloaded but can also be downloaded from `here <http://www.elektronn.org/downloads/mnist.pkl.gz>`_.
+MNIST is a benchmark data set for handwritten digit recognition/classification. State of the art benchmarks for comparison can be found `here <http://yann.lecun.com/exdb/mnist/>`_.
 
 .. note::
-  For all examples you must download and unpack the MNIST files. Additionally you must update the path to the MNIST file in the example scripts / configs.
+  The data will be automatically downloaded but can also be downloaded manually from `here <http://www.elektronn.org/downloads/mnist.pkl.gz>`_.
 
 CNN with built-in Pipeline
 --------------------------
 
-In ELEKTRONN's ``examples`` folder is a file ``MNIST_CNN_warp_config.py``. This is a configuration for *img-scalar* training and it uses a different data class than the "big" pipeline for neuro data. In case the of an alternative data pipeline the options for data loading and batch creation are given given by keyword argument dictionaries in the ``Data Alternative`` section of the config::
+In ELEKTRONN's ``examples`` folder is a file ``MNIST_CNN_warp_config.py``. This is a configuration for *img-scalar* training and it uses a different data class than the "big" pipeline for neuro data. When using an alternative data pipeline, the options for data loading and batch creation are given given by keyword argument dictionaries in the ``Data Alternative`` section of the config file::
 
 	data_class_name      = 'MNISTData'
 	data_load_kwargs     = dict(path=None, convert2image=True, warp_on=True, shift_augment=True)
@@ -31,23 +31,23 @@ In ELEKTRONN's ``examples`` folder is a file ``MNIST_CNN_warp_config.py``. This 
 
 This configuration results in:
 
-  * Initialising a data class adapted for MNIST from :py:mod:`training.traindata`
-  * Downloading the MNIST data automatically if path is ``None`` or loading from the specified path
+  * Initialising a data class adapted for MNIST from :py:mod:`elektronn.training.traindata`
+  * Downloading the MNIST data automatically if path is ``None`` (otherwise the given path is used)
   * Reshaping the "flat" training examples (they are stored as vectors of length 784) to ``28 x 28`` matrices i.e. images
   * Data augmentation through warping (see :ref:`warping`): for each batch in a training iteration random deformation parameters are sampled and the corresponding transformations are applied to the images in a background process.
-  * Data augmentation through translation: ``shift_augment`` crops the ``28 x 28`` images  to ``26 x 26`` (you may notice this in the printed output). The cropping allows to choose from which origin to crop from (like applying small translations), in this example the data set size is inflated by factor ``4``.
+  * Data augmentation through translation: ``shift_augment`` crops the ``28 x 28`` images  to ``26 x 26`` (you may notice this in the printed output). The cropping leaves choice of the origin (like applying small translations), in this example the data set size is inflated by factor ``4``.
   * For the function ``getbatch`` no additional kwargs are required (the warping and so on was specified already with the initialisation).
 
 The architecture of the NN is determined by::
 
-  n_dim           = 2
+  n_dim           = 2                     # MNIST are 2D images
   desired_input   = 26
-  filters         = [3,3]                 # filter shapes in (x,y)/(x,y,z)-order
-  pool            = [2,2]                 # pool shapes in (x,y)/(x,y,z)-order
+  filters         = [3,3]                 # two conv layers with each 3x3 filters
+  pool            = [2,2]                 # for each conv layer maxpooling by 2x2
   nof_filters     = [16,32]               # number of feature maps per layer
   MLP_layers       = [300,300]            # numbers of filters for perceptron layers (after conv layers)
 
-This is 2D CNN with two conv layers (each has ``3 x 3`` 2D filter) and two fully connected layers each with 300 neurons. As MNIST has 10 classes, an output layer with 10 neurons is automatically added, and not specified here.
+This is 2D CNN with two conv layers and two fully connected layers each with 300 neurons. As MNIST has 10 classes, an output layer with 10 neurons is automatically added, and not specified here.
 
 To run the example, make a copy of the config file and adjust the paths. Then run the ``elektronn-train`` script, and pass the path of your config file::
 
@@ -105,7 +105,7 @@ The output should read like this::
 A few comments on the expected output before training:
 
   * There will be a warning that receptive fields are not centered (the neurons in the last conv layer lie spatially "between" the neurons of the input layer). This is ok because this training task does require localisation of objects. All local information is discarded anyway when the fully connected layers are put after the conv layers.
-  * The information of :py:func:`net.netutils.CNNCalculator` is printed first, i.e. the layer sizes, receptive fields etc.
+  * The information of :py:func:`elektronn.net.netutils.CNNCalculator` is printed first, i.e. the layer sizes, receptive fields etc.
   * Although MNIST contains only 50000 training examples, it will print 200000 because of the shift augmentation, which is done when loading the data
   * For image training, an auxiliary dimension for the (colour) channel is introduced.
   * The input shape ``(50, 1, 26, 26)`` indicates that the batch size is 50, the number of channels is just 1 and the image extent is ``26 x 26``.
@@ -168,7 +168,7 @@ Standalone CNN
 
 If you think the big pipeline and long configuration file is a bit of an overkill for good old MNIST we have an alternative lightweight example in the file ``MNIST_CNN_standalone.py`` of the ``Examples`` folder. This example illustrates what (in a slightly more elaborate way) happens under the hood of the big pipeline.
 
-First we import the required classes and initialise a training data object from :py:mod:`training.traindata` (which we actually used above, too). It does not more than loading the training, validation and testing data and sample batches randomly - all further options e.g. for augmentation are not used here::
+First we import the required classes and initialise a training data object from :py:mod:`elektronn.training.traindata` (which we actually used above, too). It does not more than loading the training, validation and testing data and sample batches randomly - all further options e.g. for augmentation are not used here::
 
     from elektronn.training.traindata import MNISTData
     from elektronn.net.convnet import MixedConvNN
@@ -189,7 +189,7 @@ Next we set up the Neural Network. Each method of ``cnn`` has much more options 
 
 Finally, the training loop which applies weight updates in every iteration::
 
-	for i in range(5000):  
+	for i in range(5000):
 	  d, l = data.getbatch(batch_size)
 	  loss, loss_instance, time_per_step = cnn.trainingStep(d, l, mode="SGD")
 
@@ -233,7 +233,7 @@ This examples also uses MNIST data, but this time the task is not classification
 	cnn.compileOutputFunctions(target="regression")  #compiles the cnn.get_error function as well
 	cnn.setOptimizerParams(SGD={'LR': 5e-1, 'momentum': 0.9}, weight_decay=0)
 
-	for i in range(10000):    
+	for i in range(10000):
 	  d, l = data.getbatch(batch_size)
 	  loss, loss_instance, time_per_step = cnn.trainingStep(d, d, mode="SGD")
 
@@ -280,7 +280,9 @@ Often training data (e.g. lots of images of digits) are vastly available but nob
     d, l = data.getbatch(batch_size)
     cnn2.trainingStep(d, l, mode="SGD")
 
-RNN Example
-===========
 
-Coming soon
+..
+    RNN Example
+    ===========
+
+    Coming soon
