@@ -243,12 +243,14 @@ class Trainer(object):
                         cnn.saveParameters(save_name + '-LAST.param', show=False)
 
                         if config.plot_on and i > 30:
-                            [p.join() for p in plotting_proc]  # join before new plottings are started
-                            plotting_proc = []
-                            p0 = Process(target=trainutils.plotInfo,
-                                         args=(self.timeline, self.history, self.CG_timeline, self.errors, save_name))
-                            plotting_proc.extend([p0])
-                            [p.start() for p in plotting_proc]
+                            ### TODO plotting in process gives xcb errorn on debian/ubuntu...
+                            # [p.join() for p in plotting_proc]  # join before new plottings are started
+                            # plotting_proc = []
+                            # p0 = Process(target=trainutils.plotInfo,
+                            #             args=(self.timeline, self.history, self.CG_timeline, self.errors, save_name))
+                            # plotting_proc.extend([p0])
+                            # [p.start() for p in plotting_proc]
+                            trainutils.plotInfo(self.timeline, self.history, self.CG_timeline, self.errors, save_name)
                         else:
                             trainutils.saveHist(self.timeline, self.history, self.CG_timeline, self.errors, save_name)
 

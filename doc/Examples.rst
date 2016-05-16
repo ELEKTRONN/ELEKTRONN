@@ -4,16 +4,132 @@
 Examples
 ********
 
-This page gives examples other than using the "big" :ref:`data pipeline <pipeline>`. Besides, the examples are intended to give an idea of ways how custom network architectures could be created and trained. To understand the examples, basic knowledge of neural networks (e.g. from :ref:`training`) is required.
+This page gives examples for different use cases of ELELKTRONN. Besides, the examples are intended to give an idea of how custom network architectures could be created and trained without the built-in pipeline. To understand the examples, basic knowledge of neural networks (e.g. from :ref:`training`) is recommended. The details of the configuration parameters are described :ref:`here <pipeline>`.
 
 .. contents::
 	 :local:
-	 :depth: 1
+	 :depth: 2
+
+
+3D Neuro Data
+=============
+
+This task is about detecting neuron cell boundaries in 3D electron microscopy image volumes. The more general goal is to find a segmentation by assigning each voxel a cell ID. Predicting boundaries is surrogate target for which a CNN can be trained (see also the note about target formulation :ref:`here <data-format>`). This is a typical *img-img* task.
+
+For demonstration purpose a very small CNN with only 70k parameters and 5 layers is used. This trains fast but is obviously limited in accuracy. Besides, to solve this task well, more training data would be required.
+
+The full configuration file can be found in ELEKTRONN's ``examples`` folder as  ``neuro_3d_config.py``. Here only selected settings will be mentioned.
+
+Getting Started
+---------------
+
+1. Download `example training data <http://elektronn.org/downloads/neuro_data.zip>`_  (~100MB)::
+
+    wget http://elektronn.org/downloads/neuro_data.zip
+    unzip neuro_data.zip
+
+2. In the config file ``neuro_3d_config.py`` edit ``save_path, data_path, label_path, preview_data_path``
+
+3. Run::
+
+    elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
+
+4. Inspect the printed output and the plots in the save directory
+
+
+Data Set
+--------
+
+There are 3 volumes that contain "barrier" labels (union of cell boundaries and extra cellular space) of shape ``(150,150,150)`` in ``(x,y,z)`` axis order . Correspondingly there are 3 volumes that contain the raw electron microscopy images. Because a CNN can only make predictions within some offset from the input image extent, the size of the image cubes is larger ``(350,350,250)`` in order to be able to make predictions (and to train!) for every labelled voxel. The margin in this examples allows to make predictions for the labelled region with a maximal field of view of ``201`` in  ``x,y`` and ``101`` in ``z``.
+
+There is a difference in the lateral dimensions and in ``z`` - direction because this data set is anisotropic: lateral voxels have a spacing of :math:`10 \mu m` in contrast to :math:`20 \mu m` vertically. Snapshots of images and labels are depicted below.
+
+During training the pipeline cuts image and target patches from the loaded data cubes at randomly sampled locations and feeds them to the CNN. Therefore the CNN input size should be smaller than the size of the cubes, to leave enough space to cut from many different positions. Otherwise it will always use the same patch (more or less) and soon over-fit to that one.
+
+.. note::
+    **Implementation details:** When the cubes are read into the pipeline it is implicitly assumed that the smaller label cube is spatially centered w.r.t the larger image cube (hence the size surplus of the image cube must be even). Furthermore the cubes are for performance reasons internally axis swapped to ``(z, (ch,) x, y)`` order, zero-padded to the same size and cropped such that only the area in which labels and images are both available after considering the CNN offset. If labels cannot be effectively used for training (because either the image surplus is to small or your FOV is to larger) a note will be printed.
+
+Additionally to the 3 pairs of images and labels, 2 image cubes for live previews are included. Note that preview data must be a **list** of one or several cubes in a ``h5``-file.
+
+
+CNN design
+----------
+
+The architecture of the CNN is determined by::
+
+    n_dim = 3
+    filters = [[4,4,1],[3,3,1],[3,3,3],[3,3,3],[2,2,1]]
+    pool    = [[2,2,1],[2,2,1],[1,1,1],[1,1,1],[1,1,1]]
+    nof_filters = [10,20,40,40,40]
+    desired_input = [127,127,7]
+    batch_size = 1
+
+* Because the data is anisotropic the lateral FOV is chosen to be larger. This reduces the computational complexity compared to a naive isotropic CNN. Even for genuinely isotropic data this might be a useful strategy, if it is plausible that seeing a large lateral context is sufficient to solve the task.
+* As an extreme, the presented CNN is partially actually 2D: in the first two and in the last layer the filter kernels have extent ``1`` in ``z``. Only two middle layers perform a truly 3D aggregation of the features along the third axis.
+* The resulting FOV is ``[31,31,7]`` (to solve this task well, more than ``100`` lateral FOV is beneficial...)
+* Using this input size gives an output shape of ``[25,25,3]`` i.e. 1875 prediction neurons. For training, this is a good compromise between computational cost and sufficiently many prediction neurons to average the gradient over. Too few output pixel result in so noisy gradients that convergence might be impossible. For making predictions, it is more efficient to re-created the CNN with a larger input size (see :ref:`here <mfp>`).
+* If there are several ``100-1000`` output neurons, a batch size of ``1`` is commonly sufficient and is not necessary to compute an average gradient over several images.
+* The output shape has strides of ``[4,4,1]`` due to 2 times lateral pooling by 2. This means that the predicted ``[25,25,3]`` voxels do not lie laterally adjacent, if projected back to the space of the input image: for every lateral output voxel there are ``3`` voxel separating it from the next output voxel - for those no prediction is available. To obtain dense predictions (e.g. when making the live previews) the method :py:meth:`elektronn.net.convnet.MixedConvNN.predictDense` is used, which moves along the missing locations and stitches the results. For making large scale predictions after training, this can be done more efficiently using MFP (see :ref:`here <mfp>`).
+* To solve this task well, about twice the number of layers, several million parameters and more training data are needed.
+
+
+Training Data Options
+---------------------
+
+Config::
+
+    valid_cubes = [2,]
+    grey_augment_channels = [0]
+    flip_data = True
+    anisotropic_data = True
+    warp_on = 0.7
+
+* Of the three training data cubes the last one is used as validation data.
+* The input images are grey-valued i.e. they have only 1 channel. For this channel "grey value augmentaion" (randomised histogram distortions) are applied when sampling batches during training. This helps to achieve invariance against varying contrast and brightness gradients.
+* During patch cutting the axes are flipped and transposed as a means of data augmentation
+* If the data is anisotropic, the pipeline assumes that the singled-out axis is ``z``. For anisotropic data axes are not transposed in a way that axes of different resolution get mixed up.
+* For 70% of the batches the image and labels are randomly :ref:`warped <warping>`
+
+
+  .. figure::  images/debugGetCNNBatch.png
+   :align:   center
+
+  Left: the input data. Centre: the labels, note the offset, Right: overlay of data with labels, here you can check whether they are properly registered.
+
+During training initialisation a debug plot of a randomly sampled batch is made to check whether the training data is presented to the CNN in the intended way and to find errors (e.g. image and label cubes are not matching or labels are shifted w.r.t to images). Once the training loop has started, more such plots can be made from the ELEKTRONN command line (``ctrl+c``) ::
+
+    >>> mfk@ELEKTRONN: self.debugGetCNNBatch()
+
+
+.. note:: **Training with 2D images**:
+    The shown setup works likewise for training a 2D CNN on this task. Just the CNN configuration parameters must be adjusted.
+    Then 2D training patches are cut from the cubes. If ``anisotropic_data = True`` these are cut only from the ``x,y``-plane; otherwise transposed, too.
+    Therefore, this setup can be used for actual 2D images if they are stacked to form a cube along a new "``z``"-axis. If the 2D images have different shapes they cannot be stacked but, the 2D arrays can be augmented with a third dummy-axis to be of shape ``(x,y,1)`` and each put in a separate ``h5``-file, which is slightly more intricate.
+
+Results & Comments
+++++++++++++++++++
+
+* When running this example, commonly the NLL-loss stagnates for about ``15k`` iterations around ``0.7``. After that you should observe a clear decrease. On a desktop with a high-end GPU, with latest theano and cuDNN versions and using background processes for the batch creation the training should run ``at 15-10 it/s``.
+* Because of the (too) small training data size the validation error should stagnate soon and even go up later.
+* Because the model has too few parameters, predictions are typically not smooth and exhibit grating-like patterns - using a more complex model mitigates this effect.
+* Because the model has a small FOV (which for this task should rather be increase by more layers than more maxpooling) predictions contain a lot of "clutter" within wide cell bodies because there the CNN does not see the the outline.
+
+
+  .. figure::  images/barrier_training.gif
+   :align:   center
+
+  Preview predictions of this example model trained over 2h.
+
+
+  .. figure::  images/barrier_training.gif
+   :align:   center
+
+  Preview predictions of a more complex model composed of 9 convolutional layers, ``1.5M`` parameters and ``83`` lateral FOV, trained on 9 cubes for 16h.
 
 .. _mnist:
 
-MNIST Example
-=============
+MNIST Examples
+==============
 
 MNIST is a benchmark data set for handwritten digit recognition/classification. State of the art benchmarks for comparison can be found `here <http://yann.lecun.com/exdb/mnist/>`_.
 
@@ -113,8 +229,8 @@ A few comments on the expected output before training:
   * After the last conv layer everything except the batch dimension is flattened to be feed into a fully connected layer: ``32 x 5 x 5 == 800``. If the image extent is not sufficiently small before doing this (e.g. ``10 x 10 == 100``) this will be a bottleneck and introduce **huge** weight matrices for the fully connected layer; more poolings must be used then.
 
 
-Results & Discussion
-++++++++++++++++++++
+Results & Comments
+++++++++++++++++++
 
 The values in the example file should give a good result after about 10-15 minutes on a recent GPU, but you are invited to play around with the network architecture and meta-parameters such as the learning rate. To watch the progress (in a nicer way than the reading the printed numbers on the console) go to the save directory and have a look at the plots. Every time a new line is printed in the console, the plot gets updated as well.
 
@@ -131,7 +247,7 @@ A common regularisation technique to prevent over-fitting is drop out which is a
 
 Warping makes the training goal more difficult, therefore the CNN has to learn its task "more thoroughly". This greatly reduces the spread between training and validation set. Training also takes slightly more time. And because the task is more difficult the training error will not reach 0 anymore. The validation error is also high during training, since the CNN is devoting resources to solving the difficult (warped) training set at the expense of generalization to "normal" data of the validation set.
 
-The actual boost in (validation) performance comes when the warping is turned off and the training is fine-tuned with a smaller learning rate. Wait untill the validation error approximately plateaus, then interrupt the training using ``ctrl+c``::
+The actual boost in (validation) performance comes when the warping is turned off and the training is fine-tuned with a smaller learning rate. Wait until the validation error approximately plateaus, then interrupt the training using ``ctrl+c``::
 
   >>> data.warp_on = False # Turn off warping
   >>> setlr 0.002          # Lower learning rate
@@ -205,7 +321,7 @@ Of course the performance of this setup is not as good of the model above, but f
 .. _autoencoder:
 
 Auto encoder Example
-====================
+--------------------
 
 This examples also uses MNIST data, but this time the task is not classification but compression. The input images have shape ``28 x 28`` but we will regard them as 784 dimensional vectors. The NN is shaped like an hourglass: the number of neurons decreases from 784 input neurons to 50 internal neurons in the central layer. Then the number increases symmetrically to 784 for the output. The training target is to reproduce the input in the output layer (i.e. the labels are identical to the data). Because the inputs are float numbers, so is the output and this is a regression problem. The first part of the auto encoder compresses the information and the second part decompresses it. The weights of both parts are shared, i.e. the weight matrix of each decompression layer is the transposed weight matrix of the corresponding compression layer, and updates are made simultaneously in both layers. For constructing an auto encoder the method ``cnn.addTiedAutoencoderChain`` is used. ::
 

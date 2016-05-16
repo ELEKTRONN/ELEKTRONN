@@ -174,7 +174,7 @@ Multi Layer Perceptron (MLP) and Others
 ======================= =======	======================= =============== ===========
 Name			Mode	Type			Default		Explanation
 ======================= =======	======================= =============== ===========
-rnn_layer_kwargs        $       ``dict``/``None``	``None``	This can install a recurrent layer before MLP-layers, the kwargs are passed to :py:meth:`elektronn.net.MixedConvNN.addRecurrentLayer`. It does not together with conv-layers.
+rnn_layer_kwargs        $       ``dict``/``None``	``None``	This can install a recurrent layer before MLP-layers, the kwargs are passed to :py:meth:`elektronn.net.convnet.MixedConvNN.addRecurrentLayer`. It does not together with conv-layers.
 MLP_layers              !       list of ``int``		``[]``          Numbers of neurons for fully connected layers after conv layers. Empty for img-img training and required for img-scalar training
 target                          ``string``		'nll'		Loss function, 'nll' or 'regression'
 ======================= =======	======================= =============== ===========
@@ -227,7 +227,7 @@ border_mode			!	``string``			"crop"		Only applicable for *img-scalar*. If the CN
 upright_x        			``Bool``			False           If true, mirroring is only applied horizontally (e.g. for outdoor images or handwriting)
 downsample_xy    			``Bool``/``int``		False           Down-sample training data in x/y direction by this factor (or not at all if False)
 preview_data_path 			``string``/``None``		None            Path to a h5-file that contains data to make preview prediction images. The h5 data set must contain a one or more image cubes (normalised between 0 and 255) in the shape ((ch,) x,y,z). If ``None`` no previews are made.
-preview_kwargs    			``dict``					Specification of preview to create, see :py:meth:`training.trainer.Trainer.previewSlice`, only specify ``export_class`` and ``max_z_pred``, the ``number`` is generated automatically.
+preview_kwargs    			``dict``					Specification of preview to create, see :py:meth:`elektronn.training.trainer.Trainer.previewSlice`, only specify ``export_class`` and ``max_z_pred``, the ``number`` is generated automatically.
 ========================= 	=======	==============================	=============== ===========
 
 .. figure::  images/Preview.png
@@ -344,7 +344,7 @@ The following manipulations are possible:
 	- The command line resides within the scope of the training loop (``run`` method) of :py:class:`elektronn.training.trainer.Trainer` the and has access to:
 		* The trainer object by ``self``
 		* An instance of :py:func:`elektronn.net.convnet.MixedConvNN` by ``cnn``
-		* An instance of :py:func:`elektronn.training.trainutils.Config` by ``config``
+		* An instance of :py:func:`elektronn.training.config.Config` by ``config``
 		* An instance of :py:func:`elektronn.training.CNNData.CNNData` by ``data``
 
 The purpose of the command line is to allow the change of meta-parameters during training and to allow the inspection of the state of variables/parameters.
@@ -360,7 +360,7 @@ This fetches a in exactly the same way as is done for every training iteration. 
   .. figure::  images/Batch.png
    :align:   center
 
-  Left: the input data. Middle the labels, note the large offset, this CNN has a very larger field of view it needs 63 pixels on either side to make a prediction for the central pixel. Right: overlay of data with labels, here you can check whether they are properly registered.
+  Left: the input data. Centre: the labels, note the large offset, this CNN has a very larger field of view it needs 63 pixels on either side to make a prediction for the central pixel. Right: overlay of data with labels, here you can check whether they are properly registered.
 
 For 3D CNNs the image shows a slice along the z-axis of the data.
 
