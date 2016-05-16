@@ -5,8 +5,8 @@ Practical Introduction to Neural Networks
 *****************************************
 
 .. contents::
-	 :local:
-	 :depth: 2
+     :local:
+     :depth: 2
 
 General
 =======
@@ -24,21 +24,21 @@ Operation Modes in ELEKTRONN
 
 Generally there are three *modes* of training set ups, supported by the built-in pipeline:
 
-	- **img-img**: input data **and** output data are image-like (i.e. there exist neighbourhood relations between adjacent elements (pixels) in the data arrays. This property is irrespective of dimensionality and can also be seen as neighbourhoods of temporal nature). E.g. for neuron membrane segmentation the inputs are 3D EM-images and the labels images too, that have ``1`` for pixels in which a membrane is present and ``0`` for background.
+    - **img-img**: input data **and** output data are image-like (i.e. there exist neighbourhood relations between adjacent elements (pixels) in the data arrays. This property is irrespective of dimensionality and can also be seen as neighbourhoods of temporal nature). E.g. for neuron membrane segmentation the inputs are 3D EM-images and the labels images too, that have ``1`` for pixels in which a membrane is present and ``0`` for background.
 
   .. figure::  images/Img-Img.png
    :align:   center
 
    EM-Images and derived membrane labels from the ISBI 3D data set (the original labels contained neurite *IDs* and not neurite *boundaries*)
 
-	- **img-scalar**: the input data is image like, but the labels correspond to the image as a *whole* - not to individual pixels/locations. E.g. "this image shows a cat" or "this is an image of digit 3"
+    - **img-scalar**: the input data is image like, but the labels correspond to the image as a *whole* - not to individual pixels/locations. E.g. "this image shows a cat" or "this is an image of digit 3"
 
   .. figure::  images/Img-Scalar.png
    :align:   center
 
    20 instances form the MNIST data set and their target labels.
 
-	- **vect-scalar**: the input data is a vector of arbitrary features (i.e. there exists no relation between adjacent elements). This could also be a flattened image as in the :ref:`MNIST-example <mnist>`, but more illustrative are e.g. word counts of a document or demographic properties of persons as in the depicted example:
+    - **vect-scalar**: the input data is a vector of arbitrary features (i.e. there exists no relation between adjacent elements). This could also be a flattened image as in the :ref:`MNIST-example <mnist>`, but more illustrative are e.g. word counts of a document or demographic properties of persons as in the depicted example:
 
   .. figure::  images/Vect-Scalar.png
    :align:   center
@@ -91,35 +91,35 @@ When defining an architecture several things should be considered:
 Convolutional Networks
 ----------------------
 
-	* Filter sizes:
-		- Larger filters increase the field of view.
-		- Larger filters are slower to compute but do not require significantly more GPU-RAM.
-		- Larger filters introduce more model parameters, but as the number of filters that can be used is limited by speed or GPU-RAM the greater "expressiveness" of larger filters might actually not be utilised and smaller filters are faster and could be equally good.
-		- In the very first layer the filter size must be even if pooling by factor 2 is used. Otherwise output neurons lie "between" input pixels.
-		- Filter sizes and pooling factors can defined for each dimension separately. This is useful if 3D data has anisotropic resolution or just "a little" information in the z-direction is needed. A useful and fast compromise between a plain 3D and 2D network is a CNN that has e.g. filter shape (4,4,1) in the first layers and later (2,2,2): this means the first part is basically a stack of parallel 2D CNNs which are later concatenated to 3D CNN. Such "flat" 3D CNNs are faster than their isotropic counterparts.
-		- The last layers may have filter sizes (1,1,1) which means no convolution in any dimension and is equivalent to a stack of parallel fully connected layers (where the number of filters corresponds to the neuron count).
+    * Filter sizes:
+        - Larger filters increase the field of view.
+        - Larger filters are slower to compute but do not require significantly more GPU-RAM.
+        - Larger filters introduce more model parameters, but as the number of filters that can be used is limited by speed or GPU-RAM the greater "expressiveness" of larger filters might actually not be utilised and smaller filters are faster and could be equally good.
+        - In the very first layer the filter size must be even if pooling by factor 2 is used. Otherwise output neurons lie "between" input pixels.
+        - Filter sizes and pooling factors can defined for each dimension separately. This is useful if 3D data has anisotropic resolution or just "a little" information in the z-direction is needed. A useful and fast compromise between a plain 3D and 2D network is a CNN that has e.g. filter shape (4,4,1) in the first layers and later (2,2,2): this means the first part is basically a stack of parallel 2D CNNs which are later concatenated to 3D CNN. Such "flat" 3D CNNs are faster than their isotropic counterparts.
+        - The last layers may have filter sizes (1,1,1) which means no convolution in any dimension and is equivalent to a stack of parallel fully connected layers (where the number of filters corresponds to the neuron count).
 
-	* Number of Filters:
-		- Due to larger feature map sizes in the first layers (before pooling) fewer filters can be used than in later layers.
-		- A large number of filters in later layers may be cheap to compute for training as the feature map sizes are small but predictions still become expensive then.
-		- Still it is advisable to have a tendency of increasing filter size for later layers. This can be motivated from the view, that early layers extract primitives (such as edges) and the number of relevant primitives is rather small compared to the number of relevant combinations of such primitives.
+    * Number of Filters:
+        - Due to larger feature map sizes in the first layers (before pooling) fewer filters can be used than in later layers.
+        - A large number of filters in later layers may be cheap to compute for training as the feature map sizes are small but predictions still become expensive then.
+        - Still it is advisable to have a tendency of increasing filter size for later layers. This can be motivated from the view, that early layers extract primitives (such as edges) and the number of relevant primitives is rather small compared to the number of relevant combinations of such primitives.
 
-	* Maxpooling:
-		- Reduces the feature map size of that layer, so subsequent layers are cheaper to compute.
-		- Adds some translational invariance (e.g. it does not matter if an edge-pattern is a little bit more right or left). This is good to some extent, but too many consecutive poolings reduce localisation.
-		- Increases the field of view of a single output neuron.
-		- Results in *strided* output/predictions due to the down-sampling. Strided means the neurons after pooling correspond (spatially) to every second input neuron, by applying succesive poolings this becomes every fourth, eight and so on, the "stepsize" is called stride. Per layer for a given number of input neurons the number of output neurons is reduced by the pooling factor, this is important because too few output neurons give noisier gradients and the training progress might be slower. Another effect is that poolings make prediction more expensive, because the pixels "between the stride" must be predicted in another forward-pass through the CNN. The simple and slow way is iterating over all positions between the strides and accumulate the strided predictions to a dense image. The fast (and computationally optimal) way is to activate :ref:`mfp` which gives dense images directly but requires a lot of GPU-RAM.
-		- The final strides in each dimension is the product of pooling factors in each dimension (e.g. 2**4=16), the number of total prediction positions (or fragments for MFP) is the product of all pooling factors: in 3D 4 poolings with factor 2 in all dimensions gives the astonishing number of 4096! As mentioned for the filter sizes below, it is possible to create "flat" 3D CNNs that avoid this, by applying the pooling only in x and y, not z with pooling factors written as (2,2,1).
-		- It is recommended to use only poolings in the first layers and not more than in 4 layers in total. The value of the pooling factor should 2 be.
+    * Maxpooling:
+        - Reduces the feature map size of that layer, so subsequent layers are cheaper to compute.
+        - Adds some translational invariance (e.g. it does not matter if an edge-pattern is a little bit more right or left). This is good to some extent, but too many consecutive poolings reduce localisation.
+        - Increases the field of view of a single output neuron.
+        - Results in *strided* output/predictions due to the down-sampling. Strided means the neurons after pooling correspond (spatially) to every second input neuron, by applying succesive poolings this becomes every fourth, eight and so on, the "stepsize" is called stride. Per layer for a given number of input neurons the number of output neurons is reduced by the pooling factor, this is important because too few output neurons give noisier gradients and the training progress might be slower. Another effect is that poolings make prediction more expensive, because the pixels "between the stride" must be predicted in another forward-pass through the CNN. The simple and slow way is iterating over all positions between the strides and accumulate the strided predictions to a dense image. The fast (and computationally optimal) way is to activate :ref:`mfp` which gives dense images directly but requires a lot of GPU-RAM.
+        - The final strides in each dimension is the product of pooling factors in each dimension (e.g. 2**4=16), the number of total prediction positions (or fragments for MFP) is the product of all pooling factors: in 3D 4 poolings with factor 2 in all dimensions gives the astonishing number of 4096! As mentioned for the filter sizes below, it is possible to create "flat" 3D CNNs that avoid this, by applying the pooling only in x and y, not z with pooling factors written as (2,2,1).
+        - It is recommended to use only poolings in the first layers and not more than in 4 layers in total. The value of the pooling factor should 2 be.
 
 .. Note::
-	To get centered field of views (this means label pixels are aligned with output neurons and do not lie "in between") when using pooling factors of 2, the filter size in the first layer must be even This is at first counter-intuitive because for an even-sized filter there is no "central" pixel, but if followed by a pooling with factor 2, this results in total in a centered output.
+    To get centered field of views (this means label pixels are aligned with output neurons and do not lie "in between") when using pooling factors of 2, the filter size in the first layer must be even This is at first counter-intuitive because for an even-sized filter there is no "central" pixel, but if followed by a pooling with factor 2, this results in total in a centered output.
 
 
 Multi Layer Perceptron (MLP)
 ----------------------------
 
-	* MLP layers (Perceptron layers): these are only needed for *img-scalar* training. The image-like feature maps of the last convolutional layer are *flattened* to a vector and given as input to the perceptron layer, thus one or more perceptron layers can be attached. If the image-like extent of the last convolutional layer is large and/or the layer has many filters the flattened vector might be quite large. It is therefore advisable to reduce the image extent by using maxpooling in the layers to a small extent, e.g. 2x2(x2). The convolutional part can be interpreted as a feature extractor and perceptron layers as a classificator, but in fact this is rather a continuous transition. Each MLP layer is characterised by the number of (output) neurons.
+    * MLP layers (Perceptron layers): these are only needed for *img-scalar* training. The image-like feature maps of the last convolutional layer are *flattened* to a vector and given as input to the perceptron layer, thus one or more perceptron layers can be attached. If the image-like extent of the last convolutional layer is large and/or the layer has many filters the flattened vector might be quite large. It is therefore advisable to reduce the image extent by using maxpooling in the layers to a small extent, e.g. 2x2(x2). The convolutional part can be interpreted as a feature extractor and perceptron layers as a classificator, but in fact this is rather a continuous transition. Each MLP layer is characterised by the number of (output) neurons.
 
 .. Note::
  Always check the CNN architecture before starting a training by using :py:func:`net.netutils.CNNCalculator`. Only the input shapes listed in the attribute ``valid_inputs`` can be used. This is also applicable for *img-scalar* training, because for pooling by factor 2, the layers must have even sizes; if the desired architecture is not possible for the size of the images, the images must be constant-padded/cropped to change their size or the architecture must be changed.
@@ -146,9 +146,9 @@ CNNs are well-performing classifiers, but require a lot of data examples to gene
 In many cases rotations, mirroring, little scaling and minor warping deformations are possible, too. All mentioned transformations are implemented in the :ref:`pipeline <pipeline>` for images. For *img-img* training the labels are subjected to the geometric transformations jointly with the images (preserving the spatial correspondence). By applying the transformations with randomly drawn parameters the training set becomes arbitrarily large. But it should be noted that the augmented training inputs are *highly correlated* compared to genuinely new data. It should furthermore be noted, that the warping deformations require on average greater patch sizes (see black regions in image below) and thus the border regions are exposed to the classifier less frequently. This can be mitigated by applying the warps only to a fraction of the examples.
 
 .. figure::  images/Warp.png
- :align:   center
+    :align:   center
 
- Two exemplary results of random rotation, flipping, deformation and historgram augmentation. The black regions are only shown for illustration here, internally the data pipeline calculates the required input patch (larger than the CNN input size) such that if cropped to the CNN input size, after the transformation, no missing pixels remain. The labels would be transformed in the same way but are not shown here.
+    Two exemplary results of random rotation, flipping, deformation and historgram augmentation. The black regions are only shown for illustration here, internally the data pipeline calculates the required input patch (larger than the CNN input size) such that if cropped to the CNN input size, after the transformation, no missing pixels remain. The labels would be transformed in the same way but are not shown here.
 
 
 Dropout
@@ -181,16 +181,16 @@ Stochastic Gradient Descent (SGD)
 This is the basic principle behind all other optimisers. SGD is the most common optimisation scheme and works in most cases. One advantage of SGD is that it works well with only one example per batch.
 
 In every iteration:
-	- From the training data one or several examples are drawn. The number of drawn examples is called *batch size*.
-	- The output of the NN, given the current weights, is calculated
-	- The **gradient** of the loss (deviation between output and desired output) is calculated w.r.t to the weights
-	- The weights are *updated* by following down the gradient for a fixed step size - the *learning rate*
-	- The whole procedure is repeated with a new batch until convergence
+    - From the training data one or several examples are drawn. The number of drawn examples is called *batch size*.
+    - The output of the NN, given the current weights, is calculated
+    - The **gradient** of the loss (deviation between output and desired output) is calculated w.r.t to the weights
+    - The weights are *updated* by following down the gradient for a fixed step size - the *learning rate*
+    - The whole procedure is repeated with a new batch until convergence
 
 The learning rate is usually decreased by schedule over the time of the training.
 
 .. figure::  images/gradient-descent.png
- :align:   center
+    :align:   center
 
 Illustration of gradient descent on error surface a 2-D, this corresponds to a model with just two parameters. As can be seen, the outcome depends on the starting point (aka *weight initialisation*) and may lead to different *local* optima. For more dimensions the problem of multiple local optima is even more severe. If you train a network twice under same conditions except for the random weight initialisation and the random batch shuffling, you will almost definitely end up in completely different local optima. But empirically the performance is pretty close.  In practice another difficulty is more relevant: saddle-points which may ill-condition the training. [`img source <http://blog.datumbox.com/tuning-the-learning-rate-in-gradient-descent/>`_]
 

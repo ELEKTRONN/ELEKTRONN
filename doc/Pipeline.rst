@@ -7,28 +7,28 @@ Using the Training Pipeline
 This page gives further details about the steps described in :ref:`the basic recipe <basic-recipe>` and describes the all configurable options for the pipeline of the ``training`` package.
 
 .. contents::
-	 :local:
-	 :depth: 1
+     :local:
+     :depth: 1
 
 How it works
 ============
 
 After you set up the configuration and run ``elektronn-train``:
 
-	- The configuration file is parsed and some consistency checks are made (but not every possible combination of anything...). From the architecture parameters a :py:func:`elektronn.net.netutils.CNNCalculator` object is created (this checks the architecture and gives a list of valid input sizes, from which the closest is chosen automatically).
-	- A save directory is created, the ``cwd`` is set to this directory, the configuration file is copied to a ``Backup`` sub-directory in the save directory.
-	- A :py:class:`elektronn.training.CNNData.CNNData` object is created. All CNN relevant architecture parameters (input size, offsets, strides etc.) are passed over, such that suitable patches for training can be created. The data is read from disk into (CPU-)RAM. The required RAM is approx. (number of training image pixels) * 32bit + (number of training label pixels) * 16bit. The sub-processes for don't copy the data, so using the does not increase the physical RAM usage a lot.
-	- The CNN is created and the training functions are compiled. Compilation of the gradient can take up to several minutes the first time. For subsequent runs, parts of the binaries are cached and compilation becomes significantly faster.
-	- The training loop starts. In each iteration:
-		* From the whole training data set a batch is created by sampling random locations in the image arrays and "cutting" patches from these locations. The patches are augmented randomly according to the configuration.
-		* The CNN makes one update step on the batch (or several steps for CG and l-BFGS)
-		* Every ``history_freq`` steps: the current performance is estimated on a larger number of *monitor patches*. Some numbers are printed, plots are made, and a log file is dumped into ``Backup``.
-		* A backup of the current parameters is overwritten every ``history_freq`` steps
-		* Every hour a persistent snapshot of the CNN parameters/weights is saved
-		* Every 3 hours the training is paused and a sample image is predicted as a preview (firstly after 1 hour)
+    - The configuration file is parsed and some consistency checks are made (but not every possible combination of anything...). From the architecture parameters a :py:func:`elektronn.net.netutils.CNNCalculator` object is created (this checks the architecture and gives a list of valid input sizes, from which the closest is chosen automatically).
+    - A save directory is created, the ``cwd`` is set to this directory, the configuration file is copied to a ``Backup`` sub-directory in the save directory.
+    - A :py:class:`elektronn.training.CNNData.CNNData` object is created. All CNN relevant architecture parameters (input size, offsets, strides etc.) are passed over, such that suitable patches for training can be created. The data is read from disk into (CPU-)RAM. The required RAM is approx. (number of training image pixels) * 32bit + (number of training label pixels) * 16bit. The sub-processes for don't copy the data, so using the does not increase the physical RAM usage a lot.
+    - The CNN is created and the training functions are compiled. Compilation of the gradient can take up to several minutes the first time. For subsequent runs, parts of the binaries are cached and compilation becomes significantly faster.
+    - The training loop starts. In each iteration:
+        * From the whole training data set a batch is created by sampling random locations in the image arrays and "cutting" patches from these locations. The patches are augmented randomly according to the configuration.
+        * The CNN makes one update step on the batch (or several steps for CG and l-BFGS)
+        * Every ``history_freq`` steps: the current performance is estimated on a larger number of *monitor patches*. Some numbers are printed, plots are made, and a log file is dumped into ``Backup``.
+        * A backup of the current parameters is overwritten every ``history_freq`` steps
+        * Every hour a persistent snapshot of the CNN parameters/weights is saved
+        * Every 3 hours the training is paused and a sample image is predicted as a preview (firstly after 1 hour)
 
-	- During this iteration you can use the :ref:`CNN console <console>` accessible via ``ctrl+c``.
-	- After the maximal steps or maximal runtime are reached, everything is shutdown and the latest parameters are written to disk.
+    - During this iteration you can use the :ref:`CNN console <console>` accessible via ``ctrl+c``.
+    - After the maximal steps or maximal runtime are reached, everything is shutdown and the latest parameters are written to disk.
 
 
 
@@ -40,12 +40,12 @@ Data Format
 
 Transform your data arrays to h5 data sets in separate files for images and labels.
 
-	* images: shape (x,y,z)  or (channel,x,y,z), either ``float`` (0,1) or ``uint8`` (0,255)
-	* labels: shape (x,y,z)
-	* for classification: labels contain integer numbers encoding the class membership, starting from 0, consecutively to (#classes-1)
-	* for regression: labels contain float numbers
-	* for 2D images the dimension ``z`` can be viewed as the axis along which the instances of the training set are stacked
-	* for whole image classification the labels must be 1d
+    * images: shape (x,y,z)  or (channel,x,y,z), either ``float`` (0,1) or ``uint8`` (0,255)
+    * labels: shape (x,y,z)
+    * for classification: labels contain integer numbers encoding the class membership, starting from 0, consecutively to (#classes-1)
+    * for regression: labels contain float numbers
+    * for 2D images the dimension ``z`` can be viewed as the axis along which the instances of the training set are stacked
+    * for whole image classification the labels must be 1d
     * The z-axis is the the axis which has different units than x and y (e.g. different spatial resolution, or time).
 
 
@@ -58,10 +58,10 @@ Transform your data arrays to h5 data sets in separate files for images and labe
       Conversion of ID-labels to a binary boundary map.
 
 .. Note::
-	For 2D data you can stack the set of 2D images (and likewise the labels) to a cube and train by iterating over the z-slices (then the option ``anisotropic_data`` must be set to ``True``).
+    For 2D data you can stack the set of 2D images (and likewise the labels) to a cube and train by iterating over the z-slices (then the option ``anisotropic_data`` must be set to ``True``).
 
 .. Note::
-	For *img-scalar* training the labels which correspond to a stack of 2D images (see note above) are a vector with an entry for every image.
+    For *img-scalar* training the labels which correspond to a stack of 2D images (see note above) are a vector with an entry for every image.
 
 In the configuration file **two** lists must be specified consisting of tuples of the form *(<file name>, <h5 data set name/key in that file>)*. One list for the images and one for the labels, both must have the **same** order.
 
@@ -89,9 +89,9 @@ There are three levels of parameter configuration, **higher levels override prev
 
 The configuration file is basically a python file that contains assignments of values to variables. You can use even use list comprehensions to create lists of file names, but then you must ``del`` the iteration variable (because this variable would also be read in, but it is not a valid config value) e.g::
 
-	d_files          = [('imgs_padd_%i.h5' % ii, 'raw') for ii in range(8)]
-	l_files          = [('mem_z_%i.h5' % ii, 'labels') for ii in range(8)]
-	del ii
+    d_files          = [('imgs_padd_%i.h5' % ii, 'raw') for ii in range(8)]
+    l_files          = [('mem_z_%i.h5' % ii, 'labels') for ii in range(8)]
+    del ii
 
 This page only describes what the values do, for advice on how to find good settings refer to the section :ref:`training`.
 
@@ -137,7 +137,7 @@ Network Architecture
 --------------------
 
 .. note::
-	The output layer is added automatically (with ``n_lab`` outputs). I.e. the total number of layers is ``len(nof_filters)+ len(MLP_layers) + 1``.
+    The output layer is added automatically (with ``n_lab`` outputs). I.e. the total number of layers is ``len(nof_filters)+ len(MLP_layers) + 1``.
 
 General
 +++++++
@@ -166,7 +166,7 @@ MFP			!	list of ``bool`` or 0/1		``[]``		List whether to apply max fragment pool
 ======================= =======	========================== 	=============== ===========
 
 .. note::
-	The parameters ``filters`` and  ``pool`` can either be lists of ints or lists of 2/3-tuples of ints. For simple lists of ints the scalar values are used in all 2/3 CNN dimensions, for tuples each dimension has its own value. E.g. ``[[2,2,2], [3,3,3], [2,2,2],...]`` is identical to ``[2,3,2,...]``, in contrast anisotropic filters are declared like ``[[2,2,1],[3,3,2],...]``.
+    The parameters ``filters`` and  ``pool`` can either be lists of ints or lists of 2/3-tuples of ints. For simple lists of ints the scalar values are used in all 2/3 CNN dimensions, for tuples each dimension has its own value. E.g. ``[[2,2,2], [3,3,3], [2,2,2],...]`` is identical to ``[2,3,2,...]``, in contrast anisotropic filters are declared like ``[[2,2,1],[3,3,2],...]``.
 
 Multi Layer Perceptron (MLP) and Others
 +++++++++++++++++++++++++++++++++++++++
@@ -197,7 +197,7 @@ n_lab				!	``int`` or ``None``		``undefined``	Number of distinct labels i.e. dif
 ========================= 	=======	============================== 	=============== ===========
 
 .. warning::
-	When using background processes, the main process should not be killed from outside. Instead abort using the CNN console via ``ctrl+c`` and ``kill`` or ``abort``, otherwise the sub-processes become zombies and clutter the RAM.
+    When using background processes, the main process should not be killed from outside. Instead abort using the CNN console via ``ctrl+c`` and ``kill`` or ``abort``, otherwise the sub-processes become zombies and clutter the RAM.
 
 
 Images/CNN
@@ -272,8 +272,8 @@ LR_schedule           		List of tuples /``None`` 	None		At the specified iterati
 ======================= =======	==============================	=============== ===========
 
 .. note::
-	Regarding ``history_freq``:
-	If the training or validation errors are estimated on many examples (``monitor_batch_size``) this might take a while, therefore if you plan to train for 24 hours you should not create an output every 10 seconds but rather every 30 minutes (values 2000 to 5000). But for debugging and checking if a new training case works, it might be usefull to get several plots per minute (values 20 to 200) and use fewer monitor examples. If you know it works, you can raise the value online using the CNN console via ``ctrl+c``. Although this parameter is scalar it is a list for internal reasons.
+    Regarding ``history_freq``:
+    If the training or validation errors are estimated on many examples (``monitor_batch_size``) this might take a while, therefore if you plan to train for 24 hours you should not create an output every 10 seconds but rather every 30 minutes (values 2000 to 5000). But for debugging and checking if a new training case works, it might be usefull to get several plots per minute (values 20 to 200) and use fewer monitor examples. If you know it works, you can raise the value online using the CNN console via ``ctrl+c``. Although this parameter is scalar it is a list for internal reasons.
 
 
 
@@ -295,12 +295,12 @@ Running elektronn-train
 
 Once the parameter file is set up, the training script can be started. Run the script ``elektronn-train`` from command line::
 
-	elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
+    elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
 
 or from an existing python interpreter (e.g. within spyder).
 
 .. note::
-	 Using ``False`` as ``gpu`` arguments means a fallback to the configured device in ``.theanorc`` (which might be CPU). Otherwise it is advisable give the number of of the target GPU directly as the automatic selection of a free GPU might not work for all drivers (it looks up the power state using nvidia-smi). If the system has only one GPU its number is 0.
+    Using ``False`` as ``gpu`` arguments means a fallback to the configured device in ``.theanorc`` (which might be CPU). Otherwise it is advisable give the number of of the target GPU directly as the automatic selection of a free GPU might not work for all drivers (it looks up the power state using nvidia-smi). If the system has only one GPU its number is 0.
 
 .. _console:
 
@@ -309,43 +309,43 @@ CNN Command Line
 
 During training various changes to the setup can be made using the console which is accessible via ``ctrl+c``::
 
-	ELEKTRONN MENU
-	==============
+    ELEKTRONN MENU
+    ==============
 
-	    >> MNIST <<
-	    Shortcuts:
-	    'q' (leave menu),		    'abort' (saving params),
-	    'kill'(no saving),		    'save'/'load' (opt:filename),
-	    'sf'/' (show filters)',	    'smooth' (smooth filters),
-	    'sethist <int>',		    'setlr <float>',
-	    'setmom <float>' ,		    'params' print info,
-	    Change Training Optimizer :('SGD','CG', 'RPROP', 'LBFGS')
-	    For everything else enter a command in the command line
+        >> MNIST <<
+        Shortcuts:
+        'q' (leave menu),		    'abort' (saving params),
+        'kill'(no saving),		    'save'/'load' (opt:filename),
+        'sf'/' (show filters)',	    'smooth' (smooth filters),
+        'sethist <int>',		    'setlr <float>',
+        'setmom <float>' ,		    'params' print info,
+        Change Training Optimizer :('SGD','CG', 'RPROP', 'LBFGS')
+        For everything else enter a command in the command line
 
-	mfk@ELEKTRONN:
+    mfk@ELEKTRONN:
 
 The following manipulations are possible:
-	- Typing any of the above keywords (with optional arguments) and press `Enter`
-	- "Free" input without parenthesis is translated to printing the value of the variable by that name, e.g.:
+    - Typing any of the above keywords (with optional arguments) and press `Enter`
+    - "Free" input without parenthesis is translated to printing the value of the variable by that name, e.g.:
 
-	>>> mfk@ELEKTRONN: cnn.input_shape
-	(50, 1, 26, 26)
+    >>> mfk@ELEKTRONN: cnn.input_shape
+    (50, 1, 26, 26)
 
-	- "Free" input with parenthesis is translated to executing that command literally e.g.
+    - "Free" input with parenthesis is translated to executing that command literally e.g.
 
-	>>> mfk@ELEKTRONN: cnn.setDropoutRates([0.5, 0.5, 0.5, 1.0])
+    >>> mfk@ELEKTRONN: cnn.setDropoutRates([0.5, 0.5, 0.5, 1.0])
 
-	- If the return value of a function/method is to be printed, ``print`` must be added explicitly (otherwise it is just executed):
+    - If the return value of a function/method is to be printed, ``print`` must be added explicitly (otherwise it is just executed):
 
-	>>> mfk@ELEKTRONN: print cnn.SGD_LR.get_value()
-	>>> 0.00995
+    >>> mfk@ELEKTRONN: print cnn.SGD_LR.get_value()
+    >>> 0.00995
 
-	- Value assignments and variable instantiation are possible, too
-	- The command line resides within the scope of the training loop (``run`` method) of :py:class:`elektronn.training.trainer.Trainer` the and has access to:
-		* The trainer object by ``self``
-		* An instance of :py:func:`elektronn.net.convnet.MixedConvNN` by ``cnn``
-		* An instance of :py:func:`elektronn.training.config.Config` by ``config``
-		* An instance of :py:func:`elektronn.training.CNNData.CNNData` by ``data``
+    - Value assignments and variable instantiation are possible, too
+    - The command line resides within the scope of the training loop (``run`` method) of :py:class:`elektronn.training.trainer.Trainer` the and has access to:
+        * The trainer object by ``self``
+        * An instance of :py:func:`elektronn.net.convnet.MixedConvNN` by ``cnn``
+        * An instance of :py:func:`elektronn.training.config.Config` by ``config``
+        * An instance of :py:func:`elektronn.training.CNNData.CNNData` by ``data``
 
 The purpose of the command line is to allow the change of meta-parameters during training and to allow the inspection of the state of variables/parameters.
 
@@ -357,8 +357,8 @@ A particular useful function for debugging gives a visual output of the training
 
 This fetches a in exactly the same way as is done for every training iteration. The ``info`` variables are for internal use when lazy labels are active, and not of interest here. Besides returning the data and label array this function also prints an image into the save directory name ``debugGetCNNBatch.png``:
 
-  .. figure::  images/Batch.png
-   :align:   center
+.. figure::  images/Batch.png
+    :align:   center
 
   Left: the input data. Centre: the labels, note the large offset, this CNN has a very larger field of view it needs 63 pixels on either side to make a prediction for the central pixel. Right: overlay of data with labels, here you can check whether they are properly registered.
 
@@ -366,6 +366,6 @@ For 3D CNNs the image shows a slice along the z-axis of the data.
 
 
 .. note::
-	Some parameters cannot be changed or their change has no effect. This is mainly true for all properties that are hard-compiled into the theano functions like the network architecture (e.g. number of neurons per layer).
+    Some parameters cannot be changed or their change has no effect. This is mainly true for all properties that are hard-compiled into the theano functions like the network architecture (e.g. number of neurons per layer).
 
 

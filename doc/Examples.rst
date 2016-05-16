@@ -14,7 +14,7 @@ This page gives examples for different use cases of ELELKTRONN. Besides, the exa
 3D Neuro Data
 =============
 
-This task is about detecting neuron cell boundaries in 3D electron microscopy image volumes. The more general goal is to find a segmentation by assigning each voxel a cell ID. Predicting boundaries is surrogate target for which a CNN can be trained (see also the note about target formulation :ref:`here <data-format>`). This is a typical *img-img* task.
+This task is about detecting neuron cell boundaries in 3D electron microscopy image volumes. The more general goal is to find a segmentation by assigning each voxel a cell ID. Predicting boundaries is surrogate target for which a CNN can be trained (see also the note about target formulation :ref:`here <data-format>`) - the actual segmentation would be made by e.g. running a watershed on the predicted boundary map. This is a typical *img-img* task.
 
 For demonstration purpose a very small CNN with only 70k parameters and 5 layers is used. This trains fast but is obviously limited in accuracy. Besides, to solve this task well, more training data would be required.
 
@@ -112,19 +112,19 @@ Results & Comments
 * When running this example, commonly the NLL-loss stagnates for about ``15k`` iterations around ``0.7``. After that you should observe a clear decrease. On a desktop with a high-end GPU, with latest theano and cuDNN versions and using background processes for the batch creation the training should run ``at 15-10 it/s``.
 * Because of the (too) small training data size the validation error should stagnate soon and even go up later.
 * Because the model has too few parameters, predictions are typically not smooth and exhibit grating-like patterns - using a more complex model mitigates this effect.
-* Because the model has a small FOV (which for this task should rather be increase by more layers than more maxpooling) predictions contain a lot of "clutter" within wide cell bodies because there the CNN does not see the the outline.
+* Because the model has a small FOV (which for this task should rather be increase by more layers than more maxpooling) predictions contain a lot of "clutter" within wide cell bodies: there the CNN does not see the the cell outline which is apparently an important clue to solve this task.
 
 
-  .. figure::  images/barrier_training.gif
-   :align:   center
+.. figure::  images/barrier_training_example.gif
+    :align:   center
 
-  Preview predictions of this example model trained over 2h.
+    Preview predictions of this example model trained over 2h.
 
 
-  .. figure::  images/barrier_training.gif
-   :align:   center
+.. figure::  images/barrier_training.gif
+    :align:   center
 
-  Preview predictions of a more complex model composed of 9 convolutional layers, ``1.5M`` parameters and ``83`` lateral FOV, trained on 9 cubes for 16h.
+    Preview predictions of a more complex model composed of 9 convolutional layers, ``1.5M`` parameters and ``83`` lateral FOV, trained on 9 cubes for 16h.
 
 .. _mnist:
 
@@ -236,7 +236,7 @@ The values in the example file should give a good result after about 10-15 minut
 
 **If you had not used warping** the progress of the training would look like this:
 
-  .. figure::  images/MNIST_Nowarp.Errors.png
+.. figure::  images/MNIST_Nowarp.Errors.png
    :align:   center
 
    Withing a few minutes the *training* error goes to 0 whereas the *validation* error  stays on a higher level.
@@ -256,7 +256,7 @@ The actual boost in (validation) performance comes when the warping is turned of
 This stops the warping for further training and lowers the learning rate.
 The resulting training progress would look like this:
 
-  .. figure::  images/MNIST_warp.Errors.png
+.. figure::  images/MNIST_warp.Errors.png
    :align:   center
 
    The training was interrupted after ca. 130000 iterations. Turning off warping reduced both errors to their final level (after the gradient is 0 again, no progress can be made).
@@ -372,10 +372,10 @@ This examples also uses MNIST data, but this time the task is not classification
 
 The above NN learns to compress the 784 pixels of an image to a 50 dimensional code (ca. 15x). The quality of the reconstruction can be inspected from plotting the images and comparing them to the original input:
 
-  .. figure::  images/DAE.png
-   :align:   center
+.. figure::  images/DAE.png
+    :align:   center
 
-   Left input data (from validation set) and right reconstruction. The reconstruction values have been slightly rescaled for better visualisation.
+    Left input data (from validation set) and right reconstruction. The reconstruction values have been slightly rescaled for better visualisation.
 
 The compression part of the auto encoder can be used to reduce the dimension of a data vector, while still preserving the information necessary to reconstruct the original data.
 
