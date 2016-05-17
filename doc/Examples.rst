@@ -14,11 +14,11 @@ This page gives examples for different use cases of ELELKTRONN. Besides, the exa
 3D Neuro Data
 =============
 
-This task is about detecting neuron cell boundaries in 3D electron microscopy image volumes. The more general goal is to find a segmentation by assigning each voxel a cell ID. Predicting boundaries is surrogate target for which a CNN can be trained (see also the note about target formulation :ref:`here <data-format>`) - the actual segmentation would be made by e.g. running a watershed on the predicted boundary map. This is a typical *img-img* task.
+This task is about detecting neuron cell boundaries in 3D electron microscopy image volumes. The more general goal is to find a volume segmentation by assigning each voxel a cell ID. Predicting boundaries is a surrogate target for which a CNN can be trained (see also the note about target formulation :ref:`here <data-format>`) - the actual segmentation would be made by e.g. running a watershed on the predicted boundary map. This is a typical *img-img* task.
 
-For demonstration purpose a very small CNN with only 70k parameters and 5 layers is used. This trains fast but is obviously limited in accuracy. Besides, to solve this task well, more training data would be required.
+For demonstration purpose, a very small CNN with only 70k parameters and 5 layers is used. This trains fast but is obviously limited in accuracy. To solve this task well, more training data would be required in addition.
 
-The full configuration file can be found in ELEKTRONN's ``examples`` folder as  ``neuro_3d_config.py``. Here only selected settings will be mentioned.
+The full configuration file can be found in ELEKTRONN's ``examples`` folder as ``neuro_3d_config.py``. Here only selected settings will be mentioned.
 
 Getting Started
 ---------------
@@ -28,7 +28,7 @@ Getting Started
     wget http://elektronn.org/downloads/neuro_data.zip
     unzip neuro_data.zip
 
-2. In the config file ``neuro_3d_config.py`` edit ``save_path, data_path, label_path, preview_data_path``
+2. Edit ``save_path, data_path, label_path, preview_data_path`` in the config file ``neuro_3d_config.py`` in ELEKTRONN's ``examples`` folder
 
 3. Run::
 
@@ -40,16 +40,17 @@ Getting Started
 Data Set
 --------
 
-There are 3 volumes that contain "barrier" labels (union of cell boundaries and extra cellular space) of shape ``(150,150,150)`` in ``(x,y,z)`` axis order . Correspondingly there are 3 volumes that contain the raw electron microscopy images. Because a CNN can only make predictions within some offset from the input image extent, the size of the image cubes is larger ``(350,350,250)`` in order to be able to make predictions (and to train!) for every labelled voxel. The margin in this examples allows to make predictions for the labelled region with a maximal field of view of ``201`` in  ``x,y`` and ``101`` in ``z``.
+This data set is a subset of the zebra finch area X dataset j0126 by `Jörgen Kornfeld <http://www.neuro.mpg.de/mitarbeiter/43611/3242756>`_.
+There are 3 volumes which contain "barrier" labels (union of cell boundaries and extra cellular space) of shape ``(150,150,150)`` in ``(x,y,z)`` axis order. Correspondingly, there are 3 volumes which contain raw electron microscopy images. Because a CNN can only make predictions within some offset from the input image extent, the size of the image cubes is larger ``(350,350,250)`` in order to be able to make predictions (and to train!) for every labelled voxel. The margin in this examples allows to make predictions for the labelled region with a maximal field of view of ``201`` in  ``x,y`` and ``101`` in ``z``.
 
 There is a difference in the lateral dimensions and in ``z`` - direction because this data set is anisotropic: lateral voxels have a spacing of :math:`10 \mu m` in contrast to :math:`20 \mu m` vertically. Snapshots of images and labels are depicted below.
 
-During training the pipeline cuts image and target patches from the loaded data cubes at randomly sampled locations and feeds them to the CNN. Therefore the CNN input size should be smaller than the size of the cubes, to leave enough space to cut from many different positions. Otherwise it will always use the same patch (more or less) and soon over-fit to that one.
+During training, the pipeline cuts image and target patches from the loaded data cubes at randomly sampled locations and feeds them to the CNN. Therefore the CNN input size should be smaller than the size of the cubes, to leave enough space to cut from many different positions. Otherwise it will always use the same patch (more or less) and soon over-fit to that one.
 
 .. note::
-    **Implementation details:** When the cubes are read into the pipeline it is implicitly assumed that the smaller label cube is spatially centered w.r.t the larger image cube (hence the size surplus of the image cube must be even). Furthermore the cubes are for performance reasons internally axis swapped to ``(z, (ch,) x, y)`` order, zero-padded to the same size and cropped such that only the area in which labels and images are both available after considering the CNN offset. If labels cannot be effectively used for training (because either the image surplus is to small or your FOV is to larger) a note will be printed.
+    **Implementation details:** When the cubes are read into the pipeline, it is implicitly assumed that the smaller label cube is spatially centered w.r.t the larger image cube (hence the size surplus of the image cube must be even). Furthermore, the cubes are for performance reasons internally axis swapped to ``(z, (ch,) x, y)`` order, zero-padded to the same size and cropped such that only the area in which labels and images are both available after considering the CNN offset. If labels cannot be effectively used for training (because either the image surplus is too small or your FOV is too large) a note will be printed.
 
-Additionally to the 3 pairs of images and labels, 2 image cubes for live previews are included. Note that preview data must be a **list** of one or several cubes in a ``h5``-file.
+Additionally to the 3 pairs of images and labels, 2 small image cubes for live previews are included. Note that preview data must be a **list** of one or several cubes stored in a ``h5``-file.
 
 
 CNN design
@@ -109,22 +110,16 @@ During training initialisation a debug plot of a randomly sampled batch is made 
 Results & Comments
 ++++++++++++++++++
 
-* When running this example, commonly the NLL-loss stagnates for about ``15k`` iterations around ``0.7``. After that you should observe a clear decrease. On a desktop with a high-end GPU, with latest theano and cuDNN versions and using background processes for the batch creation the training should run ``at 15-10 it/s``.
+* When running this example, commonly the NLL-loss stagnates for about ``15k`` iterations around ``0.7``. After that you should observe a clear decrease. On a desktop with a high-end GPU, with latest theano and cuDNN versions and using background processes for the batch creation the training should run ``at 15-20 it/s``.
 * Because of the (too) small training data size the validation error should stagnate soon and even go up later.
 * Because the model has too few parameters, predictions are typically not smooth and exhibit grating-like patterns - using a more complex model mitigates this effect.
 * Because the model has a small FOV (which for this task should rather be increase by more layers than more maxpooling) predictions contain a lot of "clutter" within wide cell bodies: there the CNN does not see the the cell outline which is apparently an important clue to solve this task.
 
 
-.. figure::  images/barrier_training_example.gif
+.. figure::  images/barrier_training_dual.gif
     :align:   center
 
-    Preview predictions of this example model trained over 2h.
-
-
-.. figure::  images/barrier_training.gif
-    :align:   center
-
-    Preview predictions of a more complex model composed of 9 convolutional layers, ``1.5M`` parameters and ``83`` lateral FOV, trained on 9 cubes for 16h.
+    Left: preview predictions of this example model trained over 2h. Right: a more complex model composed of 9 convolutional layers, ``1.5M`` parameters and ``83`` lateral FOV, trained on 9 cubes for 16h.
 
 .. _mnist:
 

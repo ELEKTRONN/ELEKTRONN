@@ -360,7 +360,7 @@ This fetches a in exactly the same way as is done for every training iteration. 
 .. figure::  images/Batch.png
     :align:   center
 
-  Left: the input data. Centre: the labels, note the large offset, this CNN has a very larger field of view it needs 63 pixels on either side to make a prediction for the central pixel. Right: overlay of data with labels, here you can check whether they are properly registered.
+    Left: the input data. Centre: the labels, note the large offset, this CNN has a very larger field of view it needs 63 pixels on either side to make a prediction for the central pixel. Right: overlay of data with labels, here you can check whether they are properly registered.
 
 For 3D CNNs the image shows a slice along the z-axis of the data.
 
