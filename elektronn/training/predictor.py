@@ -67,9 +67,9 @@ def create_predncnn(config_file,
 
     from elektronn.net.netcreation import createNet  # import after gpu init
 
-    os.chdir(config.save_path)  # The trainer works directly in the save dir
     cnn = createNet(config, config.dimensions.input, n_ch, n_lab, config.dimensions)  # 1 ch 2 label
     if param_file is None:
+        os.chdir(config.save_path)  # The trainer works directly in the save dir
         path = "%s-LAST.param" % config.save_name
     else:
         path = os.path.expanduser(param_file)
