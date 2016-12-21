@@ -33,7 +33,7 @@ class PerceptronLayer(object):
     :param batch_size: batch_size
 
     :type enable_dropout: Bool
-    :param pool: whether to enable dropout in this layer. The default rate is 0.5 but it can be changed with
+    :param enable_dropout: whether to enable dropout in this layer. The default rate is 0.5 but it can be changed with
                self.activation_noise.set_value(set_value(np.float32(p)) or using cnn.setDropoutRates
 
     :type activation_func: string
