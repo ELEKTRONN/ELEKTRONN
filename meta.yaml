@@ -1,6 +1,6 @@
 package:
   name: elektronn
-  version: 1.0.12
+  version: 1.0.13
 
 source:
   path: ./
@@ -24,7 +24,7 @@ requirements:
     - h5py >=2.5
     - matplotlib >=1.5
     - numpy >=1.8
-    - scikit-learn >=0.14
+    - scikit-learn >=0.14,<0.20
     - scipy >=0.17.1
     - theano >=0.7
 

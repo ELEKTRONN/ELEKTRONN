@@ -8,8 +8,8 @@ from setuptools import setup, find_packages, Extension
 from pkg_resources import parse_version
 
 if sys.version_info[:2] != (2, 7):
-    print('\nSorry, only Python 2.7 is currently supported.')
-    print('Python 3 support is planned for the next major release.')
+    print('\nSorry, only Python 2.7 is supported by ELEKTRONN 1.0.')
+    print('Python 3 support is introduced by the new rewrite, https://github.com/ELEKTRONN/ELEKTRONN2.')
     print('\nYour current Python version is {}'.format(sys.version))
     sys.exit(1)
 
@@ -40,7 +40,7 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.12',
+    version='1.0.13',
     packages=find_packages(),
     scripts=['elektronn/scripts/elektronn-train',
              'elektronn/scripts/elektronn-profile',
@@ -58,11 +58,11 @@ setup(
         'theano>=0.7',
     ],
     extras_require={
-        'cross-validation': ['scikit-learn>=0.14'],
+        'cross-validation': ['scikit-learn>=0.14, <0.20'],  # >=0.20 will require a change in elektronn.training.traindata
     },
     author="Marius Killinger, Gregor Urban",
     author_email="Marius.Killinger@mailbox.org",
-    description=("A highly configurable toolkit for training 3d/2d CNNs and general Neural Networks"),
+    description="A highly configurable toolkit for training 3d/2d CNNs and general Neural Networks",
     long_description=read('README.rst'),
     license="GPLv3",
     keywords="cnn theano convolutional neural network machine learning classification",
