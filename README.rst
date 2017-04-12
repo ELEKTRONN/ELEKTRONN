@@ -1,8 +1,8 @@
 .. image:: https://badge.fury.io/py/elektronn.svg
     :target: https://badge.fury.io/py/elektronn
 
-.. image:: http://anaconda.org/elektronn/elektronn/badges/version.svg
-    :target: http://anaconda.org/elektronn/elektronn
+.. image:: http://anaconda.org/conda-forge/elektronn/badges/version.svg
+    :target: http://anaconda.org/conda-forge/elektronn
 
 
 ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general Neural Networks.

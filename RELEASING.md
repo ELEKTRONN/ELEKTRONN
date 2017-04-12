@@ -11,11 +11,11 @@
         $ PATH="<anaconda-root>/bin:$PATH"
           # e.g. $ PATH="~/anaconda2/bin:$PATH"
 
-3. The Anaconda environment needs the conda-build and anaconda-client packages. Install them via
+3. The Anaconda environment needs the conda-build package. Install it via
 
-        $ conda install conda-build anaconda-client
+        $ conda install conda-build
 
-4. A running bash or zsh session. Other shells (fish, etc.) are currently unsupported.
+4. For conda envs: a running bash or zsh session (for other shells, see https://github.com/conda/conda/blob/master/shell/README.md)
 All commands prefixed with "$" signs should be entered in bash or zsh.
 5. `~/.pypirc` configured according to https://docs.python.org/2/distutils/packageindex.html#the-pypirc-file
 
@@ -31,9 +31,10 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ elektronn-train MNIST_CNN_warp_config.py # make sure training works
         $ deactivate
         
-        $ conda create -p /tmp/cenv2a -c elektronn python=2.7
+        $ conda build .
+        $ conda create -p /tmp/cenv2a
         $ source activate /tmp/cenv2a
-        $ conda install .
+        $ conda install --use-local elektronn
         $ elektronn-train MNIST_CNN_warp_config.py
         $ source deactivate
         
@@ -61,18 +62,12 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ python2 setup.py sdist upload -r pypi
           # result should be "Server response (200): OK".
 
-7. Upload to anaconda.org:
+7. Update the "elektronn" conda-forge feedstock:
 
-        $ source activate root
-        $ anaconda login
-          # (only necessary if you are not already logged in)
-          # Enter your private username, e.g xeray or mdraw. Do not enter elektronn.
-          # Your username has to be registered under the elektronn organization, though.
-        $ conda build .
-        $ anaconda upload --user elektronn <path-to-elektronn.tar.bz2>
-          # You find the <path-to-elektronn.tar.bz2> argument in the last lines of "conda build ."'s output.
-          # (Do not just copy-paste the proposed command. The "--user elektronn" flag is needed.)
-        $ source deactivate
+    * Fork https://github.com/conda-forge/elektronn-feedstock
+    * Create a PR, changing necessary fields in recipe/meta.yaml
+    * (If necessary, install/update `conda-smithy`, run `$ conda smithy rerender`, commit and push.)
+    * If CI is sucessful, merge PR.
 
 8. Verify the published packages:
 
@@ -82,10 +77,9 @@ All commands prefixed with "$" signs should be entered in bash or zsh.
         $ elektronn-train MNIST_CNN_warp_config.py
         $ deactivate
         
-        $ conda create -p /tmp/cenv2b -c elektronn python=2.7
+        $ conda create -p /tmp/cenv2b
         $ source activate /tmp/cenv2b
-        $ conda config --add channels elektronn
-        $ conda install elektronn
+        $ conda install -c conda-forge elektronn
         $ elektronn-train MNIST_CNN_warp_config.py
         $ source deactivate
         

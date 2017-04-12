@@ -1,6 +1,9 @@
+# Only for local test builds. For other purposes: superceded by
+# https://github.com/conda-forge/elektronn-feedstock/blob/master/recipe/meta.yaml
+
 package:
   name: elektronn
-  version: 1.0.13
+  version: test
 
 source:
   path: ./
