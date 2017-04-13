@@ -295,12 +295,12 @@ Running elektronn-train
 
 Once the parameter file is set up, the training script can be started. Run the script ``elektronn-train`` from command line::
 
-    elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
+    elektronn-train </path/to_config_file> [ --gpu={auto|false|<int>}]
 
 or from an existing python interpreter (e.g. within spyder).
 
 .. note::
-    Using ``False`` as ``gpu`` arguments means a fallback to the configured device in ``.theanorc`` (which might be CPU). Otherwise it is advisable give the number of of the target GPU directly as the automatic selection of a free GPU might not work for all drivers (it looks up the power state using nvidia-smi). If the system has only one GPU its number is 0.
+    Using ``false`` as ``gpu`` arguments means a fallback to the configured device in ``.theanorc`` (which might be CPU). Otherwise it is advisable give the number of of the target GPU directly as the automatic selection of a free GPU might not work for all drivers (it looks up the power state using nvidia-smi). If the system has only one GPU its number is 0.
 
 .. _console:
 

@@ -16,7 +16,7 @@ This page gives examples for different use cases of ELELKTRONN. Besides, the exa
 
 This task is about detecting neuron cell boundaries in 3D electron microscopy image volumes. The more general goal is to find a volume segmentation by assigning each voxel a cell ID. Predicting boundaries is a surrogate target for which a CNN can be trained (see also the note about target formulation :ref:`here <data-format>`) - the actual segmentation would be made by e.g. running a watershed on the predicted boundary map. This is a typical *img-img* task.
 
-For demonstration purpose, a very small CNN with only 70k parameters and 5 layers is used. This trains fast but is obviously limited in accuracy. To solve this task well, more training data would be required in addition.
+For demonstration purposes, a very small CNN with only 70k parameters and 5 layers is used. This trains fast but is obviously limited in accuracy. To solve this task well, more training data would be required in addition.
 
 The full configuration file can be found in ELEKTRONN's ``examples`` folder as ``neuro_3d_config.py``. Here only selected settings will be mentioned.
 
@@ -32,7 +32,7 @@ Getting Started
 
 3. Run::
 
-    elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
+    elektronn-train </path/to_config_file> [ --gpu={auto|false|<int>}]
 
 4. Inspect the printed output and the plots in the save directory
 
@@ -87,9 +87,9 @@ Config::
 
 * Of the three training data cubes the last one is used as validation data.
 * The input images are grey-valued i.e. they have only 1 channel. For this channel "grey value augmentaion" (randomised histogram distortions) are applied when sampling batches during training. This helps to achieve invariance against varying contrast and brightness gradients.
-* During patch cutting the axes are flipped and transposed as a means of data augmentation
+* During patch cutting the axes are flipped and transposed as a means of data augmentation.
 * If the data is anisotropic, the pipeline assumes that the singled-out axis is ``z``. For anisotropic data axes are not transposed in a way that axes of different resolution get mixed up.
-* For 70% of the batches the image and labels are randomly :ref:`warped <warping>`
+* For 70% of the batches the image and labels are randomly :ref:`warped <warping>`.
 
 
   .. figure::  images/debugGetCNNBatch.png
@@ -162,7 +162,7 @@ This is 2D CNN with two conv layers and two fully connected layers each with 300
 
 To run the example, make a copy of the config file and adjust the paths. Then run the ``elektronn-train`` script, and pass the path of your config file::
 
-  elektronn-train </path/to_config_file> [ --gpu={Auto|False|<int>}]
+  elektronn-train </path/to_config_file> [ --gpu={auto|false|<int>}]
 
 The output should read like this::
 
@@ -390,10 +390,3 @@ Often training data (e.g. lots of images of digits) are vastly available but nob
   for i in range(10000):
     d, l = data.getbatch(batch_size)
     cnn2.trainingStep(d, l, mode="SGD")
-
-
-..
-    RNN Example
-    ===========
-
-    Coming soon

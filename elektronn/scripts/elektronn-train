@@ -6,7 +6,7 @@
 # Max-Planck-Institute for Medical Research, Heidelberg, Germany
 # Authors: Marius Killinger, Gregor Urban
 """
-elektronn-train </path/to_config_file> [--gpu={Auto|False|<int>}]
+elektronn-train </path/to_config_file> [--gpu={auto|false|<int>}]
 """
 
 import os

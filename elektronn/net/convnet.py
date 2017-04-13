@@ -562,7 +562,7 @@ class MixedConvNN(object):
           whether to use lazy labels; this requires the auxiliary (*aux) masks
         use_label_prop: Bool
           whether to activate label propagation on unlabelled (-1) examples
-        only_forwad: Bool
+        only_forward: Bool
           This exlcudes the building of the gradient (faster)
 
         Defined functions:

@@ -33,19 +33,18 @@ def import_variable_from_file(file_path, class_name):
 
 def parseargs(gpu):
     def convert(s):
-        if s=='auto':
+        if s.lower()=='auto':
             return s
         elif s.lower()=='false':
             return False
-        elif s.lower()==None:
-            return None
         else:
             return int(s)
     
     parser = argparse.ArgumentParser(
-    usage="elektronn-train </path/to_config_file> [--gpu={Auto|False|<int>}]")
+        usage="elektronn-train </path/to_config_file> [--gpu={auto|false|<int>}]"
+    )
     
-    parser.add_argument("--gpu", default=gpu, type=convert, choices=['auto', False, None]+range(0,100))
+    parser.add_argument("--gpu", default=gpu, type=convert, choices=['auto', False]+range(0,100))
     parser.add_argument("config", type=str)
     parsed = parser.parse_args()
     return parsed.config, parsed.gpu
@@ -56,7 +55,7 @@ def parseargs_dev(args, config_file, gpu):
     """
     Parses the commandline arguments if ``elektronn-train`` is called as:
 
-    "elektronn-train [config=</path/to_file>] [ gpu={Auto|False|<int>}]"
+    "elektronn-train [config=</path/to_file>] [ gpu={auto|false|<int>}]"
     """
     for arg in args:
         if arg.startswith('gpu='):
