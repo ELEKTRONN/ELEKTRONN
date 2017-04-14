@@ -35,21 +35,18 @@ pip
 
 If you don't want to use Anaconda you can use ``pip`` instead. Then you must take care of the dependencies yourself to some degree:
 
-*  Install ELEKTRONN using python ``pip`` (options can specify target locations, editable installs etc., see ``man pip``)::
+*  Install ELEKTRONN using python ``pip`` (options can specify target locations, editable installs etc., see ``python2 -m pip help install``)::
 
-    pip install [options] elektronn
+    python2 -m pip install [options] elektronn
 
-   In the likely case that this gives you errors (amongst other reasons because pip does not install system-level dependencies), you must install missing dependencies with your system package manager e.g::
+   If you want to install ELEKTRONN from source (or the *sdist* from PyPI), you should install Cython first. For example in Ubuntu::
 
-    apt-get install python-numpy python-scipy python-matplotlib python-h5py
+    sudo apt install cython
 
-  The dependencies are listed in the file ``requirements.txt``
-
-  .. Note::
-    If ``pip install <package>`` fails due to a permission error, try ``pip install --user <package>``.
+  The full dependencies are listed in the file ``requirements.txt``
 
   .. Note::
-    Some Distributions (e.g. Arch Linux) use python3 as default, so you need to use ``pip2`` instead of ``pip``.
+    If ``python2 -m pip install <package>`` fails due to a permission error, try ``python2 -m pip install --user <package>``.
 
 * Configure theano as explained :ref:`below <theano>`
 * After installation you can optionally create a user configuration file by editing the file ``examples/config_template.py`` and putting it into your home as ``elektronn.config`` (see :ref:`configuration`)
