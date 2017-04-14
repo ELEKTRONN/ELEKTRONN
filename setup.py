@@ -40,7 +40,7 @@ ext_modules = [
 
 setup(
     name='elektronn',
-    version='1.0.13',
+    version='1.0.14',
     packages=find_packages(),
     scripts=['elektronn/scripts/elektronn-train',
              'elektronn/scripts/elektronn-profile',
@@ -50,7 +50,6 @@ setup(
         'cython>=0.23',
     ],
     install_requires=[
-        'cython>=0.23',
         'numpy>=1.8',
         'scipy>=0.14',
         'matplotlib>=1.4',
