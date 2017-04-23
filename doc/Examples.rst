@@ -112,8 +112,8 @@ Results & Comments
 
 * When running this example, commonly the NLL-loss stagnates for about ``15k`` iterations around ``0.7``. After that you should observe a clear decrease. On a desktop with a high-end GPU, with latest theano and cuDNN versions and using background processes for the batch creation the training should run ``at 15-20 it/s``.
 * Because of the (too) small training data size the validation error should stagnate soon and even go up later.
-* Because the model has too few parameters, predictions are typically not smooth and exhibit grating-like patterns - using a more complex model mitigates this effect.
-* Because the model has a small FOV (which for this task should rather be increase by more layers than more maxpooling) predictions contain a lot of "clutter" within wide cell bodies: there the CNN does not see the the cell outline which is apparently an important clue to solve this task.
+* Because the model has too few parameters, predictions are typically not smooth and exhibit grating-like patterns - using a more complex model can mitigate this effect.
+* Because the model has a small FOV (which should be increased by more layers and more maxpooling for this task), predictions contain a lot of "clutter" within wide cell bodies: there the CNN does not see the the cell outline which is apparently an important clue to solve this task.
 
 
 .. figure::  images/barrier_training_dual.gif
