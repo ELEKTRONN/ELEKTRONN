@@ -54,7 +54,7 @@ setup(
         'scipy>=0.14',
         'matplotlib>=1.4',
         'h5py>=2.2',
-        'theano>=0.7',
+        'theano>=0.7,<0.10',  # ELEKTRONN relies on the old Theano backend that has been removed now
     ],
     extras_require={
         'cross-validation': ['scikit-learn>=0.14, <0.20'],  # >=0.20 will require a change in elektronn.training.traindata

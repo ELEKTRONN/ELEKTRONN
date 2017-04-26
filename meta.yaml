@@ -8,6 +8,9 @@ package:
 source:
   path: ./
 
+build:
+  script: python setup.py install --single-version-externally-managed --record record.txt
+
 requirements:
   build:
     - python >=2.7,<3
@@ -18,7 +21,7 @@ requirements:
     - numpy >=1.8
     - scikit-learn >=0.14
     - scipy >=0.17.1
-    - theano >=0.7
+    - theano >=0.7,<0.10
     - gcc >=4.8
 
   run:
@@ -29,7 +32,7 @@ requirements:
     - numpy >=1.8
     - scikit-learn >=0.14,<0.20
     - scipy >=0.17.1
-    - theano >=0.7
+    - theano >=0.7,<0.10
 
 about:
   home: http://www.elektronn.org/
