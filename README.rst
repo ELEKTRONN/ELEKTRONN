@@ -4,6 +4,8 @@
 .. image:: http://anaconda.org/conda-forge/elektronn/badges/version.svg
     :target: http://anaconda.org/conda-forge/elektronn
 
+About ELEKTRONN
+---------------
 
 ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general Neural Networks.
 
@@ -12,6 +14,16 @@ It is written in Python 2 and based on Theano, which allows CUDA-enabled GPUs to
 The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally, the toolkit offers training routines for tasks on non-image data.
 
 ELEKTRONN was created by Marius Killinger and Gregor Urban at the Max Planck Institute For Medical Research to solve connectomics tasks.
+
+Important Note
+--------------
+
+ELEKTRONN 1.0 has been superceded by `ELEKTRONN2 <https://github.com/ELEKTRONN/ELEKTRONN2>`_.
+
+Only ELEKTRONN2 is actively developed and supported, so we encourage you to use it instead
+of ELEKTRONN 1.0. ELEKTRONN2 brings many new features and a completely new functional API,
+which allows for much greater flexibility in creating neural networks.
+
 
 .. image:: http://elektronn.org/downloads/combined_title.jpg
     :width: 1000px
