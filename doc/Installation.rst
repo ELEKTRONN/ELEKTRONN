@@ -24,11 +24,6 @@ A comfortable way to setup a python environment with common scientific python pa
 * After installation you can optionally create a user configuration file by editing the file ``examples/config_template.py`` and put it into your home directory as ``elektronn.config`` (see :ref:`configuration`)
 * Try out one of the :ref:`examples <examples>` to confirm everything works
 
-Arch
-####
-
-Users of Arch Linux can install the `AUR package elektronn <https://aur.archlinux.org/packages/elektronn/>`_ instead.
-
 
 pip
 ###

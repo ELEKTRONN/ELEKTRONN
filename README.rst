@@ -18,11 +18,7 @@ ELEKTRONN was created by Marius Killinger and Gregor Urban at the Max Planck Ins
 Important Note
 --------------
 
-ELEKTRONN 1.0 has been superceded by `ELEKTRONN2 <https://github.com/ELEKTRONN/ELEKTRONN2>`_.
-
-Only ELEKTRONN2 is actively developed and supported, so we encourage you to use it instead
-of ELEKTRONN 1.0. ELEKTRONN2 brings many new features and a completely new functional API,
-which allows for much greater flexibility in creating neural networks.
+ELEKTRONN 1.0 has been superceded by the more flexible, PyTorch-based `elektronn3 <https://github.com/ELEKTRONN/elektronn3>`_ library. elektronn3 is actively developed and supported, so we encourage you to use it instead of ELEKTRONN 1.0.
 
 
 .. image:: http://elektronn.org/downloads/combined_title.jpg

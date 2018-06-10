@@ -7,6 +7,9 @@
 Welcome to the ELEKTRONN documentation!
 =======================================
 
+.. note::
+   ELEKTRONN 1.0 has been superceded by the more flexible, PyTorch-based `elektronn3 <https://github.com/ELEKTRONN/elektronn3>`_ library.
+   elektronn3 is actively developed and supported, so we encourage you to use it instead of ELEKTRONN 1.0.
 
 ELEKTRONN is a highly configurable toolkit for training 3D/2D CNNs and general Neural Networks. The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally, the toolkit offers training routines for tasks on non-image data.
 
