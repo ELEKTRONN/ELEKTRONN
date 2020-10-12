@@ -13,12 +13,12 @@ It is written in Python 2 and based on Theano, which allows CUDA-enabled GPUs to
 
 The package includes a sophisticated training pipeline designed for classification/localisation tasks on 3D/2D images. Additionally, the toolkit offers training routines for tasks on non-image data.
 
-ELEKTRONN was created by Marius Killinger and Gregor Urban at the Max Planck Institute For Medical Research to solve connectomics tasks.
+ELEKTRONN 1.0 and 2.0 was originally created by Marius Killinger and Gregor Urban, with contributions by Sven Dorkenwald, under the supervision of Joergen Kornfeld at the Max Planck Institute For Medical Research in Heidelberg to solve connectomics tasks.
 
 Important Note
 --------------
 
-ELEKTRONN 1.0 has been superceded by the more flexible, PyTorch-based `elektronn3 <https://github.com/ELEKTRONN/elektronn3>`_ library. elektronn3 is actively developed and supported, so we encourage you to use it instead of ELEKTRONN 1.0.
+ELEKTRONN 1.0 and 2.0 has been superceded by the more flexible, PyTorch-based `elektronn3 <https://github.com/ELEKTRONN/elektronn3>`_ library. elektronn3 is actively developed and supported, so we encourage you to use it instead of ELEKTRONN 1.0/2.0.
 
 
 .. image:: http://elektronn.org/downloads/combined_title.jpg
