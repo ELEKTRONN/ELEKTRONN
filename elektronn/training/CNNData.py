@@ -728,7 +728,7 @@ class CNNData(object):
             info = self.valid_i[i]
 
         else:
-            raise ValueError("Unkonown data source")
+            raise ValueError("Unknown data source")
 
         return d, l, info
 
